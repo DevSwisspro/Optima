@@ -1,0 +1,1595 @@
+import React, { useEffect, useMemo, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Check, Plus, Trash2, Sparkles, Search, List, FileText, ShoppingCart, Wallet, TrendingUp, TrendingDown, PiggyBank, BarChart3, Calendar, Activity, X, PieChart } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import Header from "@/components/Header";
+import LogoDevSwiss from "@/components/LogoDevSwiss";
+
+// --- Constants ---
+const LS_KEY = "todo_coach_v2";
+const LS_NOTES_KEY = "todo_coach_notes_v1";
+const LS_SHOPPING_KEY = "todo_coach_shopping_v1";
+const LS_BUDGET_KEY = "todo_coach_budget_v1";
+const LS_BUDGET_ARCHIVE_KEY = "todo_coach_budget_archive";
+
+// --- Helpers ---
+const uuid = () => Math.random().toString(36).slice(2) + Date.now().toString(36);
+
+const getCurrentYear = () => new Date().getFullYear();
+const getCurrentMonth = () => new Date().getMonth();
+
+const PRIORITY_LABELS = {
+  urgent: "Urgent",
+  normal: "Normal", 
+  low: "Faible"
+};
+
+const PRIORITY_ORDER = { urgent: 0, normal: 1, low: 2 };
+
+const SHOPPING_CATEGORIES = {
+  courant: "Courses courantes",
+  futur: "Achats futurs"
+};
+
+const MEASUREMENT_UNITS = {
+  kg: "kg", g: "g", L: "L", mL: "mL", p: "p",
+  bouteilles: "bouteilles", sacs: "sacs", boites: "boîtes", paquets: "paquets",
+  conserves: "conserves", unites: "unités", pieces: "pièces"
+};
+
+const BUDGET_CATEGORIES = {
+  revenus: { salaire: "Salaire", freelance: "Freelance", autres: "Autres revenus" },
+  depenses: { logement: "Logement", transport: "Transport", alimentation: "Alimentation", loisirs: "Loisirs", sante: "Santé", autres: "Autres dépenses" },
+  epargne: { epargne: "Épargne générale", investissement: "Investissements", retraite: "Retraite" }
+};
+
+// Sound effect helper
+const ding = () => {
+  try {
+    const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmcfCCuBzvLZiScBF2u+8OacUxMOTKzn76teDQ8sb+n+8YQYBAAAAAEAAP//AAD//w==');
+    audio.volume = 0.1;
+    audio.play().catch(() => {});
+  } catch (e) {}
+};
+
+// Natural Language Processing for tasks
+const parseTaskNLP = (input) => {
+  const text = input.toLowerCase().trim();
+  let priority = "normal";
+  let cleanedText = input.trim();
+  
+  // Priority detection
+  if (text.includes("urgent") || text.includes("!!!") || text.includes("asap")) {
+    priority = "urgent";
+    cleanedText = cleanedText.replace(/urgent|!!!|asap/gi, "").trim();
+  } else if (text.includes("faible") || text.includes("low") || text.includes("plus tard")) {
+    priority = "low";
+    cleanedText = cleanedText.replace(/faible|low|plus tard/gi, "").trim();
+  }
+  
+  // Clean up multiple spaces
+  cleanedText = cleanedText.replace(/\s+/g, " ").trim();
+  
+  return { text: cleanedText, priority };
+};
+
+export default function App() {
+  // All state management
+  const [tasks, setTasks] = useState([]);
+  const [filter, setFilter] = useState({ q: "" });
+  const [input, setInput] = useState("");
+  const [priorityChoice, setPriorityChoice] = useState("normal");
+  const [showPriorityMenu, setShowPriorityMenu] = useState(false);
+  const [activeTab, setActiveTab] = useState("tasks");
+  
+  // États pour les notes
+  const [notes, setNotes] = useState([]);
+  const [noteTitle, setNoteTitle] = useState("");
+  const [noteContent, setNoteContent] = useState("");
+  const [editingNote, setEditingNote] = useState(null);
+  const [noteFilter, setNoteFilter] = useState({ q: "" });
+  
+  // États pour les courses
+  const [shoppingItems, setShoppingItems] = useState([]);
+  const [itemName, setItemName] = useState("");
+  const [itemQuantity, setItemQuantity] = useState(1);
+  const [itemUnit, setItemUnit] = useState("p");
+  const [itemCategory, setItemCategory] = useState("courant");
+  const [editingItem, setEditingItem] = useState(null);
+  const [shoppingFilter, setShoppingFilter] = useState({});
+  
+  // États pour le budget
+  const [budgetItems, setBudgetItems] = useState([
+    { id: "sample-1", amount: 3500, type: "revenus", category: "salaire", description: "Salaire principal", date: "2025-09-01" },
+    { id: "sample-2", amount: 500, type: "revenus", category: "autres", description: "Mission web", date: "2025-09-15" },
+    { id: "sample-3", amount: -1200, type: "depenses", category: "logement", description: "Loyer appartement", date: "2025-09-01" },
+    { id: "sample-4", amount: -300, type: "depenses", category: "transport", description: "Assurance auto/habitation", date: "2025-09-01" },
+    { id: "sample-5", amount: -150, type: "depenses", category: "alimentation", description: "Courses supermarché", date: "2025-09-05" },
+    { id: "sample-6", amount: -80, type: "depenses", category: "transport", description: "Essence", date: "2025-09-10" },
+    { id: "sample-7", amount: -200, type: "depenses", category: "loisirs", description: "Restaurant et cinéma", date: "2025-09-12" },
+    { id: "sample-8", amount: 800, type: "epargne", category: "epargne", description: "Virement compte épargne", date: "2025-09-25" }
+  ]);
+  const [budgetDescription, setBudgetDescription] = useState("");
+  const [budgetAmount, setBudgetAmount] = useState("");
+  const [budgetType, setBudgetType] = useState("revenus");
+  const [budgetCategory, setBudgetCategory] = useState("salaire");
+  const [budgetDate, setBudgetDate] = useState(new Date().toISOString().split('T')[0]);
+  const [editingBudgetItem, setEditingBudgetItem] = useState(null);
+  const [budgetFilter, setBudgetFilter] = useState({});
+  
+  // États pour les dashboards
+  const [budgetArchive, setBudgetArchive] = useState({});
+  const [showGlobalDashboard, setShowGlobalDashboard] = useState(false);
+  const [selectedDashboardYear, setSelectedDashboardYear] = useState(getCurrentYear());
+  const [selectedDashboardMonth, setSelectedDashboardMonth] = useState(getCurrentMonth());
+  const [dashboardView, setDashboardView] = useState("mensuelle");
+  const [showBudgetDashboard, setShowBudgetDashboard] = useState(false);
+
+  // --- Persist data in localStorage ---
+  useEffect(() => {
+    const savedTasks = JSON.parse(localStorage.getItem(LS_KEY) || "[]");
+    const savedNotes = JSON.parse(localStorage.getItem(LS_NOTES_KEY) || "[]");
+    const savedShopping = JSON.parse(localStorage.getItem(LS_SHOPPING_KEY) || "[]");
+    const savedBudget = JSON.parse(localStorage.getItem(LS_BUDGET_KEY) || "[]");
+    const savedArchive = JSON.parse(localStorage.getItem(LS_BUDGET_ARCHIVE_KEY) || "{}");
+    
+    if (savedTasks.length) setTasks(savedTasks);
+    if (savedNotes.length) setNotes(savedNotes);
+    if (savedShopping.length) setShoppingItems(savedShopping);
+    if (savedBudget.length) setBudgetItems(savedBudget);
+    if (Object.keys(savedArchive).length) setBudgetArchive(savedArchive);
+  }, []);
+
+  useEffect(() => localStorage.setItem(LS_KEY, JSON.stringify(tasks)), [tasks]);
+  useEffect(() => localStorage.setItem(LS_NOTES_KEY, JSON.stringify(notes)), [notes]);
+  useEffect(() => localStorage.setItem(LS_SHOPPING_KEY, JSON.stringify(shoppingItems)), [shoppingItems]);
+  useEffect(() => localStorage.setItem(LS_BUDGET_KEY, JSON.stringify(budgetItems)), [budgetItems]);
+  useEffect(() => localStorage.setItem(LS_BUDGET_ARCHIVE_KEY, JSON.stringify(budgetArchive)), [budgetArchive]);
+
+  // --- Task Functions ---
+  const addTask = () => {
+    const text = input.trim();
+    if (!text) return;
+    
+    const parsed = parseTaskNLP(text);
+    const newTask = {
+      id: uuid(),
+      text: parsed.text,
+      completed: false,
+      priority: parsed.priority,
+      createdAt: Date.now()
+    };
+    
+    setTasks(prev => [...prev, newTask]);
+    setInput("");
+    setPriorityChoice("normal");
+    ding();
+  };
+
+  const completeTask = (id) => {
+    setTasks(prev => 
+      prev.map(task => 
+        task.id === id ? { ...task, completed: !task.completed } : task
+      )
+    );
+    ding();
+  };
+
+  const deleteTask = (id) => {
+    setTasks(prev => prev.filter(task => task.id !== id));
+  };
+
+  const filteredTasks = useMemo(() => {
+    return tasks
+      .filter(task => {
+        if (!filter.q) return true;
+        return task.text.toLowerCase().includes(filter.q.toLowerCase());
+      })
+      .sort((a, b) => {
+        if (a.completed && !b.completed) return 1;
+        if (!a.completed && b.completed) return -1;
+        return PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority];
+      });
+  }, [tasks, filter]);
+
+  // --- Note Functions ---
+  const addNote = () => {
+    if (!noteTitle.trim() || !noteContent.trim()) return;
+    
+    const newNote = {
+      id: uuid(),
+      title: noteTitle.trim(),
+      content: noteContent.trim(),
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    };
+    
+    if (editingNote) {
+      setNotes(prev => prev.map(note => 
+        note.id === editingNote.id 
+          ? { ...newNote, id: editingNote.id, createdAt: editingNote.createdAt }
+          : note
+      ));
+      setEditingNote(null);
+    } else {
+      setNotes(prev => [...prev, newNote]);
+    }
+    
+    setNoteTitle("");
+    setNoteContent("");
+    ding();
+  };
+
+  const editNote = (note) => {
+    setEditingNote(note);
+    setNoteTitle(note.title);
+    setNoteContent(note.content);
+  };
+
+  const deleteNote = (id) => {
+    setNotes(prev => prev.filter(note => note.id !== id));
+    if (editingNote && editingNote.id === id) {
+      setEditingNote(null);
+      setNoteTitle("");
+      setNoteContent("");
+    }
+  };
+
+  const cancelEditNote = () => {
+    setEditingNote(null);
+    setNoteTitle("");
+    setNoteContent("");
+  };
+
+  const filteredNotes = useMemo(() => {
+    return notes
+      .filter(note => {
+        if (!noteFilter.q) return true;
+        return note.title.toLowerCase().includes(noteFilter.q.toLowerCase()) ||
+               note.content.toLowerCase().includes(noteFilter.q.toLowerCase());
+      })
+      .sort((a, b) => b.updatedAt - a.updatedAt);
+  }, [notes, noteFilter]);
+
+  // --- Shopping Functions ---
+  const addShoppingItem = () => {
+    if (!itemName.trim()) return;
+    
+    const newItem = {
+      id: uuid(),
+      name: itemName.trim(),
+      quantity: itemQuantity,
+      unit: itemUnit,
+      category: itemCategory,
+      completed: false,
+      createdAt: Date.now()
+    };
+    
+    if (editingItem) {
+      setShoppingItems(prev => prev.map(item => 
+        item.id === editingItem.id 
+          ? { ...newItem, id: editingItem.id, createdAt: editingItem.createdAt }
+          : item
+      ));
+      setEditingItem(null);
+    } else {
+      setShoppingItems(prev => [...prev, newItem]);
+    }
+    
+    setItemName("");
+    setItemQuantity(1);
+    setItemUnit("p");
+    setItemCategory("courant");
+    ding();
+  };
+
+  const editShoppingItem = (item) => {
+    setEditingItem(item);
+    setItemName(item.name);
+    setItemQuantity(item.quantity);
+    setItemUnit(item.unit);
+    setItemCategory(item.category);
+  };
+
+  const deleteShoppingItem = (id) => {
+    setShoppingItems(prev => prev.filter(item => item.id !== id));
+    if (editingItem && editingItem.id === id) {
+      cancelEditShoppingItem();
+    }
+  };
+
+  const completeShoppingItem = (id) => {
+    setShoppingItems(prev => 
+      prev.map(item => 
+        item.id === id ? { ...item, completed: !item.completed } : item
+      )
+    );
+    ding();
+  };
+
+  const cancelEditShoppingItem = () => {
+    setEditingItem(null);
+    setItemName("");
+    setItemQuantity(1);
+    setItemUnit("p");
+    setItemCategory("courant");
+  };
+
+  const filteredShoppingItems = useMemo(() => {
+    return shoppingItems
+      .filter(item => {
+        if (shoppingFilter.category && item.category !== shoppingFilter.category) return false;
+        if (shoppingFilter.completed !== undefined && item.completed !== shoppingFilter.completed) return false;
+        return true;
+      })
+      .sort((a, b) => {
+        if (a.completed && !b.completed) return 1;
+        if (!a.completed && b.completed) return -1;
+        return b.createdAt - a.createdAt;
+      });
+  }, [shoppingItems, shoppingFilter]);
+
+  // --- Budget Functions ---
+  const addBudgetItem = () => {
+    if (!budgetDescription.trim() || !budgetAmount.trim()) return;
+    
+    const amount = parseFloat(budgetAmount);
+    if (isNaN(amount) || amount === 0) return;
+    
+    const newItem = {
+      id: uuid(),
+      description: budgetDescription.trim(),
+      amount: budgetType === "depenses" ? -Math.abs(amount) : Math.abs(amount),
+      type: budgetType,
+      category: budgetCategory,
+      date: budgetDate,
+      createdAt: Date.now()
+    };
+    
+    if (editingBudgetItem) {
+      setBudgetItems(prev => prev.map(item => 
+        item.id === editingBudgetItem.id 
+          ? { ...newItem, id: editingBudgetItem.id, createdAt: editingBudgetItem.createdAt }
+          : item
+      ));
+      setEditingBudgetItem(null);
+    } else {
+      setBudgetItems(prev => [...prev, newItem]);
+    }
+    
+    setBudgetDescription("");
+    setBudgetAmount("");
+    setBudgetDate(new Date().toISOString().split('T')[0]);
+    ding();
+  };
+
+  const editBudgetItem = (item) => {
+    setEditingBudgetItem(item);
+    setBudgetDescription(item.description);
+    setBudgetAmount(Math.abs(item.amount).toString());
+    setBudgetType(item.type);
+    setBudgetCategory(item.category);
+    setBudgetDate(item.date);
+  };
+
+  const deleteBudgetItem = (id) => {
+    setBudgetItems(prev => prev.filter(item => item.id !== id));
+    if (editingBudgetItem && editingBudgetItem.id === id) {
+      cancelEditBudgetItem();
+    }
+  };
+
+  const cancelEditBudgetItem = () => {
+    setEditingBudgetItem(null);
+    setBudgetDescription("");
+    setBudgetAmount("");
+    setBudgetType("revenus");
+    setBudgetCategory("salaire");
+    setBudgetDate(new Date().toISOString().split('T')[0]);
+  };
+
+  const filteredBudgetItems = useMemo(() => {
+    return budgetItems
+      .filter(item => {
+        if (budgetFilter.type && item.type !== budgetFilter.type) return false;
+        if (budgetFilter.category && item.category !== budgetFilter.category) return false;
+        return true;
+      })
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
+  }, [budgetItems, budgetFilter]);
+
+  // --- Dashboard Functions ---
+  const getDashboardData = (year, month = null) => {
+    const yearData = budgetArchive[year] || {};
+    let items = [];
+    
+    if (month !== null) {
+      items = yearData[month] || [];
+    } else {
+      items = Object.values(yearData).flat();
+    }
+
+    const revenus = items.filter(item => item.type === 'revenus').reduce((sum, item) => sum + Math.abs(item.amount), 0);
+    const depensesFixes = items.filter(item => item.type === 'depenses' && ['logement', 'transport'].includes(item.category)).reduce((sum, item) => sum + Math.abs(item.amount), 0);
+    const depensesVariables = items.filter(item => item.type === 'depenses' && !['logement', 'transport'].includes(item.category)).reduce((sum, item) => sum + Math.abs(item.amount), 0);
+    const epargne = items.filter(item => item.type === 'epargne').reduce((sum, item) => sum + Math.abs(item.amount), 0);
+    const solde = revenus - depensesFixes - depensesVariables - epargne;
+
+    return { revenus, depensesFixes, depensesVariables, epargne, solde };
+  };
+
+  const archiveBudgetData = () => {
+    if (budgetItems.length === 0) return;
+    
+    const year = selectedDashboardYear;
+    const month = selectedDashboardMonth;
+    
+    setBudgetArchive(prev => ({
+      ...prev,
+      [year]: {
+        ...prev[year],
+        [month]: budgetItems.map(item => ({
+          id: item.id,
+          type: item.type,
+          category: item.category,
+          amount: Math.abs(item.amount),
+          description: item.description,
+          date: item.date
+        }))
+      }
+    }));
+    
+    setBudgetItems([]);
+  };
+
+  // Global dashboard data calculation
+  const globalData = useMemo(() => {
+    const currentMonthData = getDashboardData(getCurrentYear(), getCurrentMonth());
+    const currentYearData = getDashboardData(getCurrentYear());
+    
+    return {
+      currentMonth: currentMonthData,
+      currentYear: currentYearData,
+      tasksTotal: tasks.length,
+      tasksCompleted: tasks.filter(t => t.completed).length,
+      notesTotal: notes.length,
+      shoppingTotal: shoppingItems.length,
+      budgetItems: budgetItems.length
+    };
+  }, [tasks, notes, shoppingItems, budgetItems, budgetArchive]);
+
+  const currentBudgetSummary = useMemo(() => {
+    const revenus = budgetItems.filter(item => item.amount > 0).reduce((sum, item) => sum + item.amount, 0);
+    const depenses = budgetItems.filter(item => item.amount < 0).reduce((sum, item) => sum + Math.abs(item.amount), 0);
+    const solde = revenus - depenses;
+    
+    return { revenus, depenses, solde };
+  }, [budgetItems]);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+      <div className="flex flex-col max-w-7xl mx-auto p-6">
+        <Header showStars={true} />
+        
+        {/* Navigation tabs */}
+        <div className="flex justify-center gap-2 mb-8 p-1 bg-gray-800/50 rounded-xl backdrop-blur-sm">
+          {[
+            { key: "tasks", label: "Tâches", icon: List },
+            { key: "notes", label: "Notes", icon: FileText },
+            { key: "shopping", label: "Courses", icon: ShoppingCart },
+            { key: "budget", label: "Budget", icon: Wallet },
+            { key: "dashboard", label: "Dashboard", icon: BarChart3 }
+          ].map(tab => {
+            const IconComponent = tab.icon;
+            return (
+              <Button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                variant={activeTab === tab.key ? "default" : "ghost"}
+                className={`flex items-center gap-2 px-6 py-3 transition-all duration-200 ${
+                  activeTab === tab.key
+                    ? "bg-red-600 text-white shadow-lg transform scale-105"
+                    : "text-gray-400 hover:text-white hover:bg-gray-700"
+                }`}
+              >
+                <IconComponent className="w-4 h-4" />
+                {tab.label}
+              </Button>
+            );
+          })}
+        </div>
+
+        {/* Tasks Tab */}
+        {activeTab === "tasks" && (
+          <div className="space-y-6">
+            <div className="text-center">
+              <h2 className="text-3xl font-bold text-white mb-2">Gestionnaire de Tâches</h2>
+              <p className="text-gray-400">Organisez vos tâches avec intelligence</p>
+            </div>
+            
+            {/* Add task form */}
+            <Card className="bg-gray-800/50 border-gray-700">
+              <CardContent className="p-6">
+                <div className="flex gap-3">
+                  <Input
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder="Nouvelle tâche... (utilisez 'urgent' pour haute priorité)"
+                    className="flex-1 bg-gray-700 border-gray-600 text-white placeholder:text-gray-400"
+                    onKeyPress={(e) => e.key === "Enter" && addTask()}
+                  />
+                  <Button 
+                    onClick={addTask}
+                    className="bg-red-600 hover:bg-red-700 px-6"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Ajouter
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Search and filters */}
+            <Card className="bg-gray-800/50 border-gray-700">
+              <CardContent className="p-4">
+                <div className="flex gap-3">
+                  <div className="flex-1">
+                    <Input
+                      value={filter.q}
+                      onChange={(e) => setFilter({...filter, q: e.target.value})}
+                      placeholder="Rechercher une tâche..."
+                      className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400"
+                    />
+                  </div>
+                  <Search className="w-5 h-5 text-gray-400 my-auto" />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Tasks list */}
+            <div className="space-y-3">
+              <AnimatePresence>
+                {filteredTasks.map(task => (
+                  <motion.div
+                    key={task.id}
+                    layout
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    className={`p-4 rounded-xl border transition-all duration-200 ${
+                      task.completed
+                        ? "bg-green-900/20 border-green-700"
+                        : "bg-gray-800/50 border-gray-700"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Button
+                        onClick={() => completeTask(task.id)}
+                        variant="ghost"
+                        size="sm"
+                        className={`p-2 rounded-lg ${
+                          task.completed
+                            ? "bg-green-600 text-white"
+                            : "bg-gray-700 hover:bg-gray-600 text-gray-300"
+                        }`}
+                      >
+                        <Check className="w-4 h-4" />
+                      </Button>
+                      
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className={`text-lg ${
+                            task.completed ? "text-gray-400 line-through" : "text-white"
+                          }`}>
+                            {task.text}
+                          </span>
+                          <Badge
+                            variant={
+                              task.priority === "urgent" ? "destructive" :
+                              task.priority === "low" ? "secondary" : "default"
+                            }
+                            className="ml-2"
+                          >
+                            {PRIORITY_LABELS[task.priority]}
+                          </Badge>
+                        </div>
+                        <div className="text-xs text-gray-400">
+                          Créée le {new Date(task.createdAt).toLocaleDateString()}
+                        </div>
+                      </div>
+                      
+                      <Button
+                        onClick={() => deleteTask(task.id)}
+                        variant="ghost"
+                        size="sm"
+                        className="p-2 text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+
+            {filteredTasks.length === 0 && (
+              <div className="text-center py-12">
+                <Sparkles className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-300 mb-2">Aucune tâche trouvée</h3>
+                <p className="text-gray-500">
+                  {filter.q ? "Essayez un autre terme de recherche" : "Commencez par ajouter une nouvelle tâche"}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Notes Tab */}
+        {activeTab === "notes" && (
+          <div className="space-y-6">
+            <div className="text-center">
+              <h2 className="text-3xl font-bold text-white mb-2">Gestionnaire de Notes</h2>
+              <p className="text-gray-400">Capturez vos idées et réflexions</p>
+            </div>
+            
+            {/* Add note form */}
+            <Card className="bg-gray-800/50 border-gray-700">
+              <CardContent className="p-6 space-y-4">
+                <Input
+                  value={noteTitle}
+                  onChange={(e) => setNoteTitle(e.target.value)}
+                  placeholder="Titre de la note..."
+                  className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400"
+                />
+                <textarea
+                  value={noteContent}
+                  onChange={(e) => setNoteContent(e.target.value)}
+                  placeholder="Contenu de la note..."
+                  rows={4}
+                  className="w-full p-3 rounded-lg bg-gray-700 border border-gray-600 text-white placeholder:text-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-red-500"
+                />
+                <div className="flex gap-3">
+                  <Button 
+                    onClick={addNote}
+                    className="bg-red-600 hover:bg-red-700 flex-1"
+                    disabled={!noteTitle.trim() || !noteContent.trim()}
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    {editingNote ? "Modifier la note" : "Ajouter la note"}
+                  </Button>
+                  {editingNote && (
+                    <Button 
+                      onClick={cancelEditNote}
+                      variant="outline"
+                      className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                    >
+                      Annuler
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Search notes */}
+            <Card className="bg-gray-800/50 border-gray-700">
+              <CardContent className="p-4">
+                <div className="flex gap-3">
+                  <div className="flex-1">
+                    <Input
+                      value={noteFilter.q}
+                      onChange={(e) => setNoteFilter({...noteFilter, q: e.target.value})}
+                      placeholder="Rechercher dans les notes..."
+                      className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400"
+                    />
+                  </div>
+                  <Search className="w-5 h-5 text-gray-400 my-auto" />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Notes list */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <AnimatePresence>
+                {filteredNotes.map(note => (
+                  <motion.div
+                    key={note.id}
+                    layout
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    className="bg-gray-800/50 border border-gray-700 rounded-xl p-4 hover:border-gray-600 transition-colors"
+                  >
+                    <div className="flex justify-between items-start mb-3">
+                      <h3 className="text-lg font-semibold text-white truncate flex-1 mr-2">
+                        {note.title}
+                      </h3>
+                      <div className="flex gap-1">
+                        <Button
+                          onClick={() => editNote(note)}
+                          variant="ghost"
+                          size="sm"
+                          className="p-1 text-gray-400 hover:text-white"
+                        >
+                          <FileText className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          onClick={() => deleteNote(note.id)}
+                          variant="ghost"
+                          size="sm"
+                          className="p-1 text-red-400 hover:text-red-300"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <p className="text-gray-300 text-sm mb-3 line-clamp-3">
+                      {note.content}
+                    </p>
+                    
+                    <div className="text-xs text-gray-400">
+                      Modifiée le {new Date(note.updatedAt).toLocaleDateString()}
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+
+            {filteredNotes.length === 0 && (
+              <div className="text-center py-12">
+                <FileText className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-300 mb-2">Aucune note trouvée</h3>
+                <p className="text-gray-500">
+                  {noteFilter.q ? "Essayez un autre terme de recherche" : "Commencez par créer votre première note"}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Shopping Tab */}
+        {activeTab === "shopping" && (
+          <div className="space-y-6">
+            <div className="text-center">
+              <h2 className="text-3xl font-bold text-white mb-2">Liste de Courses</h2>
+              <p className="text-gray-400">Gérez vos achats courants et futurs</p>
+            </div>
+            
+            {/* Add shopping item form */}
+            <Card className="bg-gray-800/50 border-gray-700">
+              <CardContent className="p-6 space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                  <Input
+                    value={itemName}
+                    onChange={(e) => setItemName(e.target.value)}
+                    placeholder="Nom de l'article..."
+                    className="md:col-span-2 bg-gray-700 border-gray-600 text-white placeholder:text-gray-400"
+                  />
+                  <Input
+                    type="number"
+                    value={itemQuantity}
+                    onChange={(e) => setItemQuantity(parseInt(e.target.value) || 1)}
+                    min="1"
+                    className="bg-gray-700 border-gray-600 text-white"
+                  />
+                  <Select value={itemUnit} onValueChange={setItemUnit}>
+                    <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-gray-700 border-gray-600">
+                      {Object.entries(MEASUREMENT_UNITS).map(([key, value]) => (
+                        <SelectItem key={key} value={key} className="text-white hover:bg-gray-600">
+                          {value}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="flex gap-3">
+                  <Select value={itemCategory} onValueChange={setItemCategory}>
+                    <SelectTrigger className="flex-1 bg-gray-700 border-gray-600 text-white">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-gray-700 border-gray-600">
+                      {Object.entries(SHOPPING_CATEGORIES).map(([key, value]) => (
+                        <SelectItem key={key} value={key} className="text-white hover:bg-gray-600">
+                          {value}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  
+                  <Button 
+                    onClick={addShoppingItem}
+                    className="bg-red-600 hover:bg-red-700"
+                    disabled={!itemName.trim()}
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    {editingItem ? "Modifier" : "Ajouter"}
+                  </Button>
+                  
+                  {editingItem && (
+                    <Button 
+                      onClick={cancelEditShoppingItem}
+                      variant="outline"
+                      className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                    >
+                      Annuler
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Shopping filters */}
+            <Card className="bg-gray-800/50 border-gray-700">
+              <CardContent className="p-4">
+                <div className="flex gap-3">
+                  <Select 
+                    value={shoppingFilter.category || ""} 
+                    onValueChange={(value) => setShoppingFilter({...shoppingFilter, category: value || undefined})}
+                  >
+                    <SelectTrigger className="flex-1 bg-gray-700 border-gray-600 text-white">
+                      <SelectValue placeholder="Toutes les catégories" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-gray-700 border-gray-600">
+                      <SelectItem value="" className="text-white hover:bg-gray-600">Toutes les catégories</SelectItem>
+                      {Object.entries(SHOPPING_CATEGORIES).map(([key, value]) => (
+                        <SelectItem key={key} value={key} className="text-white hover:bg-gray-600">
+                          {value}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  
+                  <Select 
+                    value={shoppingFilter.completed !== undefined ? shoppingFilter.completed.toString() : ""} 
+                    onValueChange={(value) => setShoppingFilter({...shoppingFilter, completed: value ? value === "true" : undefined})}
+                  >
+                    <SelectTrigger className="flex-1 bg-gray-700 border-gray-600 text-white">
+                      <SelectValue placeholder="Tous les statuts" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-gray-700 border-gray-600">
+                      <SelectItem value="" className="text-white hover:bg-gray-600">Tous les statuts</SelectItem>
+                      <SelectItem value="false" className="text-white hover:bg-gray-600">À acheter</SelectItem>
+                      <SelectItem value="true" className="text-white hover:bg-gray-600">Acheté</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Shopping items list */}
+            <div className="space-y-3">
+              <AnimatePresence>
+                {filteredShoppingItems.map(item => (
+                  <motion.div
+                    key={item.id}
+                    layout
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    className={`p-4 rounded-xl border transition-all duration-200 ${
+                      item.completed
+                        ? "bg-green-900/20 border-green-700"
+                        : "bg-gray-800/50 border-gray-700"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Button
+                        onClick={() => completeShoppingItem(item.id)}
+                        variant="ghost"
+                        size="sm"
+                        className={`p-2 rounded-lg ${
+                          item.completed
+                            ? "bg-green-600 text-white"
+                            : "bg-gray-700 hover:bg-gray-600 text-gray-300"
+                        }`}
+                      >
+                        <Check className="w-4 h-4" />
+                      </Button>
+                      
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className={`text-lg font-medium ${
+                            item.completed ? "text-gray-400 line-through" : "text-white"
+                          }`}>
+                            {item.name}
+                          </span>
+                          <Badge variant="outline" className="border-gray-600 text-gray-300">
+                            {item.quantity} {MEASUREMENT_UNITS[item.unit]}
+                          </Badge>
+                          <Badge
+                            variant={item.category === "courant" ? "default" : "secondary"}
+                          >
+                            {SHOPPING_CATEGORIES[item.category]}
+                          </Badge>
+                        </div>
+                        <div className="text-xs text-gray-400">
+                          Ajouté le {new Date(item.createdAt).toLocaleDateString()}
+                        </div>
+                      </div>
+                      
+                      <div className="flex gap-1">
+                        <Button
+                          onClick={() => editShoppingItem(item)}
+                          variant="ghost"
+                          size="sm"
+                          className="p-2 text-gray-400 hover:text-white hover:bg-gray-700"
+                        >
+                          <FileText className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          onClick={() => deleteShoppingItem(item.id)}
+                          variant="ghost"
+                          size="sm"
+                          className="p-2 text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+
+            {filteredShoppingItems.length === 0 && (
+              <div className="text-center py-12">
+                <ShoppingCart className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-300 mb-2">Aucun article trouvé</h3>
+                <p className="text-gray-500">
+                  {Object.keys(shoppingFilter).length > 0 ? "Essayez d'ajuster les filtres" : "Commencez par ajouter votre premier article"}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Budget Tab */}
+        {activeTab === "budget" && (
+          <div className="space-y-6">
+            <div className="text-center">
+              <h2 className="text-3xl font-bold text-white mb-2">Gestionnaire de Budget</h2>
+              <p className="text-gray-400">Suivez vos revenus, dépenses et épargne</p>
+            </div>
+            
+            {/* Budget summary */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card className="bg-gradient-to-br from-green-600 to-green-700 border-green-500">
+                <CardContent className="p-6 text-center">
+                  <div className="flex items-center justify-center mb-3">
+                    <TrendingUp className="w-8 h-8 text-white" />
+                  </div>
+                  <div className="text-3xl font-bold text-white mb-1">
+                    {currentBudgetSummary.revenus.toFixed(2)} CHF
+                  </div>
+                  <div className="text-green-100">Revenus</div>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-gradient-to-br from-red-600 to-red-700 border-red-500">
+                <CardContent className="p-6 text-center">
+                  <div className="flex items-center justify-center mb-3">
+                    <TrendingDown className="w-8 h-8 text-white" />
+                  </div>
+                  <div className="text-3xl font-bold text-white mb-1">
+                    {currentBudgetSummary.depenses.toFixed(2)} CHF
+                  </div>
+                  <div className="text-red-100">Dépenses</div>
+                </CardContent>
+              </Card>
+              
+              <Card className={`bg-gradient-to-br ${currentBudgetSummary.solde >= 0 ? 'from-emerald-600 to-emerald-700 border-emerald-500' : 'from-red-600 to-red-700 border-red-500'}`}>
+                <CardContent className="p-6 text-center">
+                  <div className="flex items-center justify-center mb-3">
+                    <Wallet className="w-8 h-8 text-white" />
+                  </div>
+                  <div className="text-3xl font-bold text-white mb-1">
+                    {currentBudgetSummary.solde.toFixed(2)} CHF
+                  </div>
+                  <div className="text-white/80">Solde</div>
+                </CardContent>
+              </Card>
+            </div>
+            
+            {/* Add budget item form */}
+            <Card className="bg-gray-800/50 border-gray-700">
+              <CardContent className="p-6 space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <Input
+                    value={budgetDescription}
+                    onChange={(e) => setBudgetDescription(e.target.value)}
+                    placeholder="Description..."
+                    className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400"
+                  />
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={budgetAmount}
+                    onChange={(e) => setBudgetAmount(e.target.value)}
+                    placeholder="Montant..."
+                    className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400"
+                  />
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <Select value={budgetType} onValueChange={(value) => {
+                    setBudgetType(value);
+                    setBudgetCategory(Object.keys(BUDGET_CATEGORIES[value])[0]);
+                  }}>
+                    <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-gray-700 border-gray-600">
+                      <SelectItem value="revenus" className="text-white hover:bg-gray-600">Revenus</SelectItem>
+                      <SelectItem value="depenses" className="text-white hover:bg-gray-600">Dépenses</SelectItem>
+                      <SelectItem value="epargne" className="text-white hover:bg-gray-600">Épargne</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  
+                  <Select value={budgetCategory} onValueChange={setBudgetCategory}>
+                    <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-gray-700 border-gray-600">
+                      {Object.entries(BUDGET_CATEGORIES[budgetType]).map(([key, value]) => (
+                        <SelectItem key={key} value={key} className="text-white hover:bg-gray-600">
+                          {value}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  
+                  <Input
+                    type="date"
+                    value={budgetDate}
+                    onChange={(e) => setBudgetDate(e.target.value)}
+                    className="bg-gray-700 border-gray-600 text-white"
+                  />
+                </div>
+                
+                <div className="flex gap-3">
+                  <Button 
+                    onClick={addBudgetItem}
+                    className="bg-red-600 hover:bg-red-700 flex-1"
+                    disabled={!budgetDescription.trim() || !budgetAmount.trim()}
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    {editingBudgetItem ? "Modifier l'élément" : "Ajouter l'élément"}
+                  </Button>
+                  {editingBudgetItem && (
+                    <Button 
+                      onClick={cancelEditBudgetItem}
+                      variant="outline"
+                      className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                    >
+                      Annuler
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Budget filters */}
+            <Card className="bg-gray-800/50 border-gray-700">
+              <CardContent className="p-4">
+                <div className="flex gap-3">
+                  <Select 
+                    value={budgetFilter.type || ""} 
+                    onValueChange={(value) => setBudgetFilter({...budgetFilter, type: value || undefined})}
+                  >
+                    <SelectTrigger className="flex-1 bg-gray-700 border-gray-600 text-white">
+                      <SelectValue placeholder="Tous les types" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-gray-700 border-gray-600">
+                      <SelectItem value="" className="text-white hover:bg-gray-600">Tous les types</SelectItem>
+                      <SelectItem value="revenus" className="text-white hover:bg-gray-600">Revenus</SelectItem>
+                      <SelectItem value="depenses" className="text-white hover:bg-gray-600">Dépenses</SelectItem>
+                      <SelectItem value="epargne" className="text-white hover:bg-gray-600">Épargne</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Budget items list */}
+            <div className="space-y-3">
+              <AnimatePresence>
+                {filteredBudgetItems.map(item => (
+                  <motion.div
+                    key={item.id}
+                    layout
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    className={`p-4 rounded-xl border transition-all duration-200 ${
+                      item.type === "revenus" 
+                        ? "bg-green-900/20 border-green-700"
+                        : item.type === "depenses"
+                        ? "bg-red-900/20 border-red-700"
+                        : "bg-blue-900/20 border-blue-700"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`p-2 rounded-lg ${
+                        item.type === "revenus"
+                          ? "bg-green-600 text-white"
+                          : item.type === "depenses"
+                          ? "bg-red-600 text-white"
+                          : "bg-blue-600 text-white"
+                      }`}>
+                        {item.type === "revenus" ? (
+                          <TrendingUp className="w-4 h-4" />
+                        ) : item.type === "depenses" ? (
+                          <TrendingDown className="w-4 h-4" />
+                        ) : (
+                          <PiggyBank className="w-4 h-4" />
+                        )}
+                      </div>
+                      
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-lg font-medium text-white">
+                            {item.description}
+                          </span>
+                          <Badge
+                            variant={
+                              item.type === "revenus" ? "default" :
+                              item.type === "depenses" ? "destructive" : "secondary"
+                            }
+                          >
+                            {BUDGET_CATEGORIES[item.type][item.category]}
+                          </Badge>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <span className={`text-lg font-bold ${
+                            item.type === "revenus" ? "text-green-400" :
+                            item.type === "depenses" ? "text-red-400" : "text-blue-400"
+                          }`}>
+                            {item.amount > 0 ? "+" : ""}{item.amount.toFixed(2)} CHF
+                          </span>
+                          <span className="text-xs text-gray-400">
+                            {new Date(item.date).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="flex gap-1">
+                        <Button
+                          onClick={() => editBudgetItem(item)}
+                          variant="ghost"
+                          size="sm"
+                          className="p-2 text-gray-400 hover:text-white hover:bg-gray-700"
+                        >
+                          <FileText className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          onClick={() => deleteBudgetItem(item.id)}
+                          variant="ghost"
+                          size="sm"
+                          className="p-2 text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+
+            {filteredBudgetItems.length === 0 && (
+              <div className="text-center py-12">
+                <Wallet className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-300 mb-2">Aucun élément budgétaire trouvé</h3>
+                <p className="text-gray-500">
+                  {Object.keys(budgetFilter).length > 0 ? "Essayez d'ajuster les filtres" : "Commencez par ajouter votre premier élément budgétaire"}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Dashboard Global */}
+        {activeTab === "dashboard" && (
+          <div className="space-y-8">
+            <div className="text-center">
+              <h2 className="text-3xl font-bold text-white mb-2">Dashboard Global</h2>
+              <p className="text-gray-400">Vue d'ensemble de votre productivité</p>
+            </div>
+            
+            {/* Indicateurs principaux */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <Card className="bg-gradient-to-br from-blue-600 to-blue-700 border-blue-500">
+                <CardContent className="p-6 text-center">
+                  <div className="flex items-center justify-center mb-3">
+                    <List className="w-8 h-8 text-white" />
+                  </div>
+                  <div className="text-3xl font-bold text-white mb-1">
+                    {globalData.tasksCompleted}/{globalData.tasksTotal}
+                  </div>
+                  <div className="text-blue-100">Tâches complétées</div>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-gradient-to-br from-green-600 to-green-700 border-green-500">
+                <CardContent className="p-6 text-center">
+                  <div className="flex items-center justify-center mb-3">
+                    <TrendingUp className="w-8 h-8 text-white" />
+                  </div>
+                  <div className="text-3xl font-bold text-white mb-1">
+                    {currentBudgetSummary.revenus.toFixed(0)} CHF
+                  </div>
+                  <div className="text-green-100">Revenus actuels</div>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-gradient-to-br from-purple-600 to-purple-700 border-purple-500">
+                <CardContent className="p-6 text-center">
+                  <div className="flex items-center justify-center mb-3">
+                    <FileText className="w-8 h-8 text-white" />
+                  </div>
+                  <div className="text-3xl font-bold text-white mb-1">
+                    {globalData.notesTotal}
+                  </div>
+                  <div className="text-purple-100">Notes créées</div>
+                </CardContent>
+              </Card>
+              
+              <Card className={`bg-gradient-to-br ${currentBudgetSummary.solde >= 0 ? 'from-emerald-600 to-emerald-700 border-emerald-500' : 'from-red-600 to-red-700 border-red-500'}`}>
+                <CardContent className="p-6 text-center">
+                  <div className="flex items-center justify-center mb-3">
+                    <Wallet className="w-8 h-8 text-white" />
+                  </div>
+                  <div className="text-3xl font-bold text-white mb-1">
+                    {currentBudgetSummary.solde.toFixed(0)} CHF
+                  </div>
+                  <div className="text-white/80">Solde actuel</div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Activité récente */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card className="bg-gray-800/50 border-gray-700">
+                <CardContent className="p-6">
+                  <h3 className="text-xl font-bold text-white mb-4">Statistiques Générales</h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-300">Articles de courses:</span>
+                      <span className="text-white font-semibold">{globalData.shoppingTotal}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-300">Éléments budgétaires:</span>
+                      <span className="text-white font-semibold">{globalData.budgetItems}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-300">Taux de completion tâches:</span>
+                      <span className="text-white font-semibold">
+                        {globalData.tasksTotal > 0 ? Math.round((globalData.tasksCompleted / globalData.tasksTotal) * 100) : 0}%
+                      </span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gray-800/50 border-gray-700">
+                <CardContent className="p-6">
+                  <h3 className="text-xl font-bold text-white mb-4">Actions Rapides</h3>
+                  <div className="space-y-3">
+                    <Button 
+                      onClick={() => setActiveTab("tasks")}
+                      variant="outline" 
+                      className="w-full border-gray-600 text-gray-300 hover:bg-gray-700 justify-start"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Ajouter une tâche
+                    </Button>
+                    <Button 
+                      onClick={() => setActiveTab("notes")}
+                      variant="outline" 
+                      className="w-full border-gray-600 text-gray-300 hover:bg-gray-700 justify-start"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Créer une note
+                    </Button>
+                    <Button 
+                      onClick={() => setActiveTab("shopping")}
+                      variant="outline" 
+                      className="w-full border-gray-600 text-gray-300 hover:bg-gray-700 justify-start"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Ajouter un article
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Bouton d'accès au Dashboard Budget */}
+            <div className="flex justify-center">
+              <Button 
+                onClick={() => setShowBudgetDashboard(true)}
+                className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-lg transform hover:scale-105 transition-all duration-200"
+              >
+                <BarChart3 className="w-5 h-5 mr-2" />
+                Accéder au Budget Détaillé
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Modal Dashboard Budget Détaillé */}
+        {showBudgetDashboard && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+            <div className="bg-gray-900 rounded-xl p-6 max-w-7xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-white">Dashboard Budget Spécialisé</h2>
+                <div className="flex gap-3">
+                  <Select value={selectedDashboardYear.toString()} onValueChange={(value) => setSelectedDashboardYear(parseInt(value))}>
+                    <SelectTrigger className="w-32 bg-gray-700 text-white border-gray-600">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-gray-800 border-gray-600">
+                      <SelectItem value="2023" className="text-white focus:bg-gray-700">2023</SelectItem>
+                      <SelectItem value="2024" className="text-white focus:bg-gray-700">2024</SelectItem>
+                      <SelectItem value="2025" className="text-white focus:bg-gray-700">2025</SelectItem>
+                      <SelectItem value="2026" className="text-white focus:bg-gray-700">2026</SelectItem>
+                      <SelectItem value="2027" className="text-white focus:bg-gray-700">2027</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    onClick={() => setShowBudgetDashboard(false)}
+                    variant="outline"
+                    size="icon"
+                    className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+
+              {/* Navigation par onglets */}
+              <div className="flex gap-1 mb-6 p-1 bg-gray-800 rounded-lg">
+                <Button
+                  onClick={() => setDashboardView("mensuelle")}
+                  variant={dashboardView === "mensuelle" ? "default" : "ghost"}
+                  className={`flex-1 h-10 ${dashboardView === "mensuelle" ? "bg-red-600 text-white" : "text-gray-400 hover:text-white hover:bg-gray-700"}`}
+                >
+                  📅 Vue Mensuelle
+                </Button>
+                <Button
+                  onClick={() => setDashboardView("annuelle")}
+                  variant={dashboardView === "annuelle" ? "default" : "ghost"}
+                  className={`flex-1 h-10 ${dashboardView === "annuelle" ? "bg-red-600 text-white" : "text-gray-400 hover:text-white hover:bg-gray-700"}`}
+                >
+                  📆 Vue Annuelle
+                </Button>
+                <Button
+                  onClick={() => setDashboardView("categories")}
+                  variant={dashboardView === "categories" ? "default" : "ghost"}
+                  className={`flex-1 h-10 ${dashboardView === "categories" ? "bg-red-600 text-white" : "text-gray-400 hover:text-white hover:bg-gray-700"}`}
+                >
+                  🏷️ Vue Catégories
+                </Button>
+              </div>
+
+              {/* Contenu conditionnel selon l'onglet */}
+              {(() => {
+                const monthlyData = getDashboardData(selectedDashboardYear, selectedDashboardMonth);
+                const yearlyData = getDashboardData(selectedDashboardYear);
+                const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 
+                                   'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+                
+                if (dashboardView === "mensuelle") {
+                  return (
+                    <div className="space-y-6">
+                      {/* Sélecteur de mois pour la vue mensuelle */}
+                      <div className="flex justify-center">
+                        <Select value={selectedDashboardMonth.toString()} onValueChange={(value) => setSelectedDashboardMonth(parseInt(value))}>
+                          <SelectTrigger className="w-48 bg-gray-700 text-white border-gray-600">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="bg-gray-800 border-gray-600">
+                            {monthNames.map((name, index) => (
+                              <SelectItem key={index} value={index.toString()} className="text-white focus:bg-gray-700">
+                                {name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* En-tête avec période sélectionnée */}
+                      <div className="text-center">
+                        <h3 className="text-xl font-semibold text-white">
+                          {monthNames[selectedDashboardMonth]} {selectedDashboardYear}
+                        </h3>
+                        <p className="text-gray-400">Vue détaillée du mois</p>
+                      </div>
+
+                      {/* Résumé mensuel */}
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <Card className="bg-green-600 border-green-500">
+                          <CardContent className="p-6 text-center">
+                            <div className="flex items-center justify-center mb-3">
+                              <TrendingUp className="w-8 h-8 text-white" />
+                            </div>
+                            <div className="text-3xl font-bold text-white">{monthlyData.revenus.toFixed(0)} CHF</div>
+                            <div className="text-green-100">Revenus</div>
+                          </CardContent>
+                        </Card>
+                        
+                        <Card className="bg-red-600 border-red-500">
+                          <CardContent className="p-6 text-center">
+                            <div className="flex items-center justify-center mb-3">
+                              <TrendingDown className="w-8 h-8 text-white" />
+                            </div>
+                            <div className="text-3xl font-bold text-white">
+                              {(monthlyData.depensesFixes + monthlyData.depensesVariables).toFixed(0)} CHF
+                            </div>
+                            <div className="text-red-100">Dépenses</div>
+                          </CardContent>
+                        </Card>
+                        
+                        <Card className="bg-purple-600 border-purple-500">
+                          <CardContent className="p-6 text-center">
+                            <div className="flex items-center justify-center mb-3">
+                              <PiggyBank className="w-8 h-8 text-white" />
+                            </div>
+                            <div className="text-3xl font-bold text-white">{monthlyData.epargne.toFixed(0)} CHF</div>
+                            <div className="text-purple-100">Épargne</div>
+                          </CardContent>
+                        </Card>
+                        
+                        <Card className={`${monthlyData.solde >= 0 ? 'bg-green-600 border-green-500' : 'bg-red-600 border-red-500'}`}>
+                          <CardContent className="p-6 text-center">
+                            <div className="flex items-center justify-center mb-3">
+                              <Wallet className="w-8 h-8 text-white" />
+                            </div>
+                            <div className="text-3xl font-bold text-white">{monthlyData.solde.toFixed(0)} CHF</div>
+                            <div className="text-gray-100">Solde Net</div>
+                          </CardContent>
+                        </Card>
+                      </div>
+
+                      {/* Graphiques pour vue mensuelle */}
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {/* Graphique en barres */}
+                        <Card className="bg-gray-800 border-gray-700">
+                          <CardContent className="p-6">
+                            <h3 className="text-lg font-semibold text-white mb-4">Revenus vs Dépenses</h3>
+                            <div className="h-64 bg-gray-900/50 rounded-lg p-6 flex items-end justify-center gap-8">
+                              <div className="flex flex-col items-center">
+                                <div 
+                                  className="w-16 bg-gradient-to-t from-green-600 to-green-400 rounded-t-lg"
+                                  style={{height: `${(monthlyData.revenus / Math.max(monthlyData.revenus, monthlyData.depensesFixes + monthlyData.depensesVariables)) * 180}px`}}
+                                ></div>
+                                <div className="text-green-400 font-semibold mt-2 text-center">
+                                  <div>{monthlyData.revenus.toFixed(0)}CHF</div>
+                                  <div className="text-sm">Revenus</div>
+                                </div>
+                              </div>
+                              <div className="flex flex-col items-center">
+                                <div 
+                                  className="w-16 bg-gradient-to-t from-red-600 to-red-400 rounded-t-lg"
+                                  style={{height: `${((monthlyData.depensesFixes + monthlyData.depensesVariables) / Math.max(monthlyData.revenus, monthlyData.depensesFixes + monthlyData.depensesVariables)) * 180}px`}}
+                                ></div>
+                                <div className="text-red-400 font-semibold mt-2 text-center">
+                                  <div>{(monthlyData.depensesFixes + monthlyData.depensesVariables).toFixed(0)}CHF</div>
+                                  <div className="text-sm">Dépenses</div>
+                                </div>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+
+                        {/* Graphique camembert */}
+                        <Card className="bg-gray-800 border-gray-700">
+                          <CardContent className="p-6">
+                            <h3 className="text-lg font-semibold text-white mb-4">Répartition Budget</h3>
+                            <div className="h-64 bg-gray-900/50 rounded-lg p-6 flex items-center justify-center">
+                              {(() => {
+                                const total = monthlyData.revenus;
+                                if (total === 0) return <div className="text-gray-400">Aucune donnée</div>;
+                                
+                                const depensesPercent = ((monthlyData.depensesFixes + monthlyData.depensesVariables) / total) * 100;
+                                const epargnePercent = (monthlyData.epargne / total) * 100;
+                                const soldePercent = (monthlyData.solde / total) * 100;
+                                
+                                return (
+                                  <div className="relative">
+                                    <svg viewBox="0 0 120 120" className="w-40 h-40">
+                                      <circle cx="60" cy="60" r="50" fill="none" stroke="#374151" strokeWidth="8"/>
+                                      <circle cx="60" cy="60" r="50" fill="none" stroke="#ef4444" strokeWidth="8"
+                                        strokeDasharray={`${(depensesPercent / 100) * 314} 314`} strokeDashoffset="0" transform="rotate(-90 60 60)" />
+                                      <circle cx="60" cy="60" r="50" fill="none" stroke="#8b5cf6" strokeWidth="8"
+                                        strokeDasharray={`${(epargnePercent / 100) * 314} 314`} strokeDashoffset={`-${(depensesPercent / 100) * 314}`} transform="rotate(-90 60 60)" />
+                                    </svg>
+                                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                      <div className="text-lg font-bold text-white">{total.toFixed(0)}CHF</div>
+                                      <div className="text-xs text-gray-400">Total</div>
+                                    </div>
+                                  </div>
+                                );
+                              })()}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </div>
+
+                      {/* Graphique courbe d'évolution */}
+                      <Card className="bg-gray-800 border-gray-700">
+                        <CardContent className="p-6">
+                          <h3 className="text-lg font-semibold text-white mb-4">Évolution sur 3 Mois</h3>
+                          <div className="h-64 bg-gray-900/50 rounded-lg p-6">
+                            {(() => {
+                              const months = ['Juil', 'Août', 'Sept'];
+                              const data = [
+                                { revenus: 5200, depenses: 1800, epargne: 700 },
+                                { revenus: 5400, depenses: 1750, epargne: 750 },
+                                { revenus: monthlyData.revenus, depenses: monthlyData.depensesFixes + monthlyData.depensesVariables, epargne: monthlyData.epargne }
+                              ];
+                              
+                              const maxValue = Math.max(...data.map(d => Math.max(d.revenus, d.depenses, d.epargne)));
+                              const chartWidth = 600;
+                              const chartHeight = 200;
+                              
+                              return (
+                                <svg viewBox={`0 0 ${chartWidth} ${chartHeight + 80}`} className="w-full h-full">
+                                  <defs>
+                                    <pattern id="grid-monthly" width="50" height="50" patternUnits="userSpaceOnUse">
+                                      <path d="M 50 0 L 0 0 0 50" fill="none" stroke="#374151" strokeWidth="0.5" opacity="0.3"/>
+                                    </pattern>
+                                  </defs>
+                                  <rect width={chartWidth} height={chartHeight} fill="url(#grid-monthly)" />
+                                  
+                                  <polyline fill="none" stroke="#10b981" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"
+                                    points={data.map((d, i) => `${(i / 2) * (chartWidth - 60) + 30},${chartHeight - (d.revenus / maxValue) * (chartHeight - 40) - 20}`).join(' ')} />
+                                  <polyline fill="none" stroke="#ef4444" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"
+                                    points={data.map((d, i) => `${(i / 2) * (chartWidth - 60) + 30},${chartHeight - (d.depenses / maxValue) * (chartHeight - 40) - 20}`).join(' ')} />
+                                  <polyline fill="none" stroke="#8b5cf6" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"
+                                    points={data.map((d, i) => `${(i / 2) * (chartWidth - 60) + 30},${chartHeight - (d.epargne / maxValue) * (chartHeight - 40) - 20}`).join(' ')} />
+                                  
+                                  {months.map((month, index) => (
+                                    <text key={month} x={(index / 2) * (chartWidth - 60) + 30} y={chartHeight + 40} textAnchor="middle" className="text-sm fill-gray-300">{month}</text>
+                                  ))}
+                                </svg>
+                              );
+                            })()}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  );
+                }
+                
+                return <div className="text-center text-gray-400">Vue en développement...</div>;
+              })()}
+            </div>
+          </div>
+        )}
+
+        {/* Footer */}
+        <footer className="text-center py-8 border-t border-gray-800 mt-16">
+          <div className="flex flex-col items-center justify-center gap-3">
+            <div className="flex flex-col items-center">
+              <LogoDevSwiss className="w-16 h-16 text-white" showText={false} />
+              <span className="text-white text-xl font-bold">Dev-Swiss</span>
+            </div>
+            
+            <div className="border-t border-gray-700 pt-2 mt-1">
+              <span className="text-white text-sm">Solutions web & apps sur mesure</span>
+            </div>
+          </div>
+        </footer>
+      </div>
+    </div>
+  );
+}
