@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Plus, Trash2, Sparkles, Search, List, FileText, ShoppingCart, Wallet, BarChart3, ArrowLeft, TrendingUp, PieChart as PieChartIcon, Calendar, Table, Download, Filter, ChevronLeft, ChevronRight, Settings, X } from "lucide-react";
+import { Check, Plus, Trash2, Sparkles, Search, List, FileText, ShoppingCart, Wallet, BarChart3, ArrowLeft, TrendingUp, PieChart as PieChartIcon, Calendar, Table, Download, Filter, ChevronLeft, ChevronRight, Settings, X, LogOut, User } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, LabelList } from 'recharts';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import Header from "@/components/Header";
 import { formatCurrency } from "@/lib/utils";
 import LogoDevSwiss from "@/components/LogoDevSwiss";
+import AuthModal from "@/components/AuthModal";
+import { useSupabaseData, useBudgetItems, useTasks, useNotes, useShoppingItems } from "@/hooks/useSupabaseComplete";
 
 // --- Helpers -----------------------------------------------------------
 const LS_KEY = "todo_coach_v2";
@@ -487,7 +489,21 @@ function ding() {
 
 // --- Main App ---------------------------------------------------------------
 export default function App() {
+  // Authentification Supabase
+  const { user, loading: authLoading, isOnline, supabase } = useSupabaseData();
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authLoading2, setAuthLoading2] = useState(false);
+  
+  // Hooks Supabase pour toutes les données
+  const { budgetItems, loading: budgetLoading, addBudgetItem, updateBudgetItem, deleteBudgetItem } = useBudgetItems(user);
+  const { tasks: supabaseTasks, loading: tasksLoading, addTask: addSupabaseTask, updateTask, deleteTask } = useTasks(user);
+  const { notes: supabaseNotes, loading: notesLoading, addNote: addSupabaseNote, updateNote, deleteNote } = useNotes(user);
+  const { shoppingItems: supabaseShoppingItems, loading: shoppingLoading, addShoppingItem: addSupabaseShoppingItem, updateShoppingItem, deleteShoppingItem } = useShoppingItems(user);
+  
+  // États pour l'interface (UI seulement - les données viennent de Supabase)
   const [tasks, setTasks] = useState([]);
+  const [notes, setNotes] = useState([]);
+  const [shoppingItems, setShoppingItems] = useState([]);
   const [filter, setFilter] = useState({ q: "" });
   const [input, setInput] = useState("");
   const [priorityChoice, setPriorityChoice] = useState("normal");
@@ -590,15 +606,15 @@ export default function App() {
     year: new Date().getFullYear()
   });
   
-  // États pour les notes
-  const [notes, setNotes] = useState([]);
+  // États pour les notes (local)
+  const [localNotes, setLocalNotes] = useState([]);
   const [noteTitle, setNoteTitle] = useState("");
   const [noteContent, setNoteContent] = useState("");
   const [editingNote, setEditingNote] = useState(null);
   const [noteFilter, setNoteFilter] = useState({ q: "" });
   
-  // États pour les courses
-  const [shoppingItems, setShoppingItems] = useState([]);
+  // États pour les courses (local)
+  const [localShoppingItems, setLocalShoppingItems] = useState([]);
   const [itemName, setItemName] = useState("");
   const [itemQuantity, setItemQuantity] = useState(1);
   const [itemUnit, setItemUnit] = useState("p");
@@ -606,8 +622,8 @@ export default function App() {
   const [editingItem, setEditingItem] = useState(null);
   const [shoppingFilter, setShoppingFilter] = useState({});
 
-  // États pour le budget
-  const [budgetItems, setBudgetItems] = useState([]);
+  // États pour le budget (local - sera remplacé par Supabase)
+  const [localBudgetItems, setLocalBudgetItems] = useState([]);
   const [budgetDescription, setBudgetDescription] = useState("");
   const [budgetAmount, setBudgetAmount] = useState("");
   const [budgetType, setBudgetType] = useState("revenus");
@@ -615,6 +631,88 @@ export default function App() {
   const [budgetDate, setBudgetDate] = useState(new Date().toISOString().split('T')[0]);
   const [editingBudgetItem, setEditingBudgetItem] = useState(null);
   const [budgetFilter, setBudgetFilter] = useState({});
+
+  // Fonctions d'authentification
+  const handleAuth = async (email, password, isLogin) => {
+    setAuthLoading2(true);
+    try {
+      let result;
+      if (isLogin) {
+        result = await supabase.auth.signInWithPassword({ email, password });
+      } else {
+        result = await supabase.auth.signUp({ email, password });
+      }
+      
+      if (result.error) {
+        throw new Error(result.error.message);
+      }
+      
+      if (!isLogin && result.data.user && !result.data.session) {
+        throw new Error('Inscription réussie ! Vérifiez votre email pour confirmer votre compte.');
+      }
+      
+      setShowAuthModal(false);
+    } catch (error) {
+      throw error;
+    } finally {
+      setAuthLoading2(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error('Erreur lors de la déconnexion:', error.message);
+    }
+  };
+
+  // Afficher le modal d'auth si pas connecté et on essaie d'accéder aux données
+  useEffect(() => {
+    if (!authLoading && !user && (activeTab === 'budget' || activeTab === 'tasks')) {
+      setShowAuthModal(true);
+    }
+  }, [user, authLoading, activeTab]);
+
+  // Synchroniser toutes les données Supabase avec les états locaux
+  useEffect(() => {
+    if (user && supabaseTasks.length >= 0) {
+      setTasks(supabaseTasks.map(task => ({
+        id: task.id,
+        text: task.title || task.description,
+        done: task.completed,
+        priority: task.priority || 'normal',
+        date: task.created_at
+      })));
+    }
+  }, [supabaseTasks, user]);
+
+  // Synchroniser les notes
+  useEffect(() => {
+    if (user && supabaseNotes.length >= 0) {
+      setNotes(supabaseNotes.map(note => ({
+        id: note.id,
+        text: note.content,
+        title: note.title,
+        createdAt: note.created_at
+      })));
+    }
+  }, [supabaseNotes, user]);
+
+  // Synchroniser les éléments de shopping
+  useEffect(() => {
+    if (user && supabaseShoppingItems.length >= 0) {
+      setShoppingItems(supabaseShoppingItems.map(item => ({
+        id: item.id,
+        name: item.name,
+        quantity: item.quantity,
+        unit: item.unit,
+        category: item.category,
+        checked: item.completed,
+        createdAt: item.created_at
+      })));
+    }
+  }, [supabaseShoppingItems, user]);
 
   useEffect(() => {
     try { const raw = localStorage.getItem(LS_KEY); if (raw) setTasks(JSON.parse(raw)); } catch {}
@@ -916,38 +1014,70 @@ export default function App() {
     try { localStorage.setItem(LS_BUDGET_KEY, JSON.stringify(budgetItems)); } catch {}
   }, [budgetItems]);
 
-  const addTask = () => {
+  const addTask = async () => {
+    if (!user) {
+      setShowAuthModal(true);
+      return;
+    }
+    
     const parsed = parseTaskNLP(input);
     if (!parsed.title) return;
-    const t = { id: uuid(), title: parsed.title, priority: priorityChoice || parsed.priority, completed: false };
-    setTasks(prev => [t, ...prev]);
-    setInput("");
-    setPriorityChoice("normal");
+    
+    try {
+      await addSupabaseTask({
+        title: parsed.title,
+        priority: priorityChoice || parsed.priority,
+        status: 'pending',
+        completed: false
+      });
+      setInput("");
+      setPriorityChoice("normal");
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout de la tâche:', error);
+      alert('Erreur lors de la sauvegarde. Vérifiez votre connexion.');
+    }
   };
 
-  const completeTask = (id) => {
-    setTasks(prev => prev.filter(t => t.id !== id));
+  const completeTask = async (id) => {
+    if (!user) {
+      setShowAuthModal(true);
+      return;
+    }
+    
+    try {
+      await updateTask(id, { completed: true, status: 'completed' });
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour de la tâche:', error);
+      alert('Erreur lors de la sauvegarde. Vérifiez votre connexion.');
+    }
     ding();
   };
 
   const removeTask = (id) => setTasks(prev => prev.filter(t => t.id !== id));
 
   // Fonctions pour les notes
-  const addNote = () => {
+  const addNote = async () => {
+    if (!user) {
+      setShowAuthModal(true);
+      return;
+    }
+    
     if (!noteTitle.trim() && !noteContent.trim()) return;
-    const newNote = {
-      id: uuid(),
-      title: noteTitle.trim() || "Note sans titre",
-      content: noteContent.trim(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-    setNotes(prev => [newNote, ...prev]);
-    setNoteTitle("");
-    setNoteContent("");
+    
+    try {
+      await addSupabaseNote({
+        title: noteTitle.trim() || "Note sans titre",
+        content: noteContent.trim()
+      });
+      setNoteTitle("");
+      setNoteContent("");
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout de la note:', error);
+      alert('Erreur lors de la sauvegarde. Vérifiez votre connexion.');
+    }
   };
 
-  const updateNote = () => {
+  const updateNoteLocal = () => {
     if (!editingNote) return;
     const updatedNote = {
       ...editingNote,
@@ -961,7 +1091,7 @@ export default function App() {
     setNoteContent("");
   };
 
-  const deleteNote = (id) => {
+  const deleteNoteLocal = (id) => {
     setNotes(prev => prev.filter(note => note.id !== id));
     if (editingNote && editingNote.id === id) {
       setEditingNote(null);
@@ -994,26 +1124,34 @@ export default function App() {
   }, [notes, noteFilter]);
 
   // Fonctions pour les courses
-  const addShoppingItem = () => {
+  const addShoppingItem = async () => {
+    if (!user) {
+      setShowAuthModal(true);
+      return;
+    }
+    
     if (!itemName.trim()) return;
-    const quantity = Math.max(1, itemQuantity || 1); // Assurer une quantité valide
-    const newItem = {
-      id: uuid(),
-      name: itemName.trim(),
-      quantity: quantity,
-      unit: itemUnit,
-      category: itemCategory,
-      purchased: false,
-      createdAt: new Date().toISOString()
-    };
-    setShoppingItems(prev => [newItem, ...prev]);
-    setItemName("");
-    setItemQuantity(1);
-    setItemUnit("p");
-    setItemCategory("courant");
+    const quantity = Math.max(1, itemQuantity || 1);
+    
+    try {
+      await addSupabaseShoppingItem({
+        name: itemName.trim(),
+        quantity: quantity,
+        unit: itemUnit,
+        category: itemCategory,
+        completed: false
+      });
+      setItemName("");
+      setItemQuantity(1);
+      setItemUnit("p");
+      setItemCategory("courant");
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout de l\'élément de shopping:', error);
+      alert('Erreur lors de la sauvegarde. Vérifiez votre connexion.');
+    }
   };
 
-  const updateShoppingItem = () => {
+  const updateShoppingItemLocal = () => {
     if (!editingItem) return;
     const quantity = Math.max(1, itemQuantity || 1); // Assurer une quantité valide
     const updatedItem = {
@@ -1032,7 +1170,7 @@ export default function App() {
     setItemCategory("courant");
   };
 
-  const deleteShoppingItem = (id) => {
+  const deleteShoppingItemLocal = (id) => {
     setShoppingItems(prev => prev.filter(item => item.id !== id));
     if (editingItem && editingItem.id === id) {
       setEditingItem(null);
@@ -1096,27 +1234,38 @@ export default function App() {
   }, [shoppingItems]);
 
   // Fonctions pour le budget
-  const addBudgetItem = () => {
+  const addBudgetItemLocal = async () => {
     if (!budgetAmount) return;
     const amount = parseFloat(budgetAmount);
     if (isNaN(amount)) return;
     
+    // Vérifier si l'utilisateur est connecté
+    if (!user) {
+      setShowAuthModal(true);
+      return;
+    }
+    
     const newItem = {
-      id: uuid(),
-      description: budgetDescription.trim() || BUDGET_CATEGORIES[budgetType][budgetCategory],
+      name: budgetDescription.trim() || BUDGET_CATEGORIES[budgetType][budgetCategory],
       amount: amount,
       type: budgetType,
       category: budgetCategory,
       date: budgetDate,
-      createdAt: new Date().toISOString()
+      description: budgetDescription.trim()
     };
-    setBudgetItems(prev => [newItem, ...prev]);
-    setBudgetDescription("");
-    setBudgetAmount("");
-    setBudgetDate(new Date().toISOString().split('T')[0]);
+    
+    try {
+      await addBudgetItem(newItem);
+      setBudgetDescription("");
+      setBudgetAmount("");
+      setBudgetDate(new Date().toISOString().split('T')[0]);
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout du budget item:', error);
+      alert('Erreur lors de la sauvegarde. Vérifiez votre connexion.');
+    }
   };
 
-  const updateBudgetItem = () => {
+  const updateBudgetItemLocal = () => {
     if (!editingBudgetItem || !budgetAmount) return;
     const amount = parseFloat(budgetAmount);
     if (isNaN(amount)) return;
@@ -1139,7 +1288,7 @@ export default function App() {
     setBudgetDate(new Date().toISOString().split('T')[0]);
   };
 
-  const deleteBudgetItem = (id) => {
+  const deleteBudgetItemLocal = (id) => {
     setBudgetItems(prev => prev.filter(item => item.id !== id));
     if (editingBudgetItem && editingBudgetItem.id === id) {
       setEditingBudgetItem(null);
@@ -1262,7 +1411,8 @@ export default function App() {
         </div>
 
         {/* Onglets */}
-        <div className="flex space-x-2 mb-12">
+        <div className="flex justify-between items-center mb-12">
+          <div className="flex space-x-2">
           <button
             onClick={() => setActiveTab("dashboard")}
             className={`flex items-center gap-2 px-6 py-3 rounded-md font-medium transition-all duration-300 ${
@@ -1318,6 +1468,34 @@ export default function App() {
             <Wallet className="w-5 h-5" />
             Budget
           </button>
+          </div>
+          
+          {/* Bouton Authentification */}
+          <div className="flex items-center gap-3">
+            {user ? (
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 text-white">
+                  <User className="w-4 h-4" />
+                  <span className="text-sm">{user.email}</span>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md font-medium transition-all duration-300"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Déconnexion
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setShowAuthModal(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium transition-all duration-300"
+              >
+                <User className="w-4 h-4" />
+                Se connecter
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Section Dashboard Global */}
@@ -3871,7 +4049,7 @@ export default function App() {
                     whileTap={{ scale: 0.95 }}
                   >
                     <Button 
-                      onClick={editingBudgetItem ? updateBudgetItem : addBudgetItem} 
+                      onClick={editingBudgetItem ? updateBudgetItem : addBudgetItemLocal} 
                       className="h-12 px-6 bg-red-600 hover:bg-red-500 text-white rounded-lg shadow-lg hover:shadow-xl text-lg font-bold transition-all duration-300 border-0"
                     >
                       <Plus className="w-5 h-5 mr-2" />
@@ -4481,6 +4659,14 @@ export default function App() {
           </div>
         </footer>
       </div>
+      
+      {/* Modal d'authentification */}
+      <AuthModal 
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onAuth={handleAuth}
+        isLoading={authLoading2}
+      />
     </div>
   );
 }
