@@ -1,3 +1,4 @@
+// Version 1.0.0 - Force deployment update
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, Plus, Trash2, Sparkles, Search, List, FileText, ShoppingCart, Wallet, BarChart3, ArrowLeft, TrendingUp, PieChart as PieChartIcon, Calendar, Table, Download, Filter, ChevronLeft, ChevronRight, Settings, X, LogOut, User } from "lucide-react";
