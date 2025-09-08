@@ -668,12 +668,12 @@ export default function App() {
     }
   };
 
-  // Afficher le modal d'auth si pas connecté et on essaie d'accéder aux données
+  // Forcer l'authentification dès le chargement de l'application
   useEffect(() => {
-    if (!authLoading && !user && (activeTab === 'budget' || activeTab === 'tasks')) {
+    if (!authLoading && !user) {
       setShowAuthModal(true);
     }
-  }, [user, authLoading, activeTab]);
+  }, [user, authLoading]);
 
   // Synchroniser toutes les données Supabase avec les états locaux
   useEffect(() => {
@@ -971,43 +971,18 @@ export default function App() {
     }
   }, [recurringExpenses, budgetItems]);
 
-  // Charger le budget depuis le localStorage ou forcer les données de test
+  // Charger le budget depuis le localStorage (désactivé car utilisation de Supabase)
   useEffect(() => {
-    // FORCER LES DONNÉES DE TEST (à décommenter pour réinitialiser)
-    const FORCE_TEST_DATA = true; // Mettre à false après test
+    // DONNÉES DE TEST DÉSACTIVÉES - L'application utilise maintenant Supabase
+    const FORCE_TEST_DATA = false; // Désactivé car incompatible avec Supabase
     
     if (FORCE_TEST_DATA) {
-      const testData = generateTestData();
-      setBudgetItems(testData);
-      localStorage.setItem(LS_BUDGET_KEY, JSON.stringify(testData));
+      console.log("Mode test désactivé - utilisation de Supabase");
       return;
     }
 
-    try { 
-      const raw = localStorage.getItem(LS_BUDGET_KEY); 
-      if (raw) {
-        const parsedData = JSON.parse(raw);
-        // Vérifier si on a des données valides
-        if (parsedData && parsedData.length > 0) {
-          setBudgetItems(parsedData);
-        } else {
-          // Si array vide, charger les données de test
-          const testData = generateTestData();
-          setBudgetItems(testData);
-          localStorage.setItem(LS_BUDGET_KEY, JSON.stringify(testData));
-        }
-      } else {
-        // Si pas de données sauvegardées, charger les données de test
-        const testData = generateTestData();
-        setBudgetItems(testData);
-        localStorage.setItem(LS_BUDGET_KEY, JSON.stringify(testData));
-      }
-    } catch {
-      // En cas d'erreur, charger les données de test
-      const testData = generateTestData();
-      setBudgetItems(testData);
-      localStorage.setItem(LS_BUDGET_KEY, JSON.stringify(testData));
-    }
+    // Avec Supabase, les données sont automatiquement chargées via le hook useBudgetItems
+    console.log("Application utilise Supabase pour le budget - localStorage désactivé");
   }, []);
 
   // Sauvegarder le budget dans le localStorage
@@ -1387,117 +1362,313 @@ export default function App() {
     </motion.div>
   );
 
-  return (
-    <div className="min-h-screen bg-black text-white p-3">
-      <div className="max-w-4xl mx-auto space-y-6 pt-8">
-        {/* Titre principal avec logo */}
-        <div className="text-center">
-          <div className="flex flex-col items-center mb-6 space-y-4">
-            <div>
-              <LogoDevSwiss className="w-48 h-48 text-white" showText={false} />
+  // Écran de chargement
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="w-16 h-16 mx-auto border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-gray-300">Chargement...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Page de connexion OPTIMA moderne et premium
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white relative overflow-hidden">
+        {/* Premium Background Elements */}
+        <div className="absolute inset-0">
+          {/* Gradient overlays */}
+          <div className="absolute inset-0 bg-gradient-to-br from-red-900/5 via-transparent to-red-900/5"></div>
+          <div className="absolute inset-0" style={{
+            backgroundImage: `
+              radial-gradient(circle at 25% 25%, rgba(239, 68, 68, 0.1) 0%, transparent 40%),
+              radial-gradient(circle at 75% 75%, rgba(239, 68, 68, 0.08) 0%, transparent 40%),
+              radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.03) 0%, transparent 50%)
+            `
+          }}></div>
+          
+          {/* Geometric pattern */}
+          <div className="absolute inset-0 opacity-5" style={{
+            backgroundImage: `
+              linear-gradient(30deg, transparent 40%, rgba(255,255,255,0.02) 41%, rgba(255,255,255,0.02) 42%, transparent 43%),
+              linear-gradient(-30deg, transparent 40%, rgba(255,255,255,0.02) 41%, rgba(255,255,255,0.02) 42%, transparent 43%)
+            `,
+            backgroundSize: '60px 60px'
+          }}></div>
+        </div>
+
+        {/* Floating particles */}
+        <div className="absolute inset-0 overflow-hidden">
+          {[...Array(12)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-2 h-2 bg-red-500/20 rounded-full"
+              style={{
+                left: Math.random() * 100 + '%',
+                top: Math.random() * 100 + '%',
+              }}
+              animate={{
+                y: [-10, -30, -10],
+                opacity: [0, 1, 0],
+                scale: [1, 1.5, 1],
+              }}
+              transition={{
+                duration: Math.random() * 4 + 3,
+                repeat: Infinity,
+                delay: Math.random() * 2,
+              }}
+            />
+          ))}
+        </div>
+        
+        <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4">
+          {/* Logo OPTIMA Section */}
+          <motion.div 
+            className="mb-12 text-center"
+            initial={{ opacity: 0, y: -30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, ease: "easeOut" }}
+          >
+            {/* Logo OPTIMA clean et moderne */}
+            <div className="mb-8">
+              <LogoDevSwiss className="w-64 h-64 text-white mx-auto drop-shadow-2xl" showText={false} />
             </div>
-            <h1 className="text-7xl font-black tracking-tight uppercase" style={{ 
-              fontFamily: '"Bebas Neue", "Arial Black", "Helvetica Neue", sans-serif',
-              fontWeight: '900',
-              letterSpacing: '-0.02em',
-              background: 'linear-gradient(135deg, #ef4444, #dc2626)',
+            
+            {/* Brand Name */}
+            <h1 className="text-9xl font-black tracking-tight mb-6" style={{ 
+              fontFamily: '"Bebas Neue", "Arial Black", sans-serif',
+              background: 'linear-gradient(135deg, #ef4444, #dc2626, #b91c1c)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
-              textShadow: '2px 2px 0px rgba(220, 38, 38, 0.3)'
+              filter: 'drop-shadow(0 4px 8px rgba(239, 68, 68, 0.3))'
             }}>
               OPTIMA
             </h1>
-          </div>
+            
+            {/* Tagline */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5, duration: 0.8 }}
+            >
+              <p className="text-2xl text-gray-300 mb-2 font-light tracking-wide">
+                Organisez. <span className="text-red-400">Gérez.</span> <span className="text-red-500">Optimisez.</span>
+              </p>
+              <p className="text-gray-500 text-sm tracking-widest uppercase font-medium">
+                L'excellence à portée de main
+              </p>
+            </motion.div>
+          </motion.div>
+
+          {/* CTA Section propre */}
+          <motion.div 
+            className="space-y-6 w-full max-w-md"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7, duration: 0.6 }}
+          >
+            {/* Bouton principal moderne */}
+            <Button
+              onClick={() => setShowAuthModal(true)}
+              className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-6 px-8 rounded-2xl text-lg transition-all duration-300 transform hover:scale-[1.02] shadow-xl hover:shadow-2xl hover:shadow-red-500/25 border border-red-500/50"
+            >
+              Commencer gratuitement
+            </Button>
+            
+            {/* Lien de connexion */}
+            <div className="text-center">
+              <button 
+                onClick={() => setShowAuthModal(true)}
+                className="text-gray-400 hover:text-white text-base transition-all duration-300 font-medium hover:underline underline-offset-4"
+              >
+                Déjà membre ? <span className="text-red-400 font-semibold">Connectez-vous</span>
+              </button>
+            </div>
+          </motion.div>
+
+          {/* Indicateurs de confiance */}
+          <motion.div 
+            className="mt-20 grid grid-cols-3 gap-8 max-w-lg mx-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1, duration: 0.8 }}
+          >
+            <div className="text-center">
+              <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Check className="w-6 h-6 text-green-400" />
+              </div>
+              <p className="text-green-400 text-sm font-semibold">Sécurisé</p>
+              <p className="text-gray-500 text-xs">Chiffrement SSL</p>
+            </div>
+            
+            <div className="text-center">
+              <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                <TrendingUp className="w-6 h-6 text-blue-400" />
+              </div>
+              <p className="text-blue-400 text-sm font-semibold">Version gratuite</p>
+              <p className="text-gray-500 text-xs">disponible</p>
+            </div>
+            
+            <div className="text-center">
+              <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                <User className="w-6 h-6 text-purple-400" />
+              </div>
+              <p className="text-purple-400 text-sm font-semibold">Options Premium</p>
+              <p className="text-gray-500 text-xs">à venir</p>
+            </div>
+          </motion.div>
         </div>
 
-        {/* Onglets */}
-        <div className="flex justify-between items-center mb-12">
-          <div className="flex space-x-2">
-          <button
-            onClick={() => setActiveTab("dashboard")}
-            className={`flex items-center gap-2 px-6 py-3 rounded-md font-medium transition-all duration-300 ${
-              activeTab === "dashboard" 
-                ? "bg-red-600 text-white shadow-lg" 
-                : "text-gray-300 hover:text-white"
-            }`}
-          >
-            <BarChart3 className="w-5 h-5" />
-            Dashboard
-          </button>
-          <button
-            onClick={() => setActiveTab("tasks")}
-            className={`flex items-center gap-2 px-6 py-3 rounded-md font-medium transition-all duration-300 ${
-              activeTab === "tasks" 
-                ? "bg-red-600 text-white shadow-lg" 
-                : "text-gray-300 hover:text-white"
-            }`}
-          >
-            <List className="w-5 h-5" />
-            Tâches
-          </button>
-          <button
-            onClick={() => setActiveTab("notes")}
-            className={`flex items-center gap-2 px-6 py-3 rounded-md font-medium transition-all duration-300 ${
-              activeTab === "notes" 
-                ? "bg-red-600 text-white shadow-lg" 
-                : "text-gray-300 hover:text-white"
-            }`}
-          >
-            <FileText className="w-5 h-5" />
-            Notes
-          </button>
-          <button
-            onClick={() => setActiveTab("shopping")}
-            className={`flex items-center gap-2 px-6 py-3 rounded-md font-medium transition-all duration-300 ${
-              activeTab === "shopping" 
-                ? "bg-red-600 text-white shadow-lg" 
-                : "text-gray-300 hover:text-white"
-            }`}
-          >
-            <ShoppingCart className="w-5 h-5" />
-            Courses
-          </button>
-          <button
-            onClick={() => setActiveTab("budget")}
-            className={`flex items-center gap-2 px-6 py-3 rounded-md font-medium transition-all duration-300 ${
-              activeTab === "budget" 
-                ? "bg-red-600 text-white shadow-lg" 
-                : "text-gray-300 hover:text-white"
-            }`}
-          >
-            <Wallet className="w-5 h-5" />
-            Budget
-          </button>
-          </div>
-          
-          {/* Bouton Authentification */}
-          <div className="flex items-center gap-3">
-            {user ? (
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2 text-white">
-                  <User className="w-4 h-4" />
-                  <span className="text-sm">{user.email}</span>
+        {/* Modal d'authentification */}
+        <AuthModal 
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+          onAuth={handleAuth}
+          isLoading={authLoading2}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0">
+        <div className="absolute top-10 left-10 w-96 h-96 bg-red-500/3 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-10 right-10 w-80 h-80 bg-blue-500/3 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-purple-500/3 rounded-full blur-3xl animate-pulse" style={{animationDelay: '4s'}}></div>
+      </div>
+
+      <div className="relative z-10 max-w-7xl mx-auto p-6 pt-8">
+        {/* Premium Header */}
+        <motion.div 
+          className="text-center mb-12"
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.8 }}
+        >
+          <div className="flex flex-col lg:flex-row items-center justify-between mb-8">
+            {/* Logo and Brand */}
+            <div className="flex items-center space-x-4 mb-6 lg:mb-0">
+              <div className="relative">
+                <div className="absolute inset-0 bg-red-500/20 rounded-full blur-xl animate-pulse"></div>
+                <div className="relative bg-gradient-to-br from-red-400 to-red-600 p-4 rounded-full shadow-2xl">
+                  <LogoDevSwiss className="w-12 h-12 text-white" showText={false} />
                 </div>
-                <button
+              </div>
+              <div>
+                <h1 className="text-4xl lg:text-5xl font-black tracking-tight uppercase" style={{ 
+                  fontFamily: '"Bebas Neue", "Arial Black", "Helvetica Neue", sans-serif',
+                  background: 'linear-gradient(135deg, #ef4444, #dc2626)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text'
+                }}>
+                  OPTIMA
+                </h1>
+                <p className="text-gray-400 text-sm font-light">Votre assistant personnel</p>
+              </div>
+            </div>
+
+            {/* User Menu */}
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-3 bg-gray-800/50 backdrop-blur-sm rounded-full px-6 py-3 border border-gray-700/50">
+                <div className="w-10 h-10 bg-gradient-to-br from-red-400 to-red-600 rounded-full flex items-center justify-center shadow-lg">
+                  <User className="w-5 h-5 text-white" />
+                </div>
+                <div className="text-left">
+                  <p className="text-white font-medium text-sm">{user?.email?.split('@')[0] || 'Utilisateur'}</p>
+                  <p className="text-gray-400 text-xs">Premium</p>
+                </div>
+                <Button
                   onClick={handleLogout}
-                  className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md font-medium transition-all duration-300"
+                  variant="ghost"
+                  size="sm"
+                  className="text-gray-400 hover:text-white p-2 rounded-full hover:bg-red-500/20"
                 >
                   <LogOut className="w-4 h-4" />
-                  Déconnexion
-                </button>
+                </Button>
               </div>
-            ) : (
-              <button
-                onClick={() => setShowAuthModal(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium transition-all duration-300"
-              >
-                <User className="w-4 h-4" />
-                Se connecter
-              </button>
-            )}
+            </div>
           </div>
-        </div>
+        </motion.div>
+
+        {/* Premium Navigation Tabs */}
+        <motion.div 
+          className="flex justify-center mb-12"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.2, duration: 0.6 }}
+        >
+          <div className="flex bg-gray-900/80 backdrop-blur-sm rounded-2xl p-2 border border-gray-700/50 shadow-2xl">
+            <button
+              onClick={() => setActiveTab("dashboard")}
+              className={`flex items-center gap-3 px-8 py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 ${
+                activeTab === "dashboard" 
+                  ? "bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg shadow-red-500/25" 
+                  : "text-gray-400 hover:text-white hover:bg-gray-800/50"
+              }`}
+            >
+              <BarChart3 className="w-5 h-5" />
+              <span className="hidden sm:inline">Dashboard</span>
+            </button>
+            <button
+              onClick={() => setActiveTab("tasks")}
+              className={`flex items-center gap-3 px-8 py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 ${
+                activeTab === "tasks" 
+                  ? "bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg shadow-red-500/25" 
+                  : "text-gray-400 hover:text-white hover:bg-gray-800/50"
+              }`}
+            >
+              <List className="w-5 h-5" />
+              <span className="hidden sm:inline">Tâches</span>
+            </button>
+            <button
+              onClick={() => setActiveTab("notes")}
+              className={`flex items-center gap-3 px-8 py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 ${
+                activeTab === "notes" 
+                  ? "bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg shadow-red-500/25" 
+                  : "text-gray-400 hover:text-white hover:bg-gray-800/50"
+              }`}
+            >
+              <FileText className="w-5 h-5" />
+              <span className="hidden sm:inline">Notes</span>
+            </button>
+            <button
+              onClick={() => setActiveTab("shopping")}
+              className={`flex items-center gap-3 px-8 py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 ${
+                activeTab === "shopping" 
+                  ? "bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg shadow-red-500/25" 
+                  : "text-gray-400 hover:text-white hover:bg-gray-800/50"
+              }`}
+            >
+              <ShoppingCart className="w-5 h-5" />
+              <span className="hidden sm:inline">Courses</span>
+            </button>
+            <button
+              onClick={() => setActiveTab("budget")}
+              className={`flex items-center gap-3 px-8 py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 ${
+                activeTab === "budget" 
+                  ? "bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg shadow-red-500/25" 
+                  : "text-gray-400 hover:text-white hover:bg-gray-800/50"
+              }`}
+          >
+            <Wallet className="w-5 h-5" />
+            <span className="hidden sm:inline">Budget</span>
+          </button>
+          </div>
+        </motion.div>
+        
+        {/* Content Container */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.6 }}
+        >
 
         {/* Section Dashboard Global */}
         {activeTab === "dashboard" && (
@@ -4645,7 +4816,7 @@ export default function App() {
         )}
 
         {/* Footer */}
-        <footer className="text-center py-8 border-t border-gray-800">
+        <footer className="text-center py-8 border-t border-gray-800 mt-16">
           <div className="flex flex-col items-center justify-center gap-3">
             {/* Logo et nom */}
             <div className="flex flex-col items-center">
@@ -4659,15 +4830,9 @@ export default function App() {
             </div>
           </div>
         </footer>
+        
+        </motion.div>
       </div>
-      
-      {/* Modal d'authentification */}
-      <AuthModal 
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-        onAuth={handleAuth}
-        isLoading={authLoading2}
-      />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { X, Mail, Lock, User, Loader2 } from 'lucide-react';
+import { X, Mail, Lock, User, Loader2, Eye, EyeOff, Sparkles } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -13,6 +13,8 @@ const AuthModal = ({ isOpen, onClose, onAuth, isLoading }) => {
     confirmPassword: ''
   });
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   if (!isOpen) return null;
 
@@ -49,168 +51,187 @@ const AuthModal = ({ isOpen, onClose, onAuth, isLoading }) => {
 
   return (
     <motion.div
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
       <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.9, opacity: 0 }}
+        initial={{ scale: 0.9, opacity: 0, y: 20 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.9, opacity: 0, y: 20 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
         className="w-full max-w-md"
       >
-        <Card className="border-0 shadow-2xl bg-white/95 backdrop-blur-sm">
-          <CardContent className="p-0">
-            {/* Header */}
-            <div className="relative bg-gradient-to-r from-blue-600 to-purple-600 p-6 text-white">
-              <button
-                onClick={onClose}
-                className="absolute top-4 right-4 p-2 hover:bg-white/20 rounded-full transition-colors"
-                disabled={isLoading}
-              >
-                <X size={20} />
-              </button>
-              
-              <div className="text-center">
-                <div className="w-16 h-16 mx-auto mb-4 bg-white/20 rounded-full flex items-center justify-center">
-                  <User size={24} />
-                </div>
-                <h2 className="text-2xl font-bold mb-2">
-                  {isLogin ? 'Connexion' : 'Inscription'}
-                </h2>
-                <p className="text-blue-100">
-                  {isLogin 
-                    ? 'Connectez-vous pour sauvegarder vos données'
-                    : 'Créez votre compte pour commencer'
-                  }
-                </p>
+        <div className="relative bg-gradient-to-br from-gray-900/95 to-black/95 backdrop-blur-xl border border-gray-700/50 rounded-3xl p-10 shadow-2xl">
+          {/* Decorative elements */}
+          <div className="absolute -top-px left-20 right-20 h-px bg-gradient-to-r from-transparent via-red-500/50 to-transparent"></div>
+          <div className="absolute -bottom-px left-20 right-20 h-px bg-gradient-to-r from-transparent via-red-500/30 to-transparent"></div>
+          
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 p-2 text-gray-500 hover:text-white hover:bg-gray-800/50 rounded-full transition-all duration-200"
+            disabled={isLoading}
+          >
+            <X size={20} />
+          </button>
+          
+          {/* Header */}
+          <div className="text-center mb-10">
+            {/* Premium Logo */}
+            <div className="relative mb-6">
+              <div className="absolute inset-0 bg-red-500/20 rounded-full blur-xl animate-pulse"></div>
+              <div className="relative bg-gradient-to-br from-red-400 to-red-600 p-4 rounded-full shadow-xl w-20 h-20 mx-auto flex items-center justify-center">
+                <Sparkles className="w-8 h-8 text-white" />
               </div>
             </div>
+            
+            <h1 className="text-5xl font-black mb-3" style={{ 
+              fontFamily: '"Bebas Neue", "Arial Black", sans-serif',
+              background: 'linear-gradient(135deg, #ef4444, #dc2626)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text'
+            }}>
+              OPTIMA
+            </h1>
+            <p className="text-gray-400 text-lg font-light">
+              {isLogin ? 'Bon retour parmi nous' : 'Rejoignez l\'excellence'}
+            </p>
+          </div>
 
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
-              {/* Email */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email
-                </label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                  <Input
-                    type="email"
-                    placeholder="votre.email@exemple.com"
-                    value={formData.email}
-                    onChange={(e) => handleInputChange('email', e.target.value)}
-                    className="pl-10 h-12"
-                    disabled={isLoading}
-                    required
-                  />
-                </div>
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Email Field */}
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <Mail className="h-5 w-5 text-gray-400" />
               </div>
+              <Input
+                type="email"
+                placeholder="Votre adresse email"
+                value={formData.email}
+                onChange={(e) => handleInputChange('email', e.target.value)}
+                className="h-16 pl-12 pr-4 bg-gray-800/50 border-gray-600/50 focus:border-red-500/50 focus:ring-2 focus:ring-red-500/20 text-white placeholder:text-gray-500 rounded-xl text-lg"
+                disabled={isLoading}
+                required
+              />
+            </div>
 
-              {/* Password */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Mot de passe
-                </label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                  <Input
-                    type="password"
-                    placeholder="••••••••"
-                    value={formData.password}
-                    onChange={(e) => handleInputChange('password', e.target.value)}
-                    className="pl-10 h-12"
-                    disabled={isLoading}
-                    required
-                    minLength={6}
-                  />
-                </div>
+            {/* Password Field */}
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <Lock className="h-5 w-5 text-gray-400" />
               </div>
-
-              {/* Confirm Password (for signup) */}
-              {!isLogin && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Confirmer le mot de passe
-                  </label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                    <Input
-                      type="password"
-                      placeholder="••••••••"
-                      value={formData.confirmPassword}
-                      onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                      className="pl-10 h-12"
-                      disabled={isLoading}
-                      required={!isLogin}
-                      minLength={6}
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* Error Message */}
-              {error && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-red-50 border border-red-200 rounded-lg p-3"
-                >
-                  <p className="text-red-600 text-sm font-medium">{error}</p>
-                </motion.div>
-              )}
-
-              {/* Submit Button */}
-              <Button
-                type="submit"
-                className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold"
+              <Input
+                type={showPassword ? "text" : "password"}
+                placeholder="Mot de passe"
+                value={formData.password}
+                onChange={(e) => handleInputChange('password', e.target.value)}
+                className="h-16 pl-12 pr-12 bg-gray-800/50 border-gray-600/50 focus:border-red-500/50 focus:ring-2 focus:ring-red-500/20 text-white placeholder:text-gray-500 rounded-xl text-lg"
+                disabled={isLoading}
+                required
+                minLength={6}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-white transition-colors"
                 disabled={isLoading}
               >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {isLogin ? 'Connexion...' : 'Inscription...'}
-                  </>
-                ) : (
-                  isLogin ? 'Se connecter' : 'S\'inscrire'
-                )}
-              </Button>
+                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+              </button>
+            </div>
 
-              {/* Toggle Mode */}
-              <div className="text-center pt-4">
+            {/* Confirm Password Field (for signup) */}
+            {!isLogin && (
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Lock className="h-5 w-5 text-gray-400" />
+                </div>
+                <Input
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="Confirmer le mot de passe"
+                  value={formData.confirmPassword}
+                  onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                  className="h-16 pl-12 pr-12 bg-gray-800/50 border-gray-600/50 focus:border-red-500/50 focus:ring-2 focus:ring-red-500/20 text-white placeholder:text-gray-500 rounded-xl text-lg"
+                  disabled={isLoading}
+                  required
+                  minLength={6}
+                />
                 <button
                   type="button"
-                  onClick={() => {
-                    setIsLogin(!isLogin);
-                    setError('');
-                    setFormData({ email: '', password: '', confirmPassword: '' });
-                  }}
-                  className="text-sm text-gray-600 hover:text-blue-600 transition-colors"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-white transition-colors"
                   disabled={isLoading}
                 >
-                  {isLogin ? (
-                    <>
-                      Pas de compte ? <span className="font-semibold text-blue-600">Inscrivez-vous</span>
-                    </>
-                  ) : (
-                    <>
-                      Déjà un compte ? <span className="font-semibold text-blue-600">Connectez-vous</span>
-                    </>
-                  )}
+                  {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
-            </form>
+            )}
 
-            {/* Info */}
-            <div className="bg-gray-50 p-4 text-center">
-              <p className="text-xs text-gray-500">
-                🔒 Vos données sont sécurisées et chiffrées
-              </p>
+            {/* Error Message */}
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-red-500/10 border border-red-500/30 rounded-xl p-4"
+              >
+                <p className="text-red-400 text-sm text-center font-medium">{error}</p>
+              </motion.div>
+            )}
+
+            {/* Submit Button */}
+            <Button
+              type="submit"
+              className="group w-full h-16 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold text-lg rounded-xl transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl hover:shadow-red-500/25 border border-red-500/30"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <div className="flex items-center justify-center gap-3">
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                  <span>Connexion en cours...</span>
+                </div>
+              ) : (
+                <div className="flex items-center justify-center gap-3">
+                  <Sparkles className="h-5 w-5 group-hover:rotate-180 transition-transform duration-500" />
+                  <span>{isLogin ? 'Se connecter' : 'Créer mon compte'}</span>
+                </div>
+              )}
+            </Button>
+
+            {/* Toggle Mode */}
+            <div className="text-center pt-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsLogin(!isLogin);
+                  setError('');
+                  setFormData({ email: '', password: '', confirmPassword: '' });
+                  setShowPassword(false);
+                  setShowConfirmPassword(false);
+                }}
+                className="text-gray-400 hover:text-white text-base transition-all duration-300 font-medium hover:underline underline-offset-4"
+                disabled={isLoading}
+              >
+                {isLogin ? (
+                  <>Nouveau sur OPTIMA ? <span className="text-red-400 font-semibold">Créez votre compte</span></>
+                ) : (
+                  <>Déjà membre ? <span className="text-red-400 font-semibold">Connectez-vous</span></>
+                )}
+              </button>
             </div>
-          </CardContent>
-        </Card>
+          </form>
+
+          {/* Trust indicator */}
+          <div className="mt-8 text-center">
+            <div className="flex items-center justify-center gap-2 text-gray-500 text-xs">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              <span>Connexion sécurisée SSL</span>
+            </div>
+          </div>
+        </div>
       </motion.div>
     </motion.div>
   );
