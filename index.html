@@ -2,12 +2,226 @@
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Optima - Votre Assistant Personnel</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#dc2626" />
+    <meta name="background-color" content="#0f0f0f" />
+    
+    <!-- App Info -->
+    <title>OPTIMA - Coach Personnel</title>
+    <meta name="description" content="Votre coach personnel pour tâches, budget, notes et courses" />
+    <meta name="keywords" content="productivité, tâches, budget, notes, organisation" />
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- App Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192x192.png" />
+    
+    <!-- iOS Specific Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="OPTIMA" />
+    
+    <!-- Android Specific Meta Tags -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="OPTIMA" />
+    
+    <!-- Windows Specific Meta Tags -->
+    <meta name="msapplication-TileColor" content="#dc2626" />
+    <meta name="msapplication-TileImage" content="/icons/icon-144x144.png" />
+    
+    <!-- Splash Screens for iOS -->
+    <link rel="apple-touch-startup-image" href="/icons/icon-512x512.png" />
+    
+    <!-- Prevent tap highlight on mobile -->
+    <style>
+      * {
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+      
+      input, textarea, [contenteditable] {
+        -webkit-user-select: auto;
+        -moz-user-select: auto;
+        -ms-user-select: auto;
+        user-select: auto;
+      }
+
+      /* Native app feel */
+      body {
+        overscroll-behavior: none;
+        touch-action: manipulation;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      /* PWA Loading Screen */
+      .pwa-loading {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: #0f0f0f;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        z-index: 9999;
+        transition: opacity 0.3s ease;
+      }
+      
+      .pwa-loading.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .pwa-logo {
+        width: 80px;
+        height: 80px;
+        background: #dc2626;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        font-weight: bold;
+        color: white;
+        margin-bottom: 20px;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+      }
+
+      .pwa-text {
+        color: #fff;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-size: 18px;
+        font-weight: 500;
+      }
+    </style>
   </head>
   <body>
+    <!-- PWA Loading Screen -->
+    <div class="pwa-loading" id="pwaLoading">
+      <div class="pwa-logo">O</div>
+      <div class="pwa-text">OPTIMA</div>
+    </div>
+
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+      // Masquer le loading screen après chargement
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          const loading = document.getElementById('pwaLoading');
+          if (loading) {
+            loading.classList.add('hidden');
+            setTimeout(() => loading.remove(), 300);
+          }
+        }, 1000);
+      });
+
+      // Enregistrement du Service Worker
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(registration => {
+              console.log('✅ Service Worker registered:', registration);
+              
+              // Vérifier les mises à jour
+              registration.addEventListener('updatefound', () => {
+                const newWorker = registration.installing;
+                newWorker.addEventListener('statechange', () => {
+                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    // Nouvelle version disponible
+                    if (confirm('Une nouvelle version d\'OPTIMA est disponible. Redémarrer l\'application ?')) {
+                      window.location.reload();
+                    }
+                  }
+                });
+              });
+            })
+            .catch(error => {
+              console.log('❌ Service Worker registration failed:', error);
+            });
+        });
+      }
+
+      // Install prompt pour PWA
+      let deferredPrompt;
+      window.addEventListener('beforeinstallprompt', (e) => {
+        console.log('💾 Install prompt available');
+        e.preventDefault();
+        deferredPrompt = e;
+        
+        // Afficher un bouton d'installation personnalisé
+        showInstallButton();
+      });
+
+      function showInstallButton() {
+        // Créer un bouton d'installation flottant
+        const installBtn = document.createElement('button');
+        installBtn.innerHTML = '📱 Installer OPTIMA';
+        installBtn.style.cssText = `
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          background: #dc2626;
+          color: white;
+          border: none;
+          padding: 12px 16px;
+          border-radius: 25px;
+          font-weight: 500;
+          box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+          z-index: 1000;
+          cursor: pointer;
+          font-size: 14px;
+          animation: slideIn 0.3s ease;
+        `;
+
+        installBtn.addEventListener('click', () => {
+          if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+              if (choiceResult.outcome === 'accepted') {
+                console.log('✅ PWA installed');
+              }
+              deferredPrompt = null;
+              installBtn.remove();
+            });
+          }
+        });
+
+        document.body.appendChild(installBtn);
+
+        // Masquer automatiquement après 10 secondes
+        setTimeout(() => {
+          if (installBtn && installBtn.parentNode) {
+            installBtn.remove();
+          }
+        }, 10000);
+      }
+
+      // Gestion des raccourcis PWA
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('shortcut')) {
+        const shortcut = urlParams.get('shortcut');
+        console.log('🚀 Launched from shortcut:', shortcut);
+        // Vous pouvez ajouter une logique pour ouvrir directement la section correspondante
+      }
+    </script>
   </body>
 </html>
