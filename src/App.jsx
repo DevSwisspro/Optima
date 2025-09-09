@@ -678,6 +678,30 @@ export default function App() {
     }
   };
 
+  // Gérer la vérification email au chargement
+  useEffect(() => {
+    const handleEmailVerification = async () => {
+      const hash = window.location.hash;
+      if (hash && hash.includes('access_token')) {
+        try {
+          const { data, error } = await supabase.auth.getSession();
+          if (error) throw error;
+          
+          if (data.session) {
+            console.log('✅ Email vérifié avec succès !');
+            setShowAuthModal(false);
+            // Nettoyer l'URL pour éviter les problèmes de cache
+            window.history.replaceState({}, document.title, window.location.pathname);
+          }
+        } catch (error) {
+          console.error('❌ Erreur lors de la vérification email:', error.message);
+        }
+      }
+    };
+
+    handleEmailVerification();
+  }, []);
+
   // Forcer l'authentification dès le chargement de l'application
   useEffect(() => {
     if (!authLoading && !user) {
