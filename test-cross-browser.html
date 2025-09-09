@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OPTIMA - Test Cross-Browser</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 900px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background: #0f0f0f; 
+            color: #fff;
+        }
+        .test-section { 
+            background: #1f1f1f; 
+            padding: 20px; 
+            margin: 15px 0; 
+            border-radius: 8px; 
+            border: 1px solid #333;
+        }
+        button { 
+            background: #dc2626; 
+            color: white; 
+            border: none; 
+            padding: 12px 24px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            margin: 5px;
+        }
+        button:hover { background: #b91c1c; }
+        .success { color: #22c55e; }
+        .error { color: #ef4444; }
+        .info { color: #3b82f6; }
+        .warning { color: #f59e0b; }
+        pre { 
+            background: #111; 
+            padding: 10px; 
+            border-radius: 4px; 
+            overflow-x: auto;
+            white-space: pre-wrap;
+            font-size: 12px;
+        }
+        input { 
+            padding: 12px; 
+            margin: 5px; 
+            border: 1px solid #444; 
+            border-radius: 4px; 
+            background: #2f2f2f; 
+            color: #fff; 
+            width: 300px;
+        }
+        .browser-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        .browser-card {
+            background: #2a2a2a;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>🌐 OPTIMA - Test Compatibilité Navigateurs</h1>
+    
+    <div class="test-section">
+        <h2>📊 Informations Navigateur</h2>
+        <div class="browser-info" id="browser-info"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔐 Test Authentification Cross-Browser</h2>
+        <input type="email" id="test-email" placeholder="Votre email personnalisé" value="">
+        <input type="password" id="test-password" placeholder="Mot de passe test" value="TestPass123!">
+        <br><br>
+        <button onclick="testSignUp()">🔓 Tester Inscription</button>
+        <button onclick="testEmailValidation()">📧 Valider Email</button>
+        <button onclick="runFullCompatibilityTest()">🧪 Test Complet</button>
+        <div id="auth-test-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>📱 Support PWA par Navigateur</h2>
+        <button onclick="testPWASupport()">📱 Test PWA</button>
+        <div id="pwa-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔧 APIs Web Supportées</h2>
+        <button onclick="testWebAPIs()">🔧 Test APIs</button>
+        <div id="api-result"></div>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+        
+        const SUPABASE_URL = 'https://tuxqlybmtjmlyadbtneb.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR1eHFseWJtdGptbHlhZGJ0bmViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc0MDQ4NjksImV4cCI6MjA3Mjk4MDg2OX0.hi22ZhvttiBpYjeFPh7TMG-NLueiH3YdW-vgXsnGQJY';
+        
+        window.supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Détecter le navigateur
+        function detectBrowser() {
+            const ua = navigator.userAgent;
+            let browser = 'Unknown';
+            let version = '';
+            
+            if (ua.includes('Chrome') && !ua.includes('Edg') && !ua.includes('OPR')) {
+                browser = 'Chrome';
+                version = ua.match(/Chrome\/([0-9]+)/)?.[1] || '';
+            } else if (ua.includes('Firefox')) {
+                browser = 'Firefox';
+                version = ua.match(/Firefox\/([0-9]+)/)?.[1] || '';
+            } else if (ua.includes('Safari') && !ua.includes('Chrome')) {
+                browser = 'Safari';
+                version = ua.match(/Version\/([0-9]+\.[0-9]+)/)?.[1] || '';
+            } else if (ua.includes('Edg')) {
+                browser = 'Edge';
+                version = ua.match(/Edg\/([0-9]+)/)?.[1] || '';
+            } else if (ua.includes('OPR')) {
+                browser = 'Opera';
+                version = ua.match(/OPR\/([0-9]+)/)?.[1] || '';
+            } else if (ua.includes('brave')) {
+                browser = 'Brave';
+            }
+            
+            return { browser, version, ua };
+        }
+
+        // Afficher infos navigateur
+        function displayBrowserInfo() {
+            const info = detectBrowser();
+            const isIncognito = isPrivateMode();
+            
+            const cards = [
+                {
+                    title: '🌐 Navigateur',
+                    content: `${info.browser} ${info.version}`,
+                    status: getSupportStatus(info.browser)
+                },
+                {
+                    title: '📱 Platform',
+                    content: navigator.platform,
+                    status: 'info'
+                },
+                {
+                    title: '🕵️ Mode',
+                    content: isIncognito ? 'Privé/Incognito' : 'Normal',
+                    status: isIncognito ? 'warning' : 'success'
+                },
+                {
+                    title: '🍪 Cookies',
+                    content: navigator.cookieEnabled ? 'Activés' : 'Désactivés',
+                    status: navigator.cookieEnabled ? 'success' : 'error'
+                }
+            ];
+
+            const browserInfoDiv = document.getElementById('browser-info');
+            browserInfoDiv.innerHTML = cards.map(card => `
+                <div class="browser-card">
+                    <h3>${card.title}</h3>
+                    <p class="${card.status}">${card.content}</p>
+                </div>
+            `).join('');
+        }
+
+        function getSupportStatus(browser) {
+            const support = {
+                'Chrome': 'success',
+                'Edge': 'success', 
+                'Firefox': 'info',
+                'Safari': 'info',
+                'Brave': 'warning',
+                'Opera': 'info'
+            };
+            return support[browser] || 'error';
+        }
+
+        function isPrivateMode() {
+            // Détection simplifiée du mode privé
+            try {
+                localStorage.setItem('test-private', '1');
+                localStorage.removeItem('test-private');
+                return false;
+            } catch (e) {
+                return true;
+            }
+        }
+
+        // Test validation email
+        window.testEmailValidation = function() {
+            const email = document.getElementById('test-email').value;
+            const result = document.getElementById('auth-test-result');
+            
+            if (!email) {
+                result.innerHTML = '<div class="error">❌ Entrez votre email personnalisé</div>';
+                return;
+            }
+
+            result.innerHTML = '<div class="info">⏳ Validation email...</div>';
+            
+            // Test format email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const isValidFormat = emailRegex.test(email);
+            
+            // Extraire le domaine
+            const domain = email.split('@')[1];
+            
+            let validation = [];
+            validation.push(`📧 Email: ${email}`);
+            validation.push(`🌐 Domaine: ${domain}`);
+            validation.push(`✅ Format: ${isValidFormat ? 'Valide' : 'Invalide'}`);
+            
+            // Test DNS du domaine (approximatif via image)
+            testDomainExistence(domain).then(exists => {
+                validation.push(`🌍 DNS: ${exists ? 'Résolu' : 'Non résolu'}`);
+                
+                result.innerHTML = validation.map(v => `<div>${v}</div>`).join('');
+                
+                if (isValidFormat && exists) {
+                    result.innerHTML += '<div class="success">✅ Email devrait fonctionner avec Supabase</div>';
+                } else {
+                    result.innerHTML += '<div class="warning">⚠️ Email peut être rejeté par Supabase</div>';
+                    result.innerHTML += '<div class="info">💡 Essayez avec Gmail/Outlook pour tester</div>';
+                }
+            });
+        };
+
+        async function testDomainExistence(domain) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                const timeout = setTimeout(() => {
+                    resolve(false);
+                }, 3000);
+                
+                img.onload = img.onerror = () => {
+                    clearTimeout(timeout);
+                    resolve(true);
+                };
+                
+                img.src = `https://${domain}/favicon.ico?t=${Date.now()}`;
+            });
+        }
+
+        // Test inscription
+        window.testSignUp = async function() {
+            const email = document.getElementById('test-email').value;
+            const password = document.getElementById('test-password').value;
+            const result = document.getElementById('auth-test-result');
+            
+            if (!email || !password) {
+                result.innerHTML = '<div class="error">❌ Remplissez email et mot de passe</div>';
+                return;
+            }
+
+            result.innerHTML = '<div class="info">⏳ Test inscription...</div>';
+            
+            try {
+                const { data, error } = await supabase.auth.signUp({
+                    email: email,
+                    password: password
+                });
+                
+                if (error) {
+                    let errorClass = 'error';
+                    let errorIcon = '❌';
+                    
+                    if (error.message.includes('email_address_invalid')) {
+                        errorIcon = '📧';
+                        result.innerHTML = `
+                            <div class="${errorClass}">${errorIcon} Domaine email rejeté par Supabase</div>
+                            <div class="info">🔍 Code erreur: ${error.code}</div>
+                            <div class="warning">⚠️ Supabase valide les domaines email</div>
+                            <div class="info">💡 Solutions:</div>
+                            <div class="info">• Utilisez Gmail/Outlook temporairement</div>
+                            <div class="info">• Contactez le support pour whitelist votre domaine</div>
+                            <pre>${JSON.stringify(error, null, 2)}</pre>
+                        `;
+                    } else {
+                        result.innerHTML = `
+                            <div class="${errorClass}">${errorIcon} ${error.message}</div>
+                            <pre>${JSON.stringify(error, null, 2)}</pre>
+                        `;
+                    }
+                } else {
+                    result.innerHTML = `
+                        <div class="success">✅ Inscription réussie!</div>
+                        <div class="info">👤 User ID: ${data.user?.id}</div>
+                        <div class="info">📧 Email: ${data.user?.email}</div>
+                        <div class="info">✉️ Statut: ${data.user?.email_confirmed_at ? 'Confirmé' : 'En attente de confirmation'}</div>
+                    `;
+                }
+                
+            } catch (err) {
+                result.innerHTML = `
+                    <div class="error">💥 Exception: ${err.message}</div>
+                    <pre>${err.stack}</pre>
+                `;
+            }
+        };
+
+        // Test PWA
+        window.testPWASupport = function() {
+            const result = document.getElementById('pwa-result');
+            
+            const pwaFeatures = [
+                { name: 'Service Workers', supported: 'serviceWorker' in navigator },
+                { name: 'Manifest', supported: 'onbeforeinstallprompt' in window },
+                { name: 'Push Notifications', supported: 'PushManager' in window },
+                { name: 'Background Sync', supported: 'serviceWorker' in navigator && 'sync' in window.ServiceWorkerRegistration?.prototype },
+                { name: 'Web Share', supported: 'share' in navigator },
+                { name: 'Fullscreen', supported: 'requestFullscreen' in document.documentElement },
+            ];
+            
+            const browserSupport = detectBrowser();
+            const pwaScore = pwaFeatures.filter(f => f.supported).length;
+            
+            result.innerHTML = `
+                <div class="info">📱 Support PWA: ${pwaScore}/${pwaFeatures.length}</div>
+                <div class="info">🌐 Navigateur: ${browserSupport.browser}</div>
+                ${pwaFeatures.map(f => 
+                    `<div class="${f.supported ? 'success' : 'error'}">
+                        ${f.supported ? '✅' : '❌'} ${f.name}
+                    </div>`
+                ).join('')}
+            `;
+        };
+
+        // Test APIs Web
+        window.testWebAPIs = function() {
+            const result = document.getElementById('api-result');
+            
+            const apis = [
+                { name: 'Fetch API', test: () => 'fetch' in window },
+                { name: 'LocalStorage', test: () => 'localStorage' in window },
+                { name: 'SessionStorage', test: () => 'sessionStorage' in window },
+                { name: 'IndexedDB', test: () => 'indexedDB' in window },
+                { name: 'Geolocation', test: () => 'geolocation' in navigator },
+                { name: 'Vibration', test: () => 'vibrate' in navigator },
+                { name: 'Web Crypto', test: () => 'crypto' in window && 'subtle' in crypto },
+                { name: 'Intersection Observer', test: () => 'IntersectionObserver' in window }
+            ];
+            
+            result.innerHTML = apis.map(api => {
+                const supported = api.test();
+                return `<div class="${supported ? 'success' : 'error'}">
+                    ${supported ? '✅' : '❌'} ${api.name}
+                </div>`;
+            }).join('');
+        };
+
+        // Test complet
+        window.runFullCompatibilityTest = async function() {
+            const result = document.getElementById('auth-test-result');
+            result.innerHTML = '<div class="info">⏳ Test complet en cours...</div>';
+            
+            // Test environnement
+            const browserInfo = detectBrowser();
+            const isPrivate = isPrivateMode();
+            
+            // Test connectivité Supabase
+            let supabaseOK = false;
+            try {
+                const { data, error } = await supabase.from('tasks').select('count', { count: 'exact', head: true });
+                supabaseOK = !error;
+            } catch (e) {
+                supabaseOK = false;
+            }
+            
+            // Test APIs critiques
+            const criticalAPIs = [
+                'fetch' in window,
+                'localStorage' in window,
+                navigator.cookieEnabled,
+                'serviceWorker' in navigator
+            ];
+            const apiScore = criticalAPIs.filter(Boolean).length;
+            
+            const compatibility = {
+                browser: browserInfo.browser,
+                version: browserInfo.version,
+                privateMode: isPrivate,
+                supabaseConnection: supabaseOK,
+                apiSupport: `${apiScore}/4`,
+                recommendedAction: getRecommendation(browserInfo.browser, isPrivate, supabaseOK, apiScore)
+            };
+            
+            result.innerHTML = `
+                <h3>📊 Rapport de Compatibilité</h3>
+                <div class="${compatibility.supabaseConnection ? 'success' : 'error'}">
+                    🌐 Connexion Supabase: ${compatibility.supabaseConnection ? 'OK' : 'Échouée'}
+                </div>
+                <div class="info">🖥️ Navigateur: ${compatibility.browser} ${compatibility.version}</div>
+                <div class="${compatibility.privateMode ? 'warning' : 'success'}">
+                    🕵️ Mode: ${compatibility.privateMode ? 'Privé (peut causer problèmes)' : 'Normal'}
+                </div>
+                <div class="${apiScore === 4 ? 'success' : apiScore >= 2 ? 'warning' : 'error'}">
+                    🔧 APIs: ${compatibility.apiSupport}
+                </div>
+                <div class="info">💡 Recommandation: ${compatibility.recommendedAction}</div>
+            `;
+        };
+
+        function getRecommendation(browser, isPrivate, supabaseOK, apiScore) {
+            if (!supabaseOK) return 'Vérifiez votre connexion internet';
+            if (isPrivate) return 'Utilisez le mode navigation normale';
+            if (apiScore < 3) return 'Mettez à jour votre navigateur';
+            if (browser === 'Brave') return 'Désactivez Shields pour ce site';
+            if (['Chrome', 'Edge'].includes(browser)) return 'Configuration optimale ✅';
+            return 'Navigateur supporté, testez l\'inscription';
+        }
+
+        // Initialisation
+        displayBrowserInfo();
+    </script>
+</body>
+</html>

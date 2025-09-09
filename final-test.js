@@ -6,8 +6,8 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-const SUPABASE_URL = 'https://ntytkeasfjnwoehpzhtm.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im50eXRrZWFzZmpud29laHB6aHRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwMDIyMDAsImV4cCI6MjA3MjU3ODIwMH0.dGYlqy6bNUactQdI3ngBK6uYT2JyNVMsdx-nCdzG8dc';
+const SUPABASE_URL = 'https://tuxqlybmtjmlyadbtneb.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR1eHFseWJtdGptbHlhZGJ0bmViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc0MDQ4NjksImV4cCI6MjA3Mjk4MDg2OX0.hi22ZhvttiBpYjeFPh7TMG-NLueiH3YdW-vgXsnGQJY';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -87,9 +87,9 @@ async function runTests() {
     // Test 5: Live Application Status
     console.log('\n🌐 Test 5: Live Application');
     try {
-      const response = await fetch('https://todo-coach-app-1757010879.netlify.app');
+      const response = await fetch('https://optima.dev-swiss.ch');
       if (response.ok) {
-        console.log('✅ Live application accessible at https://todo-coach-app-1757010879.netlify.app');
+        console.log('✅ Live application accessible at https://optima.dev-swiss.ch');
         console.log(`📊 Response status: ${response.status} ${response.statusText}`);
       } else {
         console.log(`❌ Live application error: ${response.status} ${response.statusText}`);
@@ -116,7 +116,7 @@ async function runTests() {
       console.log('✅ Your Todo Coach App is fully functional!');
       console.log('\n🎯 System Status: READY FOR PRODUCTION');
       console.log('\n📱 Access your app:');
-      console.log('   • Live: https://todo-coach-app-1757010879.netlify.app');
+      console.log('   • Live: https://optima.dev-swiss.ch');
       console.log('   • Local: http://localhost:3015 (if dev server is running)');
       console.log('\n🔧 Features available:');
       console.log('   • ✅ Task Management');
