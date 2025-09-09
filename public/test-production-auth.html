@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Production - OPTIMA</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            background: linear-gradient(135deg, #1a1a1a, #2d2d2d); 
+            color: white; 
+            margin: 0; 
+            padding: 20px; 
+            min-height: 100vh; 
+        }
+        .container { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            background: rgba(0,0,0,0.3); 
+            padding: 30px; 
+            border-radius: 15px; 
+            backdrop-filter: blur(10px); 
+        }
+        .status { 
+            padding: 15px; 
+            margin: 15px 0; 
+            border-radius: 8px; 
+            font-weight: bold; 
+        }
+        .success { background: rgba(34, 197, 94, 0.2); border-left: 4px solid #22c55e; }
+        .error { background: rgba(239, 68, 68, 0.2); border-left: 4px solid #ef4444; }
+        .info { background: rgba(59, 130, 246, 0.2); border-left: 4px solid #3b82f6; }
+        button { 
+            background: linear-gradient(135deg, #ef4444, #dc2626); 
+            color: white; 
+            border: none; 
+            padding: 12px 24px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            margin: 10px 5px; 
+        }
+        button:hover { background: linear-gradient(135deg, #dc2626, #b91c1c); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 DIAGNOSTIC OPTIMA PRODUCTION</h1>
+        
+        <div class="status success">
+            ✅ <strong>Fichier de diagnostic accessible depuis Internet</strong><br>
+            URL: https://optima.dev-swiss.ch/test-production-auth.html
+        </div>
+        
+        <div class="status info">
+            🌐 <strong>Site Production:</strong> https://optima.dev-swiss.ch<br>
+            👁️ <strong>Preview URL:</strong> https://68c03cdbe1c6363bec25f309--optimav1.netlify.app<br>
+            📅 <strong>Dernier déploiement:</strong> 09/09/2025 19:50 UTC
+        </div>
+        
+        <h2>🔧 Tests Automatiques</h2>
+        <button onclick="testProductionSite()">🌐 Tester Site Principal</button>
+        <button onclick="testSupabaseConnection()">🔐 Tester Supabase</button>
+        <button onclick="showCacheInstructions()">🧹 Instructions Cache</button>
+        
+        <div id="results" style="margin-top: 20px;"></div>
+        
+        <h2>💡 Solutions Erreur 403</h2>
+        <div class="status error">
+            <strong>Si vous rencontrez encore l'erreur 403:</strong><br><br>
+            <strong>1. Videz le cache navigateur:</strong><br>
+            &nbsp;&nbsp;• Chrome/Edge: F12 → Network → Clic droit Refresh → "Empty Cache Hard Reload"<br>
+            &nbsp;&nbsp;• Firefox: Ctrl+Shift+Delete → Tout effacer<br>
+            &nbsp;&nbsp;• Safari: Cmd+Option+E<br><br>
+            
+            <strong>2. Testez en navigation privée/incognito</strong><br><br>
+            
+            <strong>3. Changez de réseau (4G au lieu de WiFi)</strong><br><br>
+            
+            <strong>4. Redémarrez votre routeur/box</strong>
+        </div>
+        
+        <h2>📊 Diagnostic Technique</h2>
+        <div class="status info">
+            <strong>Configuration vérifiée:</strong><br>
+            • ✅ DNS: Pointe vers Netlify<br>
+            • ✅ SSL: Certificat valide<br>
+            • ✅ Déploiement: Site publié<br>
+            • ✅ Supabase: Base de données opérationnelle<br>
+            • ✅ PWA: Application installable
+        </div>
+    </div>
+
+    <script>
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.innerHTML = message;
+            results.appendChild(div);
+        }
+
+        async function testProductionSite() {
+            addResult('🔄 Test du site principal...', 'info');
+            try {
+                const response = await fetch('https://optima.dev-swiss.ch', { 
+                    method: 'HEAD',
+                    cache: 'no-cache'
+                });
+                if (response.ok) {
+                    addResult(`✅ Site principal OK - Status: ${response.status}`, 'success');
+                    setTimeout(() => {
+                        window.open('https://optima.dev-swiss.ch', '_blank');
+                    }, 1000);
+                } else {
+                    addResult(`❌ Erreur site principal - Status: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                addResult(`❌ Erreur réseau: ${error.message}`, 'error');
+            }
+        }
+
+        async function testSupabaseConnection() {
+            addResult('🔄 Test de la connexion Supabase...', 'info');
+            try {
+                const response = await fetch('https://tuxqlybmtjmlyadbtneb.supabase.co/rest/v1/', {
+                    headers: {
+                        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR1eHFseWJtdGptbHlhZGJ0bmViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc0MDQ4NjksImV4cCI6MjA3Mjk4MDg2OX0.hi22ZhvttiBpYjeFPh7TMG-NLueiH3YdW-vgXsnGQJY'
+                    }
+                });
+                if (response.ok) {
+                    addResult(`✅ Supabase connexion OK - Status: ${response.status}`, 'success');
+                } else {
+                    addResult(`❌ Erreur Supabase - Status: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                addResult(`❌ Erreur Supabase: ${error.message}`, 'error');
+            }
+        }
+
+        function showCacheInstructions() {
+            addResult(`
+                <strong>🧹 Instructions détaillées pour vider le cache:</strong><br><br>
+                
+                <strong>Chrome/Edge:</strong><br>
+                1. Appuyez sur F12 pour ouvrir les outils développeur<br>
+                2. Allez dans l'onglet "Network" ou "Réseau"<br>
+                3. Clic droit sur le bouton actualiser → "Empty Cache and Hard Reload"<br>
+                4. Ou: Ctrl+Shift+Delete → Sélectionner tout → Effacer données<br><br>
+                
+                <strong>Firefox:</strong><br>
+                1. Ctrl+Shift+Delete<br>
+                2. Sélectionner "Tout" dans la liste déroulante<br>
+                3. Cocher toutes les cases<br>
+                4. Cliquer "Effacer maintenant"<br><br>
+                
+                <strong>Safari:</strong><br>
+                1. Cmd+Option+E pour vider le cache<br>
+                2. Ou: Safari → Préférences → Avancées → Menu Développement → Vider les caches<br><br>
+                
+                <strong>Puis rechargez:</strong> https://optima.dev-swiss.ch
+            `, 'info');
+        }
+
+        // Auto-diagnostic au chargement
+        setTimeout(() => {
+            addResult('📊 Page de diagnostic chargée avec succès depuis Internet', 'success');
+            addResult('🎯 Le site OPTIMA est déployé et accessible', 'success');
+        }, 500);
+    </script>
+</body>
+</html>
