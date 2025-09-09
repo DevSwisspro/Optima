@@ -1,8 +1,8 @@
 // Script simple pour créer les tables Supabase manuellement
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = 'https://ntytkeasfjnwoehpzhtm.supabase.co'
-const supabaseServiceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im50eXRrZWFzZmpud29laHB6aHRtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyNTc5MDAyNSwiZXhwIjoyMDQxMzY2MDI1fQ.YQl7zZLZoFcgOoKB-D6fiMZW4oQOQJvQ2xwdFfLPP3M'
+const supabaseUrl = 'https://tuxqlybmtjmlyadbtneb.supabase.co'
+const supabaseServiceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR1eHFseWJtdGptbHlhZGJ0bmViIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NzQwNDg2OSwiZXhwIjoyMDcyOTgwODY5fQ.sp1kcCwMNl-v58BhFkD-Y8ntUYl-USnmAmpr9ezDyOk'
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey)
 

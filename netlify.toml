@@ -12,8 +12,13 @@
 
 [context.production.environment]
   VITE_NODE_ENV = "production"
-  VITE_SUPABASE_URL = "https://ntytkeasfjnwoehpzhtm.supabase.co"
-  VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im50eXRrZWFzZmpud29laHB6aHRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjU3OTAwMjUsImV4cCI6MjA0MTM2NjAyNX0.3Kls5qIJBGKwJMiZZI_gLTBiEcKCmh3VXoSkQPHcPQY"
+  VITE_SUPABASE_URL = "https://tuxqlybmtjmlyadbtneb.supabase.co"
+  VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR1eHFseWJtdGptbHlhZGJ0bmViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc0MDQ4NjksImV4cCI6MjA3Mjk4MDg2OX0.hi22ZhvttiBpYjeFPh7TMG-NLueiH3YdW-vgXsnGQJY"
+
+[build.environment]
+  NODE_VERSION = "18"
+  VITE_SUPABASE_URL = "https://tuxqlybmtjmlyadbtneb.supabase.co"
+  VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR1eHFseWJtdGptbHlhZGJ0bmViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc0MDQ4NjksImV4cCI6MjA3Mjk4MDg2OX0.hi22ZhvttiBpYjeFPh7TMG-NLueiH3YdW-vgXsnGQJY"
 
 [context.deploy-preview.environment]
   VITE_NODE_ENV = "preview"
@@ -33,4 +38,4 @@
 [[headers]]
   for = "/assets/*"
   [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"# Deployment Trigger 2025-09-08 23:28:09
+    Cache-Control = "public, max-age=31536000, immutable"
