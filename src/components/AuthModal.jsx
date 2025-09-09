@@ -40,7 +40,32 @@ const AuthModal = ({ isOpen, onClose, onAuth, isLoading }) => {
     try {
       await onAuth(formData.email, formData.password, isLogin);
     } catch (err) {
-      setError(err.message || 'Une erreur s\'est produite');
+      console.error('Auth error:', err);
+      
+      // Messages d'erreur améliorés pour mode incognito
+      let errorMessage = '';
+      
+      if (err.message?.includes('Failed to fetch') || err.message?.includes('NetworkError')) {
+        errorMessage = '⚠️ Problème de connexion détecté.\n\n' +
+                      '🕵️ Si vous êtes en mode incognito/privé :\n' +
+                      '• Essayez en mode normal\n' +
+                      '• Ou autorisez les cookies tiers\n\n' +
+                      '🔧 Autres solutions :\n' +
+                      '• Désactivez les bloqueurs de pub\n' +
+                      '• Vérifiez votre connexion internet';
+      } else if (err.message?.includes('Invalid login credentials')) {
+        errorMessage = '❌ Email ou mot de passe incorrect';
+      } else if (err.message?.includes('Email not confirmed')) {
+        errorMessage = '📧 Vérifiez votre email et cliquez sur le lien de confirmation';
+      } else if (err.message?.includes('User already registered')) {
+        errorMessage = '👤 Ce compte existe déjà. Essayez de vous connecter.';
+      } else if (err.message?.includes('Password should be at least 6 characters')) {
+        errorMessage = '🔑 Le mot de passe doit contenir au moins 6 caractères';
+      } else {
+        errorMessage = err.message || 'Une erreur s\'est produite. Réessayez.';
+      }
+      
+      setError(errorMessage);
     }
   };
 
