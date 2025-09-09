@@ -641,7 +641,17 @@ export default function App() {
       if (isLogin) {
         result = await supabase.auth.signInWithPassword({ email, password });
       } else {
-        result = await supabase.auth.signUp({ email, password });
+        // Déterminer l'URL de redirection basée sur l'environnement
+        const isProduction = window.location.hostname !== 'localhost';
+        const redirectUrl = isProduction ? 'https://optima.dev-swiss.ch' : 'http://localhost:3000';
+        
+        result = await supabase.auth.signUp({ 
+          email, 
+          password,
+          options: {
+            emailRedirectTo: redirectUrl
+          }
+        });
       }
       
       if (result.error) {
