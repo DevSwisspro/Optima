@@ -16,16 +16,14 @@ if (!supabaseUrl || !supabaseAnonKey) {
   })
 }
 
-// Ne créer le client que si les variables sont présentes
-export const supabase = supabaseUrl && supabaseAnonKey 
-  ? createClient(supabaseUrl, supabaseAnonKey, {
-      auth: {
-        autoRefreshToken: true,
-        persistSession: true,
-        detectSessionInUrl: true
-      }
-    })
-  : null
+// Toujours créer le client - Vite injecte les variables automatiquement
+export const supabase = createClient(supabaseUrl || '', supabaseAnonKey || '', {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true
+  }
+})
 
 // Debug: vérifier que supabase.auth existe
 if (supabase) {
@@ -45,6 +43,9 @@ export const isSupabaseConfigured = () => {
 // Fonction pour tester la connexion Supabase
 export const testSupabaseConnection = async () => {
   try {
+    if (!supabase || !supabaseUrl || !supabaseAnonKey) {
+      return { success: false, message: 'Client Supabase non configuré' }
+    }
     const { data, error } = await supabase.from('test').select('*').limit(1)
     if (error && error.code !== '42P01') { // 42P01 = table doesn't exist
       throw error

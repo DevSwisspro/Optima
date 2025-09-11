@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase Debug - OPTIMA</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { margin: 0; }
+        pre { white-space: pre-wrap; word-wrap: break-word; }
+    </style>
+</head>
+<body>
+    <div id="root">
+        <div class="min-h-screen bg-gray-900 text-white p-6">
+            <div class="max-w-4xl mx-auto">
+                <div class="mb-8">
+                    <h1 class="text-3xl font-bold text-green-400 mb-2">
+                        🔍 Supabase Auth Debug Tool
+                    </h1>
+                    <p class="text-gray-400">
+                        Loading Supabase configuration...
+                    </p>
+                    <p id="status" class="text-yellow-400 mt-2">
+                        ⏳ Initializing...
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module">
+        // ✅ On passe par le client Vite/TS pour récupérer les valeurs
+        import { SUPABASE_URL, SUPABASE_ANON_KEY, supabase } from '/src/lib/supabaseClient.ts'
+
+        const el = document.getElementById('status')
+        const log = (...args) => { console.log('[supabase-debug]', ...args) }
+
+        log('URL via client:', SUPABASE_URL)
+        log('Key prefix via client:', (SUPABASE_ANON_KEY ?? '').slice(0, 8))
+        
+        if (el) {
+            el.innerHTML = `
+                <div class="space-y-2">
+                    <div>URL: ${SUPABASE_URL || 'undefined'}</div>
+                    <div>Key: ${String(SUPABASE_ANON_KEY).slice(0,8) || 'undefined'}...</div>
+                    <div>Client: ${supabase ? '✅ Ready' : '❌ Failed'}</div>
+                    <div>Auth: ${supabase?.auth ? '✅ Available' : '❌ Unavailable'}</div>
+                </div>
+            `
+        }
+
+        // Petit check runtime
+        ;(async () => {
+            try {
+                const { data, error } = await supabase.auth.getSession()
+                log('getSession()', { data, error })
+                
+                // Test simple signUp
+                log('Testing signUp...')
+                const testResult = await supabase.auth.signUp({
+                    email: 'test-debug@example.com',
+                    password: 'TestDebug123!',
+                    options: {
+                        data: { debug_test: true }
+                    }
+                })
+                
+                log('SignUp test result:', testResult)
+                
+                // Ajouter résultat à la page
+                const resultsDiv = document.createElement('div')
+                resultsDiv.className = 'mt-6 bg-gray-800 rounded-lg p-6'
+                resultsDiv.innerHTML = `
+                    <h2 class="text-xl font-semibold mb-4">Test Results</h2>
+                    <pre class="bg-gray-900 rounded p-4 overflow-auto text-sm text-green-400">
+${JSON.stringify({
+    session_check: { data, error },
+    signup_test: testResult
+}, null, 2)}
+                    </pre>
+                `
+                
+                document.querySelector('.max-w-4xl').appendChild(resultsDiv)
+                
+            } catch (e) {
+                console.error('Runtime test failed:', e)
+                
+                if (el) {
+                    el.innerHTML += `
+                        <div class="mt-4 text-red-400">
+                            ❌ Runtime Error: ${e.message}
+                        </div>
+                    `
+                }
+            }
+        })()
+    </script>
+</body>
+</html>
