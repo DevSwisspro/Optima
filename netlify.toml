@@ -4,8 +4,8 @@
 
 [build.environment]
   NODE_VERSION = "18"
-  VITE_SUPABASE_URL = "https://ntytkeasfjnwoehpzhtm.supabase.co"
-  VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im50eXRrZWFzZmpud29laHB6aHRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwMDIyMDAsImV4cCI6MjA3MjU3ODIwMH0.xGNrOTw_mQxxFQQjp4pLmpRMp7J7_CU9LJWEZBZAfvw"
+  VITE_SUPABASE_URL = "https://tuxqlybmtjmlyadbtneb.supabase.co"
+  VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR1eHFseWJtdGptbHlhZGJ0bmViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc0MDQ4NjksImV4cCI6MjA3Mjk4MDg2OX0.hi22ZhvttiBpYjeFPh7TMG-NLueiH3YdW-vgXsnGQJY"
 
 [[redirects]]
   from = "/*"
@@ -14,8 +14,8 @@
 
 [context.production.environment]
   VITE_NODE_ENV = "production"
-  VITE_SUPABASE_URL = "https://ntytkeasfjnwoehpzhtm.supabase.co"
-  VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im50eXRrZWFzZmpud29laHB6aHRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwMDIyMDAsImV4cCI6MjA3MjU3ODIwMH0.xGNrOTw_mQxxFQQjp4pLmpRMp7J7_CU9LJWEZBZAfvw"
+  VITE_SUPABASE_URL = "https://tuxqlybmtjmlyadbtneb.supabase.co"
+  VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR1eHFseWJtdGptbHlhZGJ0bmViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc0MDQ4NjksImV4cCI6MjA3Mjk4MDg2OX0.hi22ZhvttiBpYjeFPh7TMG-NLueiH3YdW-vgXsnGQJY"
 
 [context.deploy-preview.environment]
   VITE_NODE_ENV = "preview"
