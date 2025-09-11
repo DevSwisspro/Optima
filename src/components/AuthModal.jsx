@@ -5,8 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 
-const AuthModal = ({ isOpen, onClose, onAuth, isLoading }) => {
+const AuthModal = ({ isOpen, onClose, onAuth, isLoading, supabase }) => {
   const [isLogin, setIsLogin] = useState(true);
+  const [showCodeVerification, setShowCodeVerification] = useState(false);
+  const [verificationCode, setVerificationCode] = useState('');
+  const [pendingEmail, setPendingEmail] = useState('');
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -38,7 +41,32 @@ const AuthModal = ({ isOpen, onClose, onAuth, isLoading }) => {
     }
 
     try {
-      await onAuth(formData.email, formData.password, isLogin);
+      if (isLogin) {
+        await onAuth(formData.email, formData.password, isLogin);
+      } else {
+        // Pour l'inscription, utiliser directement Supabase avec phone auth comme fallback
+        const { data, error } = await supabase.auth.signUp({
+          email: formData.email,
+          password: formData.password,
+          options: {
+            // Désactiver la confirmation par email pour utiliser notre système de code
+            emailRedirectTo: undefined
+          }
+        });
+
+        if (error) throw error;
+
+        if (data.user && !data.session) {
+          // Utilisateur créé mais pas encore confirmé
+          setPendingEmail(formData.email);
+          setShowCodeVerification(true);
+          setError('');
+          return; // Ne pas appeler onAuth, attendre le code de vérification
+        } else if (data.session) {
+          // Connexion directe réussie
+          await onAuth(formData.email, formData.password, isLogin);
+        }
+      }
     } catch (err) {
       console.error('Auth error:', err);
       
@@ -72,6 +100,62 @@ const AuthModal = ({ isOpen, onClose, onAuth, isLoading }) => {
   const handleInputChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     setError(''); // Clear error when user starts typing
+  };
+
+  const handleCodeVerification = async (e) => {
+    e.preventDefault();
+    if (!verificationCode || verificationCode.length !== 6) {
+      setError('Veuillez saisir un code à 6 chiffres');
+      return;
+    }
+
+    try {
+      // Supabase utilise des tokens OTP pour la vérification
+      const { data, error } = await supabase.auth.verifyOtp({
+        email: pendingEmail,
+        token: verificationCode,
+        type: 'signup'
+      });
+
+      if (error) throw error;
+
+      if (data.session) {
+        console.log('✅ Code vérifié avec succès !');
+        setShowCodeVerification(false);
+        onClose();
+      }
+    } catch (error) {
+      console.error('❌ Erreur lors de la vérification du code:', error.message);
+      if (error.message.includes('expired')) {
+        setError('❌ Code expiré. Cliquez sur "Renvoyer le code"');
+      } else if (error.message.includes('invalid')) {
+        setError('❌ Code incorrect. Vérifiez et réessayez.');
+      } else {
+        setError('❌ Erreur lors de la vérification. Réessayez.');
+      }
+    }
+  };
+
+  const resendCode = async () => {
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: pendingEmail
+      });
+
+      if (error) throw error;
+      setError('');
+      alert('📧 Nouveau code envoyé par email !');
+    } catch (error) {
+      console.error('Erreur lors du renvoi:', error.message);
+      setError('❌ Impossible de renvoyer le code. Réessayez.');
+    }
+  };
+
+  const handleCodeInputChange = (value) => {
+    const cleanValue = value.replace(/\D/g, '').slice(0, 6);
+    setVerificationCode(cleanValue);
+    setError('');
   };
 
   return (

@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//h/Workspace_IA/01_ASSISTANTS/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

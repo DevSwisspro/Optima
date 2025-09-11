@@ -3,186 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Production Authentication - OPTIMA</title>
+    <title>Test Production - OPTIMA</title>
     <style>
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            max-width: 800px; 
-            margin: 0 auto; 
-            padding: 20px; 
-            background: #0f0f0f; 
-            color: #fff;
-        }
-        .test-section { 
-            background: #1f1f1f; 
-            padding: 20px; 
-            margin: 15px 0; 
-            border-radius: 8px; 
-            border: 1px solid #333;
-        }
-        button { 
-            background: #dc2626; 
-            color: white; 
-            border: none; 
-            padding: 12px 24px; 
-            border-radius: 6px; 
-            cursor: pointer; 
-            margin: 5px;
-        }
-        button:hover { background: #b91c1c; }
-        .success { color: #22c55e; }
-        .error { color: #ef4444; }
-        .info { color: #3b82f6; }
-        .warning { color: #f59e0b; }
-        pre { 
-            background: #111; 
-            padding: 10px; 
-            border-radius: 4px; 
-            overflow-x: auto;
-            white-space: pre-wrap;
-            font-size: 12px;
-        }
-        input { 
-            padding: 12px; 
-            margin: 5px; 
-            border: 1px solid #444; 
-            border-radius: 4px; 
-            background: #2f2f2f; 
-            color: #fff; 
-            width: 300px;
-        }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: linear-gradient(135deg, #1a1a1a, #2d2d2d); color: white; margin: 0; padding: 20px; min-height: 100vh; }
+        .container { max-width: 800px; margin: 0 auto; background: rgba(0,0,0,0.3); padding: 30px; border-radius: 15px; backdrop-filter: blur(10px); }
+        .status { padding: 15px; margin: 15px 0; border-radius: 8px; font-weight: bold; }
+        .success { background: rgba(34, 197, 94, 0.2); border-left: 4px solid #22c55e; }
+        .error { background: rgba(239, 68, 68, 0.2); border-left: 4px solid #ef4444; }
+        .info { background: rgba(59, 130, 246, 0.2); border-left: 4px solid #3b82f6; }
+        button { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: bold; margin: 10px 5px; }
+        button:hover { background: linear-gradient(135deg, #dc2626, #b91c1c); }
     </style>
 </head>
 <body>
-    <h1>🔍 Test Production Authentication - OPTIMA</h1>
-    
-    <div class="test-section">
-        <h2>🌐 Detect Supabase URL</h2>
-        <button onclick="detectSupabaseConfig()">🔍 Detect Configuration</button>
-        <div id="config-result"></div>
-    </div>
-
-    <div class="test-section">
-        <h2>🧪 Test Production Authentication</h2>
-        <input type="email" id="test-email" placeholder="Test email" value="test@gmail.com">
-        <input type="password" id="test-password" placeholder="Test password" value="TestPass123!">
-        <br><br>
-        <button onclick="testProductionAuth()">🔐 Test Production Auth</button>
-        <div id="auth-result"></div>
-    </div>
-
-    <script type="module">
-        // Test production environment by trying to load OPTIMA app and detect Supabase config
+    <div class="container">
+        <h1>🚀 DIAGNOSTIC OPTIMA</h1>
+        <div class="status success">✅ Site redéployé avec succès !</div>
+        <div class="status info">🌐 <strong>Production:</strong> https://optima.dev-swiss.ch</div>
+        <div class="status info">👁️ <strong>Preview:</strong> https://68c03cdbe1c6363bec25f309--optimav1.netlify.app</div>
         
-        window.detectSupabaseConfig = async function() {
-            const result = document.getElementById('config-result');
-            result.innerHTML = '<div class="info">⏳ Detecting configuration...</div>';
-            
-            try {
-                // Try to detect Supabase client from production app
-                const response = await fetch('https://optima.dev-swiss.ch');
-                const html = await response.text();
-                
-                // Look for Supabase URL in the HTML/JS
-                const supabaseUrlMatch = html.match(/tuxqlybmtjmlyadbtneb\.supabase\.co|ntytkeasfjnwoehpzhtm\.supabase\.co/);
-                const hasCorrectUrl = html.includes('tuxqlybmtjmlyadbtneb.supabase.co');
-                const hasIncorrectUrl = html.includes('ntytkeasfjnwoehpzhtm.supabase.co');
-                
-                let status = '';
-                if (hasCorrectUrl) {
-                    status = '<div class="success">✅ Correct Supabase URL found: tuxqlybmtjmlyadbtneb.supabase.co</div>';
-                } else if (hasIncorrectUrl) {
-                    status = '<div class="error">❌ Incorrect Supabase URL found: ntytkeasfjnwoehpzhtm.supabase.co</div>';
-                } else {
-                    status = '<div class="warning">⚠️ No Supabase URL detected in HTML</div>';
-                }
-                
-                result.innerHTML = `
-                    <div class="info">🌐 Production site responding</div>
-                    ${status}
-                    <div class="info">📄 Page size: ${html.length} characters</div>
-                    <div class="info">🔍 Contains "Optima": ${html.includes('Optima') ? 'Yes' : 'No'}</div>
-                `;
-                
-            } catch (error) {
-                result.innerHTML = `
-                    <div class="error">❌ Failed to fetch production site</div>
-                    <div class="error">Error: ${error.message}</div>
-                `;
-            }
-        };
-
-        window.testProductionAuth = async function() {
-            const email = document.getElementById('test-email').value;
-            const password = document.getElementById('test-password').value;
-            const result = document.getElementById('auth-result');
-            
-            if (!email || !password) {
-                result.innerHTML = '<div class="error">❌ Please enter email and password</div>';
-                return;
-            }
-
-            result.innerHTML = '<div class="info">⏳ Testing production authentication...</div>';
-            
-            try {
-                // Import Supabase client and test with correct URL
-                const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
-                
-                const CORRECT_URL = 'https://tuxqlybmtjmlyadbtneb.supabase.co';
-                const CORRECT_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR1eHFseWJtdGptbHlhZGJ0bmViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc0MDQ4NjksImV4cCI6MjA3Mjk4MDg2OX0.hi22ZhvttiBpYjeFPh7TMG-NLueiH3YdW-vgXsnGQJY';
-                
-                const supabase = createClient(CORRECT_URL, CORRECT_KEY);
-                
-                // Test database connection first
-                const { data: dbTest, error: dbError } = await supabase
-                    .from('tasks')
-                    .select('count', { count: 'exact', head: true });
-                
-                if (dbError) {
-                    result.innerHTML = `
-                        <div class="error">❌ Database connection failed</div>
-                        <div class="error">Error: ${dbError.message}</div>
-                        <pre>${JSON.stringify(dbError, null, 2)}</pre>
-                    `;
-                    return;
-                }
-                
-                result.innerHTML += '<div class="success">✅ Database connection successful</div>';
-                
-                // Test authentication
-                const { data, error } = await supabase.auth.signUp({
-                    email: `test.prod.${Date.now()}@gmail.com`,
-                    password: password
-                });
-                
-                if (error) {
-                    result.innerHTML = `
-                        <div class="error">❌ Authentication failed</div>
-                        <div class="error">Error: ${error.message}</div>
-                        <pre>${JSON.stringify(error, null, 2)}</pre>
-                    `;
-                } else {
-                    result.innerHTML = `
-                        <div class="success">✅ Production authentication working!</div>
-                        <div class="info">👤 User ID: ${data.user?.id}</div>
-                        <div class="info">📧 Email: ${data.user?.email}</div>
-                        <div class="info">✉️ Confirmation: ${data.user?.email_confirmed_at ? 'Confirmed' : 'Pending'}</div>
-                    `;
-                }
-                
-            } catch (error) {
-                result.innerHTML = `
-                    <div class="error">❌ Test failed</div>
-                    <div class="error">Error: ${error.message}</div>
-                    <pre>${error.stack}</pre>
-                `;
-            }
-        };
-
-        // Auto-detect configuration on load
-        window.addEventListener('load', () => {
-            detectSupabaseConfig();
-        });
-    </script>
+        <h2>💡 SOLUTIONS ERREUR 403</h2>
+        <div class="status error">
+        <strong>Si vous avez encore l'erreur 403 :</strong><br><br>
+        1. <strong>Videz votre cache navigateur :</strong><br>
+        &nbsp;&nbsp;• Chrome: F12 → Network → Clic droit Refresh → Empty Cache Hard Reload<br>
+        &nbsp;&nbsp;• Firefox: Ctrl+Shift+Delete → Tout effacer<br><br>
+        2. <strong>Testez en navigation privée</strong><br><br>
+        3. <strong>Changez de réseau (4G/WiFi)</strong><br><br>
+        4. <strong>Redémarrez votre routeur</strong>
+        </div>
+        
+        <button onclick="window.open('https://optima.dev-swiss.ch', '_blank')">🌐 Ouvrir Site Production</button>
+        <button onclick="window.open('https://68c03cdbe1c6363bec25f309--optimav1.netlify.app', '_blank')">👁️ Ouvrir Preview</button>
+    </div>
 </body>
 </html>
