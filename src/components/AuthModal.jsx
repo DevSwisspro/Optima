@@ -44,6 +44,11 @@ const AuthModal = ({ isOpen, onClose, onAuth, isLoading, supabase }) => {
       if (isLogin) {
         await onAuth(formData.email, formData.password, isLogin);
       } else {
+        // Vérifier que supabase est disponible
+        if (!supabase || !supabase.auth) {
+          throw new Error('Service d\'authentification non disponible. Vérifiez votre configuration.');
+        }
+
         // Pour l'inscription, utiliser directement Supabase avec phone auth comme fallback
         const { data, error } = await supabase.auth.signUp({
           email: formData.email,
@@ -110,6 +115,10 @@ const AuthModal = ({ isOpen, onClose, onAuth, isLoading, supabase }) => {
     }
 
     try {
+      if (!supabase || !supabase.auth) {
+        throw new Error('Service d\'authentification non disponible');
+      }
+
       // Supabase utilise des tokens OTP pour la vérification
       const { data, error } = await supabase.auth.verifyOtp({
         email: pendingEmail,
@@ -138,6 +147,10 @@ const AuthModal = ({ isOpen, onClose, onAuth, isLoading, supabase }) => {
 
   const resendCode = async () => {
     try {
+      if (!supabase || !supabase.auth) {
+        throw new Error('Service d\'authentification non disponible');
+      }
+
       const { error } = await supabase.auth.resend({
         type: 'signup',
         email: pendingEmail

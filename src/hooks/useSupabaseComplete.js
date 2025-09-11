@@ -8,9 +8,18 @@ export const useSupabaseData = () => {
   const [isOnline, setIsOnline] = useState(isSupabaseConfigured())
 
   useEffect(() => {
+    if (!supabase) {
+      console.error('Supabase client non disponible')
+      setLoading(false)
+      return
+    }
+
     // Récupérer la session actuelle
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
+      setLoading(false)
+    }).catch(error => {
+      console.error('Erreur getSession:', error)
       setLoading(false)
     })
 

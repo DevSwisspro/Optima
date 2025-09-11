@@ -637,6 +637,10 @@ export default function App() {
   const handleAuth = async (email, password, isLogin) => {
     setAuthLoading2(true);
     try {
+      if (!supabase || !supabase.auth) {
+        throw new Error('Service d\'authentification non disponible. Vérifiez votre configuration.');
+      }
+
       let result;
       if (isLogin) {
         result = await supabase.auth.signInWithPassword({ email, password });
@@ -672,6 +676,10 @@ export default function App() {
 
   const handleLogout = async () => {
     try {
+      if (!supabase || !supabase.auth) {
+        console.error('Service d\'authentification non disponible');
+        return;
+      }
       await supabase.auth.signOut();
     } catch (error) {
       console.error('Erreur lors de la déconnexion:', error.message);
@@ -684,6 +692,10 @@ export default function App() {
       const hash = window.location.hash;
       if (hash && hash.includes('access_token')) {
         try {
+          if (!supabase || !supabase.auth) {
+            console.error('Service d\'authentification non disponible pour vérification email');
+            return;
+          }
           const { data, error } = await supabase.auth.getSession();
           if (error) throw error;
           
