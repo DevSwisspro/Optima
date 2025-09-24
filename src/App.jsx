@@ -1559,45 +1559,96 @@ export default function App() {
   }, [mediaItems]);
 
   const PriorityBadge = ({ p }) => (
-    <Badge className={`ml-2 rounded px-3 py-1 text-xs font-bold ${
-      p === "urgent" ? "bg-red-600 text-white" : 
-      p === "normal" ? "bg-orange-600 text-white" :
-      "bg-gray-600 text-white"
-    }`}>
-      {PRIORITY_LABELS[p]}
-    </Badge>
+    <motion.div
+      initial={{ scale: 0.8, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      whileHover={{ scale: 1.05 }}
+      className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold shadow-lg border transition-all duration-300 ${
+        p === "urgent" ? "bg-gradient-to-r from-red-500 to-red-600 text-white shadow-red-500/30 border-red-400/50" :
+        p === "normal" ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-orange-500/30 border-orange-400/50" :
+        "bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-gray-500/30 border-gray-400/50"
+      }`}
+    >
+      <div className={`w-2 h-2 rounded-full ${
+        p === "urgent" ? "bg-white/90" :
+        p === "normal" ? "bg-white/90" :
+        "bg-white/90"
+      }`}></div>
+      <span className="text-xs font-semibold">
+        {PRIORITY_LABELS[p]}
+      </span>
+    </motion.div>
   );
 
   const TaskRow = ({ t }) => (
-    <motion.div 
-      layout 
-      initial={{ opacity: 0, y: 20, scale: 0.95 }} 
-      animate={{ opacity: 1, y: 0, scale: 1 }} 
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 20, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: -20, scale: 0.95 }}
-      whileHover={{ scale: 1.02, y: -2 }}
-      className={`group relative overflow-hidden rounded-xl border border-gray-700/50 bg-gray-800/90 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 ${
+      whileTap={{ scale: 0.98 }}
+      whileHover={{ scale: 1.01, y: -1 }}
+      className={`group relative overflow-hidden rounded-2xl glass-dark neo-shadow border border-white/20 transition-all duration-300 ${
         t.completed ? "opacity-60" : ""
       }`}
     >
-      <div className="relative flex items-center gap-4 p-6">
-        <Button 
-          size="icon" 
-          variant="outline" 
-          onClick={() => completeTask(t.id)} 
-          className="relative rounded-full bg-gradient-to-br from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 active:scale-95 group-hover:shadow-red-500/50"
+      <div className="relative flex items-center gap-4 p-5 min-h-[72px]">
+        {/* Touch target amélioré pour iPhone avec zone cliquable plus large */}
+        <motion.button
+          onClick={() => completeTask(t.id)}
+          whileTap={{ scale: 0.92 }}
+          whileHover={{ scale: 1.08 }}
+          className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-red-500 to-red-600 hover:from-red-400 hover:to-red-500 shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center touch-target iphone-optimized performance-optimized group-hover:shadow-red-500/40"
         >
-          <Check className="w-5 h-5 text-white" />
-        </Button>
-        
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start gap-3">
-            <span className="font-semibold text-lg break-words leading-relaxed flex-1 text-gray-100 group-hover:text-white transition-colors duration-300 cursor-pointer">
+          <Check className="w-6 h-6 text-white drop-shadow-sm" />
+
+          {/* Effet de brillance au survol */}
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent rounded-2xl"
+            initial={{ x: '-100%', opacity: 0 }}
+            whileHover={{ x: '100%', opacity: 1 }}
+            transition={{ duration: 0.6 }}
+          />
+        </motion.button>
+
+        <div className="flex-1 min-w-0 py-1">
+          <div className="flex items-start gap-3 sm:gap-4">
+            <span className="font-semibold text-lg sm:text-xl break-words leading-tight flex-1 text-white group-hover:text-gray-100 transition-colors duration-300 cursor-pointer">
               {t.title}
             </span>
-            <PriorityBadge p={t.priority} />
+
+            {/* Badge de priorité redesigné pour mobile */}
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.1 }}
+            >
+              <PriorityBadge p={t.priority} />
+            </motion.div>
           </div>
+
+          {/* Indicateur visuel subtil pour le swipe (optionnel) */}
+          <motion.div
+            className="absolute right-2 top-1/2 transform -translate-y-1/2 opacity-20 group-hover:opacity-40 transition-opacity duration-300"
+            initial={{ x: 10, opacity: 0 }}
+            animate={{ x: 0, opacity: 0.2 }}
+          >
+            <div className="flex gap-1">
+              <div className="w-1 h-1 bg-white rounded-full"></div>
+              <div className="w-1 h-1 bg-white rounded-full"></div>
+              <div className="w-1 h-1 bg-white rounded-full"></div>
+            </div>
+          </motion.div>
         </div>
       </div>
+
+      {/* Effet de gradient sur les bords pour design moderne */}
+      <motion.div
+        className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+        style={{
+          background: 'linear-gradient(90deg, transparent 0%, rgba(220, 38, 38, 0.1) 50%, transparent 100%)'
+        }}
+      />
     </motion.div>
   );
 
@@ -3284,91 +3335,167 @@ export default function App() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.3, ease: "easeInOut" }}
+              className="performance-optimized smooth-scroll safe-area-inset"
             >
               {/* Zone d'ajout de tâche */}
-            <div className="bg-gray-800 rounded-xl p-6 space-y-4">
-              <div className="flex gap-3 items-center">
-                <Input 
-                  value={input} 
-                  onChange={(e) => setInput(e.target.value)} 
-                  placeholder="Que voulez-vous accomplir aujourd'hui ?" 
-                  onKeyDown={(e) => { if (e.key === "Enter") addTask(); }} 
-                  className="flex-1 h-12 text-lg rounded-lg border-0 bg-gray-700 text-white placeholder:text-gray-400 font-medium focus:bg-gray-600 focus:ring-2 focus:ring-red-500 transition-all duration-300" 
-                />
-
-                <div className="relative" ref={priorityMenuRef}>
-                  <button
-                    onClick={() => setShowPriorityMenu(!showPriorityMenu)}
-                    className={`w-auto min-w-48 h-12 rounded text-white border-0 text-sm px-3 flex items-center justify-between focus:outline-none ${
-                      priorityChoice === "urgent" ? "bg-red-600" :
-                      priorityChoice === "normal" ? "bg-orange-600" :
-                      "bg-gray-600"
-                    }`}
-                  >
-                    <span>
-                      {PRIORITY_LABELS[priorityChoice]}
-                    </span>
-                    <span className="text-white ml-2">▼</span>
-                  </button>
-                  {showPriorityMenu && (
-                    <motion.div 
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="absolute top-full left-0 right-0 mt-2 bg-gray-900 rounded border border-gray-700 z-10"
-                    >
-                      <div 
-                        className="px-4 py-3 hover:bg-red-800/50 cursor-pointer rounded-t-lg text-white text-sm font-medium"
-                        onClick={() => { setPriorityChoice("urgent"); setShowPriorityMenu(false); }}
-                      >
-                        {PRIORITY_LABELS["urgent"]}
-                      </div>
-                      <div 
-                        className="px-4 py-3 hover:bg-orange-800/50 cursor-pointer text-white text-sm font-medium"
-                        onClick={() => { setPriorityChoice("normal"); setShowPriorityMenu(false); }}
-                      >
-                        {PRIORITY_LABELS["normal"]}
-                      </div>
-                      <div 
-                        className="px-4 py-3 hover:bg-gray-800 cursor-pointer rounded-b-lg text-white text-sm font-medium"
-                        onClick={() => { setPriorityChoice("low"); setShowPriorityMenu(false); }}
-                      >
-                        {PRIORITY_LABELS["low"]}
-                      </div>
-                    </motion.div>
-                  )}
-                </div>
-
-                <Button 
-                  onClick={addTask} 
-                  className="h-12 px-6 bg-red-600 text-white rounded hover:bg-red-500 text-lg font-bold"
-                >
-                  <Plus className="w-5 h-5 mr-2" />
-                  Ajouter
-                </Button>
-              </div>
-            </div>
-
-            {/* Barre de recherche */}
-            <div className="bg-gray-800 rounded-xl p-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="glass-dark rounded-2xl p-6 neo-shadow border border-white/10 space-y-6"
+            >
+              {/* Header avec icône et titre */}
               <div className="flex items-center gap-3">
-                <Search className="w-5 h-5 text-gray-400" />
-                <Input 
-                  placeholder="Rechercher des tâches..." 
-                  className="flex-1 bg-gray-700 border-0 rounded-lg text-white placeholder:text-gray-400 text-base font-medium focus:bg-gray-600 focus:ring-2 focus:ring-red-500 transition-all duration-300" 
-                  value={filter.q} 
-                  onChange={(e) => setFilter({ ...filter, q: e.target.value })} 
+                <div className="p-3 bg-gradient-to-br from-red-500 to-red-600 rounded-xl shadow-lg">
+                  <Plus className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-white">Nouvelle tâche</h3>
+              </div>
+
+              {/* Interface mobile optimisée */}
+              <div className="space-y-4">
+                {/* Input principal */}
+                <Input
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="Que voulez-vous accomplir ?"
+                  onKeyDown={(e) => { if (e.key === "Enter") addTask(); }}
+                  className="w-full h-14 text-lg rounded-2xl border-0 bg-white/10 text-white placeholder:text-gray-300 font-medium focus:bg-white/15 focus:ring-2 focus:ring-red-500 transition-all duration-300 px-5"
+                />
+
+                {/* Mobile layout: Priority et bouton stack verticalement sur très petit écran */}
+                <div className="flex flex-col sm:flex-row gap-3">
+                  {/* Sélecteur de priorité mobile-friendly */}
+                  <div className="flex-1 relative" ref={priorityMenuRef}>
+                    <motion.button
+                      onClick={() => setShowPriorityMenu(!showPriorityMenu)}
+                      whileTap={{ scale: 0.98 }}
+                      className={`w-full h-14 rounded-2xl text-white border-0 text-base px-5 flex items-center justify-between focus:outline-none transition-all duration-300 font-semibold ${
+                        priorityChoice === "urgent" ? "bg-gradient-to-r from-red-600 to-red-700 shadow-lg shadow-red-500/25" :
+                        priorityChoice === "normal" ? "bg-gradient-to-r from-orange-500 to-orange-600 shadow-lg shadow-orange-500/25" :
+                        "bg-gradient-to-r from-gray-600 to-gray-700 shadow-lg"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`w-3 h-3 rounded-full ${
+                          priorityChoice === "urgent" ? "bg-white/80" :
+                          priorityChoice === "normal" ? "bg-white/80" :
+                          "bg-white/80"
+                        }`}></div>
+                        <span>{PRIORITY_LABELS[priorityChoice]}</span>
+                      </div>
+                      <motion.span
+                        className="text-white text-lg"
+                        animate={{ rotate: showPriorityMenu ? 180 : 0 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        ▼
+                      </motion.span>
+                    </motion.button>
+
+                    {/* Menu déroulant amélioré */}
+                    {showPriorityMenu && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                        className="absolute top-full left-0 right-0 mt-3 glass-dark rounded-2xl border border-white/20 z-20 overflow-hidden neo-shadow"
+                      >
+                        <motion.div
+                          className="py-4 px-5 hover:bg-red-600/20 cursor-pointer text-white text-base font-semibold transition-colors duration-200 active:bg-red-600/30"
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => { setPriorityChoice("urgent"); setShowPriorityMenu(false); }}
+                        >
+                          <div className="flex items-center gap-4">
+                            <div className="w-4 h-4 bg-red-500 rounded-full shadow-lg"></div>
+                            <span>{PRIORITY_LABELS["urgent"]}</span>
+                          </div>
+                        </motion.div>
+                        <motion.div
+                          className="py-4 px-5 hover:bg-orange-600/20 cursor-pointer text-white text-base font-semibold transition-colors duration-200 active:bg-orange-600/30"
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => { setPriorityChoice("normal"); setShowPriorityMenu(false); }}
+                        >
+                          <div className="flex items-center gap-4">
+                            <div className="w-4 h-4 bg-orange-500 rounded-full shadow-lg"></div>
+                            <span>{PRIORITY_LABELS["normal"]}</span>
+                          </div>
+                        </motion.div>
+                        <motion.div
+                          className="py-4 px-5 hover:bg-gray-600/20 cursor-pointer text-white text-base font-semibold transition-colors duration-200 active:bg-gray-600/30"
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => { setPriorityChoice("low"); setShowPriorityMenu(false); }}
+                        >
+                          <div className="flex items-center gap-4">
+                            <div className="w-4 h-4 bg-gray-500 rounded-full shadow-lg"></div>
+                            <span>{PRIORITY_LABELS["low"]}</span>
+                          </div>
+                        </motion.div>
+                      </motion.div>
+                    )}
+                  </div>
+
+                  {/* Bouton d'ajout optimisé mobile avec haptic feedback */}
+                  <motion.button
+                    onClick={addTask}
+                    whileTap={{ scale: 0.95 }}
+                    whileHover={{ scale: 1.02 }}
+                    className="sm:w-auto w-full h-14 px-6 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-2xl hover:from-red-500 hover:to-red-600 text-lg font-bold shadow-lg shadow-red-500/25 transition-all duration-300 flex items-center justify-center gap-3 min-w-[140px] touch-target iphone-optimized performance-optimized"
+                  >
+                    <motion.div
+                      whileHover={{ rotate: 90 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <Plus className="w-5 h-5" />
+                    </motion.div>
+                    <span>Ajouter</span>
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Barre de recherche optimisée iPhone */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="glass-dark rounded-2xl p-5 neo-shadow border border-white/10"
+            >
+              <div className="flex items-center gap-4">
+                <div className="p-2 bg-gradient-to-br from-gray-600 to-gray-700 rounded-xl">
+                  <Search className="w-5 h-5 text-white" />
+                </div>
+                <Input
+                  placeholder="Rechercher vos tâches..."
+                  className="flex-1 h-12 bg-white/10 border-0 rounded-2xl text-white placeholder:text-gray-300 text-lg font-medium focus:bg-white/15 focus:ring-2 focus:ring-red-500/60 transition-all duration-300 px-4"
+                  value={filter.q}
+                  onChange={(e) => setFilter({ ...filter, q: e.target.value })}
                 />
               </div>
-            </div>
+            </motion.div>
 
-            {/* Zone d'affichage des tâches */}
-            <div className="bg-gray-800 rounded-xl p-6 min-h-96">
+            {/* Zone d'affichage des tâches optimisée iPhone */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="glass-dark rounded-2xl p-6 min-h-96 neo-shadow border border-white/10"
+            >
               {(tasksByPriority.urgent.length === 0 && tasksByPriority.normal.length === 0) ? (
-                <div className="text-center text-gray-400 py-16">
-                  <div className="text-2xl mb-4">📝</div>
-                  <div className="text-xl font-semibold mb-2">Aucune tâche pour le moment</div>
-                  <div className="text-lg">Commencez par créer votre première tâche</div>
-                </div>
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="text-center text-gray-300 py-16"
+                >
+                  <motion.div
+                    animate={{ rotate: [0, 5, -5, 0] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                    className="text-4xl mb-6"
+                  >
+                    📝
+                  </motion.div>
+                  <div className="text-2xl font-bold mb-3 text-white">Aucune tâche</div>
+                  <div className="text-lg text-gray-400">Créez votre première tâche pour commencer</div>
+                </motion.div>
               ) : (
                 <div className="space-y-8">
                   {/* Section À faire rapidement */}
@@ -3376,17 +3503,29 @@ export default function App() {
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="space-y-4"
+                      className="space-y-5"
                     >
-                      <div className="flex items-center gap-3 pb-3 border-b border-red-500/30">
-                        <div className="flex items-center gap-2 text-red-400 font-bold text-lg">
-                          À faire rapidement
-                          <span className="text-sm bg-red-600 text-white rounded w-6 h-6 flex items-center justify-center">
-                            {tasksByPriority.urgent.length}
-                          </span>
+                      <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="flex items-center gap-4 pb-4 border-b border-red-500/40"
+                      >
+                        <div className="p-2 bg-gradient-to-br from-red-500 to-red-600 rounded-xl shadow-lg">
+                          <Sparkles className="w-5 h-5 text-white" />
                         </div>
-                      </div>
-                      <div className="flex flex-col gap-4">
+                        <div className="flex items-center gap-3 text-red-400 font-bold text-xl">
+                          À faire rapidement
+                          <motion.span
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ type: "spring", bounce: 0.5 }}
+                            className="text-sm bg-gradient-to-r from-red-500 to-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg"
+                          >
+                            {tasksByPriority.urgent.length}
+                          </motion.span>
+                        </div>
+                      </motion.div>
+                      <div className="flex flex-col gap-3">
                         <AnimatePresence initial={false}>
                           {tasksByPriority.urgent.map(t => <TaskRow key={t.id} t={t} />)}
                         </AnimatePresence>
@@ -3400,17 +3539,30 @@ export default function App() {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.1 }}
-                      className="space-y-4"
+                      className="space-y-5"
                     >
-                      <div className="flex items-center gap-3 pb-3 border-b border-orange-500/30">
-                        <div className="flex items-center gap-2 text-orange-400 font-bold text-lg">
-                          À faire prochainement
-                          <span className="text-sm bg-orange-600 text-white rounded w-6 h-6 flex items-center justify-center">
-                            {tasksByPriority.normal.length}
-                          </span>
+                      <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.1 }}
+                        className="flex items-center gap-4 pb-4 border-b border-orange-500/40"
+                      >
+                        <div className="p-2 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg">
+                          <Calendar className="w-5 h-5 text-white" />
                         </div>
-                      </div>
-                      <div className="flex flex-col gap-4">
+                        <div className="flex items-center gap-3 text-orange-400 font-bold text-xl">
+                          À faire prochainement
+                          <motion.span
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ type: "spring", bounce: 0.5, delay: 0.1 }}
+                            className="text-sm bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg"
+                          >
+                            {tasksByPriority.normal.length}
+                          </motion.span>
+                        </div>
+                      </motion.div>
+                      <div className="flex flex-col gap-3">
                         <AnimatePresence initial={false}>
                           {tasksByPriority.normal.map(t => <TaskRow key={t.id} t={t} />)}
                         </AnimatePresence>
@@ -3420,7 +3572,7 @@ export default function App() {
 
                 </div>
               )}
-            </div>
+            </motion.div>
             </motion.div>
           )}
 
