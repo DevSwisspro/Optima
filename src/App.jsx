@@ -485,12 +485,12 @@ const SORT_OPTIONS = {
 };
 
 // --- API Functions ------------------------------------------------------
-const TMDB_API_KEY = 'YOUR_TMDB_API_KEY'; // À remplacer par votre clé API TMDB
+const TMDB_API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
 
 const searchTMDB = async (query, type = 'multi') => {
-  if (!query || !TMDB_API_KEY || TMDB_API_KEY === 'YOUR_TMDB_API_KEY') return [];
+  if (!query || !TMDB_API_KEY) return [];
 
   try {
     const response = await fetch(
