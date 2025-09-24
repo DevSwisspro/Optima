@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug APIs - Optima</title>
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            background: #111827;
+            color: #e5e7eb;
+            padding: 2rem;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-section {
+            background: #1f2937;
+            border: 1px solid #374151;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+        .success { color: #10b981; }
+        .error { color: #ef4444; }
+        .warning { color: #f59e0b; }
+        button {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 0.5rem;
+        }
+        button:hover {
+            background: #b91c1c;
+        }
+        pre {
+            background: #0f172a;
+            padding: 1rem;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        input {
+            background: #374151;
+            border: 1px solid #4b5563;
+            color: #e5e7eb;
+            padding: 0.5rem;
+            border-radius: 4px;
+            margin: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Test des APIs - Optima</h1>
+
+        <div class="test-section">
+            <h2>📋 Configuration</h2>
+            <div id="config-status"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>🎬 Test TMDB</h2>
+            <input type="text" id="movie-search" placeholder="Rechercher un film..." value="inception">
+            <button onclick="testTMDB()">Tester TMDB</button>
+            <div id="tmdb-results"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>🎌 Test AniList</h2>
+            <input type="text" id="anime-search" placeholder="Rechercher un anime..." value="naruto">
+            <button onclick="testAniList()">Tester AniList</button>
+            <div id="anilist-results"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>🌐 Test Site Production</h2>
+            <p>Votre site Netlify : <a href="https://optima-app.netlify.app" target="_blank" style="color: #3b82f6;">https://optima-app.netlify.app</a></p>
+            <button onclick="window.open('https://optima-app.netlify.app', '_blank')">Ouvrir le site</button>
+        </div>
+    </div>
+
+    <script>
+        // Variables d'environnement
+        const TMDB_API_KEY = 'b121567bcaadb1d20806b5f9fc7590dc';
+        const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
+
+        // Vérification de la configuration
+        function checkConfig() {
+            const configDiv = document.getElementById('config-status');
+            let status = '<h3>État des variables :</h3>';
+
+            if (!TMDB_API_KEY || TMDB_API_KEY === 'VOTRE_CLE_TMDB') {
+                status += '<p class="error">❌ TMDB API Key non configurée</p>';
+            } else {
+                status += '<p class="success">✅ TMDB API Key configurée</p>';
+            }
+
+            status += '<p class="success">✅ AniList ne nécessite pas de clé API</p>';
+            status += '<p class="warning">⚠️  Cette page est pour les tests locaux uniquement</p>';
+            status += '<p class="warning">🔥 Vos vraies APIs sont configurées sur Netlify</p>';
+
+            configDiv.innerHTML = status;
+        }
+
+        // Test TMDB
+        async function testTMDB() {
+            const resultsDiv = document.getElementById('tmdb-results');
+            const query = document.getElementById('movie-search').value;
+
+            resultsDiv.innerHTML = '<p>🔄 Test en cours...</p>';
+
+            if (!TMDB_API_KEY || TMDB_API_KEY === 'VOTRE_CLE_TMDB') {
+                resultsDiv.innerHTML = '<p class="error">❌ Clé API TMDB manquante. Testez directement sur votre site Netlify !</p>';
+                return;
+            }
+
+            try {
+                const response = await fetch(
+                    `${TMDB_BASE_URL}/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}&language=fr-FR`
+                );
+                const data = await response.json();
+
+                if (data.results && data.results.length > 0) {
+                    let html = '<p class="success">✅ TMDB fonctionne !</p>';
+                    html += '<h4>Résultats :</h4>';
+                    data.results.slice(0, 3).forEach(movie => {
+                        html += `<p>🎬 ${movie.title} (${movie.release_date?.split('-')[0] || 'N/A'})</p>`;
+                    });
+                    resultsDiv.innerHTML = html;
+                } else {
+                    resultsDiv.innerHTML = '<p class="error">❌ Aucun résultat trouvé</p>';
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<p class="error">❌ Erreur: ${error.message}</p>`;
+            }
+        }
+
+        // Test AniList
+        async function testAniList() {
+            const resultsDiv = document.getElementById('anilist-results');
+            const query = document.getElementById('anime-search').value;
+
+            resultsDiv.innerHTML = '<p>🔄 Test en cours...</p>';
+
+            const graphqlQuery = `
+                query ($search: String) {
+                    Page(page: 1, perPage: 3) {
+                        media(search: $search, type: ANIME) {
+                            id
+                            title {
+                                romaji
+                                english
+                            }
+                            startDate {
+                                year
+                            }
+                        }
+                    }
+                }
+            `;
+
+            try {
+                const response = await fetch('https://graphql.anilist.co', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        query: graphqlQuery,
+                        variables: { search: query }
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.data?.Page?.media?.length > 0) {
+                    let html = '<p class="success">✅ AniList fonctionne !</p>';
+                    html += '<h4>Résultats :</h4>';
+                    data.data.Page.media.forEach(anime => {
+                        const title = anime.title.english || anime.title.romaji;
+                        html += `<p>🎌 ${title} (${anime.startDate?.year || 'N/A'})</p>`;
+                    });
+                    resultsDiv.innerHTML = html;
+                } else {
+                    resultsDiv.innerHTML = '<p class="error">❌ Aucun résultat trouvé</p>';
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<p class="error">❌ Erreur: ${error.message}</p>`;
+            }
+        }
+
+        // Test automatique au chargement
+        window.onload = function() {
+            checkConfig();
+        };
+    </script>
+</body>
+</html>

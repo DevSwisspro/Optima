@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Plus, Trash2, Sparkles, Search, List, FileText, ShoppingCart, Wallet, BarChart3, ArrowLeft, TrendingUp, PieChart as PieChartIcon, Calendar, Table, Download, Filter, ChevronLeft, ChevronRight, Settings, X, Play, Star } from "lucide-react";
+import { Check, Plus, Trash2, Sparkles, Search, List, FileText, ShoppingCart, Wallet, BarChart3, ArrowLeft, TrendingUp, PieChart as PieChartIcon, Calendar, Table, Download, Filter, ChevronLeft, ChevronRight, Settings, X, Play, Star, Edit } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, LabelList } from 'recharts';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -493,22 +493,37 @@ const searchTMDB = async (query, type = 'multi') => {
   if (!query || !TMDB_API_KEY) return [];
 
   try {
-    const response = await fetch(
+    // Recherche prioritairement en français
+    let response = await fetch(
       `${TMDB_BASE_URL}/search/${type}?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}&language=fr-FR`
     );
-    const data = await response.json();
+    let data = await response.json();
 
-    return data.results?.slice(0, 8).map(item => ({
-      id: item.id,
-      title: item.title || item.name,
-      originalTitle: item.original_title || item.original_name,
-      overview: item.overview,
-      posterPath: item.poster_path ? `${TMDB_IMAGE_BASE_URL}${item.poster_path}` : null,
-      releaseDate: item.release_date || item.first_air_date,
-      mediaType: item.media_type === 'tv' ? 'tv' : 'movie',
-      voteAverage: item.vote_average,
-      genres: item.genre_ids || []
-    })) || [];
+    // Si pas de résultats en français, essayer en anglais comme fallback
+    if (!data.results || data.results.length === 0) {
+      console.log('🔄 Pas de résultats FR, fallback EN pour:', query);
+      response = await fetch(
+        `${TMDB_BASE_URL}/search/${type}?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}&language=en-US`
+      );
+      data = await response.json();
+    }
+
+    return data.results?.slice(0, 8).map(item => {
+      // Prioriser titre français, fallback original
+      const title = item.title || item.name;
+      const originalTitle = item.original_title || item.original_name;
+
+      return {
+        id: item.id,
+        title: title, // Déjà en français grâce à language=fr-FR
+        originalTitle: originalTitle !== title ? originalTitle : null,
+        overview: null, // Masqué comme demandé - pas de description
+        posterPath: item.poster_path ? `${TMDB_IMAGE_BASE_URL}${item.poster_path}` : null,
+        releaseDate: item.release_date || item.first_air_date,
+        mediaType: item.media_type === 'tv' ? 'tv' : 'movie',
+        // Plus de voteAverage - suppression des notes API
+      };
+    }) || [];
   } catch (error) {
     console.error('TMDB API Error:', error);
     return [];
@@ -528,14 +543,13 @@ const searchAniList = async (query) => {
             english
             native
           }
-          description
+          description(asHtml: false)
           coverImage {
             large
           }
           startDate {
             year
           }
-          averageScore
           genres
         }
       }
@@ -556,19 +570,59 @@ const searchAniList = async (query) => {
 
     const data = await response.json();
 
-    return data.data?.Page?.media?.map(item => ({
-      id: item.id,
-      title: item.title.romaji || item.title.english,
-      originalTitle: item.title.native,
-      overview: item.description?.replace(/<[^>]*>/g, '').substring(0, 300) + '...',
-      posterPath: item.coverImage.large,
-      releaseDate: item.startDate?.year,
-      mediaType: 'anime',
-      voteAverage: item.averageScore ? item.averageScore / 10 : null,
-      genres: item.genres || []
-    })) || [];
+    return data.data?.Page?.media?.map(item => {
+      // Prioriser titres dans l'ordre : anglais > romaji (pas de français dans AniList)
+      const title = item.title.english || item.title.romaji;
+      const originalTitle = item.title.native;
+
+      console.log('🎌 AniList titre:', {
+        english: item.title.english,
+        romaji: item.title.romaji,
+        native: item.title.native,
+        selected: title
+      });
+
+      return {
+        id: item.id,
+        title: title,
+        originalTitle: originalTitle !== title ? originalTitle : null,
+        overview: null, // Masqué - pas de description comme demandé
+        posterPath: item.coverImage.large,
+        releaseDate: item.startDate?.year,
+        mediaType: 'anime'
+        // Plus d'averageScore - suppression des notes API
+      };
+    }) || [];
   } catch (error) {
     console.error('AniList API Error:', error);
+    return [];
+  }
+};
+
+// Fonction principale de recherche multi-API
+const searchMedias = async (query, selectedType = 'multi') => {
+  console.log('🔍 searchMedias appelée avec:', query, 'Type:', selectedType);
+  if (!query || query.length < 2) {
+    console.log('❌ Query trop courte ou vide');
+    return [];
+  }
+
+  try {
+    let results = [];
+
+    if (selectedType === 'anime') {
+      console.log('🎌 Recherche AniList pour:', query);
+      results = await searchAniList(query);
+    } else {
+      const searchType = selectedType === 'movie' ? 'movie' : selectedType === 'tv' ? 'tv' : 'multi';
+      console.log('🎬 Recherche TMDB pour:', query, 'Type:', searchType);
+      results = await searchTMDB(query, searchType);
+    }
+
+    console.log('✅ Résultats trouvés:', results.length, results);
+    return results;
+  } catch (error) {
+    console.error('❌ Search error:', error);
     return [];
   }
 };
@@ -1318,23 +1372,38 @@ export default function App() {
 
   // Fonctions pour l'auto-complétion
   const handleSearchMedia = async (query) => {
+    console.log('🔍 handleSearchMedia appelée avec:', query, 'Type média actuel:', mediaType);
+    console.log('🔍 mediaType typeof:', typeof mediaType, 'valeur exacte:', JSON.stringify(mediaType));
+
     if (!query || query.length < 2) {
+      console.log('❌ Query trop courte, reset suggestions');
       setSearchSuggestions([]);
       setShowSuggestions(false);
       return;
     }
 
+    console.log('🚀 Démarrage recherche...');
     setSearchLoading(true);
     try {
       let results = [];
 
+      console.log('🔍 Comparaison:', {
+        mediaType: mediaType,
+        isAnime: mediaType === 'anime',
+        isMovie: mediaType === 'movie',
+        isTv: mediaType === 'tv'
+      });
+
       if (mediaType === 'anime') {
+        console.log('🎌 Recherche AniList pour:', query);
         results = await searchAniList(query);
       } else {
         const searchType = mediaType === 'movie' ? 'movie' : mediaType === 'tv' ? 'tv' : 'multi';
+        console.log('🎬 Recherche TMDB pour:', query, 'Type:', searchType);
         results = await searchTMDB(query, searchType);
       }
 
+      console.log('✅ Résultats reçus:', results.length, results);
       setSearchSuggestions(results);
       setShowSuggestions(true);
     } catch (error) {
@@ -1349,6 +1418,9 @@ export default function App() {
     setMediaTitle(result.title);
     setMediaType(result.mediaType);
     setShowSuggestions(false);
+
+    // Plus d'auto-commentaire automatique - utilisateur saisit lui-même
+    setMediaComment("");
   };
 
   // Fonctions pour les médias
@@ -1362,7 +1434,7 @@ export default function App() {
       overview: selectedApiResult?.overview || '',
       posterPath: selectedApiResult?.posterPath || null,
       releaseDate: selectedApiResult?.releaseDate || null,
-      voteAverage: selectedApiResult?.voteAverage || null,
+      // voteAverage supprimé - plus de notes API
       genres: selectedApiResult?.genres || [],
       type: mediaType,
       status: mediaStatus,
@@ -1417,7 +1489,7 @@ export default function App() {
       overview: media.overview,
       posterPath: media.posterPath,
       releaseDate: media.releaseDate,
-      voteAverage: media.voteAverage,
+      // voteAverage supprimé - plus de notes API
       genres: media.genres,
       mediaType: media.type,
       id: media.apiId
@@ -4758,12 +4830,65 @@ export default function App() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <Input
-                  value={mediaTitle}
-                  onChange={(e) => setMediaTitle(e.target.value)}
-                  placeholder="Titre du film, série, animé..."
-                  className="h-12 text-lg rounded-lg border-0 bg-gray-700 text-white placeholder:text-gray-400 font-medium focus:bg-gray-600 focus:ring-2 focus:ring-red-500 transition-all duration-300"
-                />
+                <div className="relative">
+                  <Input
+                    value={mediaTitle}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setMediaTitle(value);
+                      // Déclencher la recherche API automatiquement
+                      console.log('🔍 Input change:', value, 'Length:', value.length);
+                      if (value.length > 2) {
+                        console.log('🚀 Déclenchement recherche pour:', value);
+                        handleSearchMedia(value);
+                      } else {
+                        console.log('❌ Trop court, pas de recherche');
+                        setShowSuggestions(false);
+                      }
+                    }}
+                    placeholder="Titre du film, série, animé..."
+                    className="h-12 text-lg rounded-lg border-0 bg-gray-700 text-white placeholder:text-gray-400 font-medium focus:bg-gray-600 focus:ring-2 focus:ring-red-500 transition-all duration-300"
+                  />
+                  {/* Suggestions API */}
+                  {showSuggestions && searchSuggestions.length > 0 && (
+                    <div className="absolute top-full left-0 right-0 z-50 bg-gray-800 border border-gray-600 rounded-lg mt-1 max-h-80 overflow-y-auto shadow-2xl">
+                      {searchLoading ? (
+                        <div className="p-4 text-center text-gray-400">
+                          🔍 Recherche en cours...
+                        </div>
+                      ) : (
+                        <>
+                          {searchSuggestions.map((result, index) => (
+                            <div
+                              key={`${result.mediaType}-${result.id}-${index}`}
+                              onClick={() => selectApiResult(result)}
+                              className="p-3 hover:bg-gray-700 cursor-pointer border-b border-gray-700 last:border-b-0 flex items-start gap-3"
+                            >
+                              {result.posterPath && (
+                                <img
+                                  src={result.posterPath}
+                                  alt={result.title}
+                                  className="w-12 h-16 object-cover rounded flex-shrink-0"
+                                />
+                              )}
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <h4 className="font-medium text-white truncate">{result.title}</h4>
+                                  <span className="text-xs px-2 py-1 bg-red-600 text-white rounded">
+                                    {result.mediaType === 'movie' ? '🎬' : result.mediaType === 'tv' ? '📺' : '🎌'}
+                                  </span>
+                                </div>
+                                <p className="text-sm text-gray-400 mb-1">
+                                  {result.releaseDate && typeof result.releaseDate === 'string' && `📅 ${result.releaseDate.split('-')[0]}`}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                        </>
+                      )}
+                    </div>
+                  )}
+                </div>
 
                 <Select value={mediaType} onValueChange={setMediaType}>
                   <SelectTrigger className="h-12 rounded-lg border-0 bg-gray-700 text-white focus:bg-gray-600 focus:ring-2 focus:ring-red-500">
@@ -4886,67 +5011,122 @@ export default function App() {
                     {filteredMedia.map(media => (
                       <motion.div
                         key={media.id}
-                        initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: -20, scale: 0.95 }}
-                        whileHover={{ scale: 1.02, y: -2 }}
-                        className="bg-gray-700 rounded-lg p-4 border border-gray-600 relative overflow-hidden group hover:border-red-500/30 transition-all duration-300"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        whileHover={{ scale: 1.02 }}
+                        className="group relative"
                       >
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                              <h3 className="text-lg font-semibold text-white">{media.title}</h3>
-                              <Badge className="bg-red-600 text-white text-xs">
-                                {MEDIA_TYPES[media.type]}
-                              </Badge>
-                              <Badge className={`text-xs ${
-                                media.status === 'watched' ? 'bg-green-600 text-white' : 'bg-blue-600 text-white'
-                              }`}>
-                                {MEDIA_STATUS[media.status]}
-                              </Badge>
-                            </div>
+                        {/* Carte minimaliste */}
+                        <div className="bg-gray-800/60 backdrop-blur-sm rounded-2xl border border-gray-700/50 overflow-hidden hover:border-red-500/40 transition-all duration-300 shadow-lg hover:shadow-xl">
 
-                            {media.status === "watched" && (
-                              <div className="flex items-center gap-2 mb-2">
-                                <span className="text-gray-300 text-sm">Note:</span>
-                                <div className="flex gap-1">
-                                  {[1, 2, 3, 4, 5].map((star) => (
-                                    <Star
-                                      key={star}
-                                      className={`w-4 h-4 ${star <= media.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-500'}`}
-                                    />
-                                  ))}
+                          {/* Layout responsive : mobile-first */}
+                          <div className="flex flex-col sm:flex-row">
+
+                            {/* Poster - propre sans overlay */}
+                            <div className="flex-shrink-0">
+                              {media.posterPath ? (
+                                <img
+                                  src={media.posterPath}
+                                  alt={media.title}
+                                  className="w-full h-64 sm:w-28 sm:h-40 object-cover rounded-lg shadow-md"
+                                  loading="lazy"
+                                />
+                              ) : (
+                                <div className="w-full h-64 sm:w-28 sm:h-40 bg-gray-700/50 flex items-center justify-center rounded-lg">
+                                  <Play className="w-8 h-8 text-gray-500" />
                                 </div>
-                                <span className="text-yellow-400 text-sm font-medium">({media.rating}/5)</span>
-                              </div>
-                            )}
-
-                            {media.comment && (
-                              <p className="text-gray-300 text-sm italic">"{media.comment}"</p>
-                            )}
-
-                            <div className="text-xs text-gray-400 mt-2">
-                              Ajouté le {new Date(media.dateAdded).toLocaleDateString('fr-FR')}
+                              )}
                             </div>
-                          </div>
 
-                          <div className="flex gap-2">
-                            <Button
-                              size="icon"
-                              variant="outline"
-                              onClick={() => startEditMedia(media)}
-                              className="rounded-full bg-gray-600 hover:bg-gray-500 border-0"
-                            >
-                              ✏️
-                            </Button>
-                            <Button
-                              size="icon"
-                              variant="outline"
-                              onClick={() => deleteMedia(media.id)}
-                              className="rounded-full bg-red-600 hover:bg-red-500 border-0"
-                            >
-                              <Trash2 className="w-4 h-4 text-white" />
-                            </Button>
+                            {/* Contenu principal */}
+                            <div className="flex-1 p-5 space-y-4">
+
+                              {/* Header avec titre et actions */}
+                              <div className="flex justify-between items-start gap-3">
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-3 mb-2 flex-wrap">
+                                    <h3 className="text-lg font-semibold text-white leading-tight">
+                                      {media.title}
+                                    </h3>
+
+                                    {/* Badges type et statut à côté du titre */}
+                                    <Badge className="bg-red-600/90 text-white text-xs px-2 py-1 rounded-md font-medium">
+                                      {media.type === 'movie' ? '🎬 Film' : media.type === 'tv' ? '📺 Série' : '🎌 Animé'}
+                                    </Badge>
+
+                                    <Badge className={`text-xs px-2 py-1 rounded-md font-medium ${
+                                      media.status === 'watched' ? 'bg-emerald-600 text-white' :
+                                      media.status === 'watching' ? 'bg-blue-600 text-white' :
+                                      'bg-amber-600 text-white'
+                                    }`}>
+                                      {media.status === 'watched' ? '✓ Vu' : media.status === 'watching' ? '▶ En cours' : '○ À voir'}
+                                    </Badge>
+                                  </div>
+
+                                  {/* Infos essentielles */}
+                                  <div className="flex items-center gap-3 text-sm text-gray-400">
+                                    {media.releaseDate && (
+                                      <span className="flex items-center gap-1">
+                                        📅 {typeof media.releaseDate === 'string' ? media.releaseDate.split('-')[0] : media.releaseDate}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+
+                                {/* Boutons d'action - visibles au survol */}
+                                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                  <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    onClick={() => startEditMedia(media)}
+                                    className="h-8 w-8 rounded-lg bg-gray-700/60 hover:bg-gray-600 text-gray-300 hover:text-white"
+                                  >
+                                    <Edit className="w-3 h-3" />
+                                  </Button>
+                                  <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    onClick={() => deleteMedia(media.id)}
+                                    className="h-8 w-8 rounded-lg bg-red-600/60 hover:bg-red-500 text-white"
+                                  >
+                                    <Trash2 className="w-3 h-3" />
+                                  </Button>
+                                </div>
+                              </div>
+
+                              {/* Ma note personnelle - uniquement si vu */}
+                              {media.status === "watched" && media.rating && (
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs text-gray-400 font-medium">⭐ Ma note:</span>
+                                  <div className="flex gap-0.5">
+                                    {[1, 2, 3, 4, 5].map((star) => (
+                                      <Star
+                                        key={star}
+                                        className={`w-4 h-4 ${
+                                          star <= media.rating
+                                            ? 'text-yellow-400 fill-yellow-400'
+                                            : 'text-gray-600'
+                                        }`}
+                                      />
+                                    ))}
+                                  </div>
+                                  <span className="text-yellow-400 text-sm font-bold">
+                                    {media.rating}/5
+                                  </span>
+                                </div>
+                              )}
+
+                              {/* Commentaire personnel - s'il existe */}
+                              {media.status === "watched" && media.comment && (
+                                <div className="bg-gray-700/30 rounded-xl p-3 border border-gray-600/30">
+                                  <p className="text-gray-200 text-sm italic leading-relaxed">
+                                    "{media.comment}"
+                                  </p>
+                                </div>
+                              )}
+
+                            </div>
                           </div>
                         </div>
                       </motion.div>

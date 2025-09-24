@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Environment - Optima</title>
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            background: #111827;
+            color: #e5e7eb;
+            padding: 2rem;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-section {
+            background: #1f2937;
+            border: 1px solid #374151;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+        .success { color: #10b981; }
+        .error { color: #ef4444; }
+        .warning { color: #f59e0b; }
+        pre {
+            background: #0f172a;
+            padding: 1rem;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        button {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 0.5rem;
+        }
+        button:hover {
+            background: #b91c1c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Debug Variables d'Environnement</h1>
+
+        <div class="test-section">
+            <h2>📋 Variables Vite</h2>
+            <div id="env-status"></div>
+            <button onclick="testEnv()">Vérifier les variables</button>
+        </div>
+
+        <div class="test-section">
+            <h2>🧪 Test TMDB Direct</h2>
+            <button onclick="testTMDBDirect()">Test TMDB avec clé</button>
+            <div id="tmdb-direct-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>🧪 Test AniList Direct</h2>
+            <button onclick="testAniListDirect()">Test AniList</button>
+            <div id="anilist-direct-result"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Test des variables d'environnement
+        window.testEnv = function() {
+            const envDiv = document.getElementById('env-status');
+
+            // Variables Vite (import.meta.env)
+            const tmdbKey = import.meta.env.VITE_TMDB_API_KEY;
+            const anilistId = import.meta.env.VITE_ANILIST_CLIENT_ID;
+
+            let html = '<h3>Variables détectées :</h3><pre>';
+            html += `VITE_TMDB_API_KEY: ${tmdbKey ? '✅ Définie (' + tmdbKey.slice(0,8) + '...)' : '❌ Non définie'}\n`;
+            html += `VITE_ANILIST_CLIENT_ID: ${anilistId ? '✅ Définie (' + anilistId + ')' : '❌ Non définie'}\n`;
+            html += '</pre>';
+
+            if (!tmdbKey) {
+                html += '<p class="error">❌ TMDB_API_KEY manquante ! Le serveur doit être redémarré après avoir modifié .env.local</p>';
+            } else {
+                html += '<p class="success">✅ Variables chargées correctement</p>';
+            }
+
+            envDiv.innerHTML = html;
+        };
+
+        // Test TMDB direct
+        window.testTMDBDirect = async function() {
+            const resultDiv = document.getElementById('tmdb-direct-result');
+            resultDiv.innerHTML = '<p>🔄 Test en cours...</p>';
+
+            const tmdbKey = import.meta.env.VITE_TMDB_API_KEY;
+
+            if (!tmdbKey) {
+                resultDiv.innerHTML = '<p class="error">❌ Clé TMDB manquante</p>';
+                return;
+            }
+
+            try {
+                const response = await fetch(
+                    `https://api.themoviedb.org/3/search/multi?api_key=${tmdbKey}&query=naruto&language=fr-FR`
+                );
+                const data = await response.json();
+
+                if (data.results && data.results.length > 0) {
+                    let html = '<p class="success">✅ TMDB fonctionne !</p>';
+                    html += '<h4>Résultats Naruto :</h4><pre>';
+                    data.results.slice(0, 3).forEach(item => {
+                        html += `${item.title || item.name} (${item.release_date || item.first_air_date || 'N/A'})\n`;
+                    });
+                    html += '</pre>';
+                    resultDiv.innerHTML = html;
+                } else {
+                    resultDiv.innerHTML = '<p class="error">❌ Aucun résultat trouvé</p>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">❌ Erreur: ${error.message}</p>`;
+            }
+        };
+
+        // Test AniList direct
+        window.testAniListDirect = async function() {
+            const resultDiv = document.getElementById('anilist-direct-result');
+            resultDiv.innerHTML = '<p>🔄 Test en cours...</p>';
+
+            const query = `
+                query {
+                    Page(page: 1, perPage: 3) {
+                        media(search: "naruto", type: ANIME) {
+                            id
+                            title {
+                                romaji
+                                english
+                            }
+                            startDate {
+                                year
+                            }
+                        }
+                    }
+                }
+            `;
+
+            try {
+                const response = await fetch('https://graphql.anilist.co', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query })
+                });
+
+                const data = await response.json();
+
+                if (data.data?.Page?.media?.length > 0) {
+                    let html = '<p class="success">✅ AniList fonctionne !</p>';
+                    html += '<h4>Résultats Naruto :</h4><pre>';
+                    data.data.Page.media.forEach(anime => {
+                        const title = anime.title.english || anime.title.romaji;
+                        html += `${title} (${anime.startDate?.year || 'N/A'})\n`;
+                    });
+                    html += '</pre>';
+                    resultDiv.innerHTML = html;
+                } else {
+                    resultDiv.innerHTML = '<p class="error">❌ Aucun résultat trouvé</p>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">❌ Erreur: ${error.message}</p>`;
+            }
+        };
+
+        // Test automatique au chargement
+        window.onload = function() {
+            testEnv();
+        };
+    </script>
+</body>
+</html>
