@@ -1,7 +1,6 @@
-// Version 1.0.0 - Force deployment update
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Plus, Trash2, Sparkles, Search, List, FileText, ShoppingCart, Wallet, BarChart3, ArrowLeft, TrendingUp, PieChart as PieChartIcon, Calendar, Table, Download, Filter, ChevronLeft, ChevronRight, Settings, X, LogOut, User } from "lucide-react";
+import { Check, Plus, Trash2, Sparkles, Search, List, FileText, ShoppingCart, Wallet, BarChart3, ArrowLeft, TrendingUp, PieChart as PieChartIcon, Calendar, Table, Download, Filter, ChevronLeft, ChevronRight, Settings, X, Play, Star } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, LabelList } from 'recharts';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,8 +10,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import Header from "@/components/Header";
 import { formatCurrency } from "@/lib/utils";
 import LogoDevSwiss from "@/components/LogoDevSwiss";
-import AuthModal from "@/components/AuthModal";
-import { useSupabaseData, useBudgetItems, useTasks, useNotes, useShoppingItems } from "@/hooks/useSupabaseComplete";
 
 // --- Helpers -----------------------------------------------------------
 const LS_KEY = "todo_coach_v2";
@@ -21,6 +18,7 @@ const LS_SHOPPING_KEY = "todo_coach_shopping_v1";
 const LS_BUDGET_KEY = "todo_coach_budget_v1";
 const LS_RECURRING_KEY = "todo_coach_recurring_v1";
 const LS_BUDGET_LIMITS_KEY = "todo_coach_budget_limits_v1";
+const LS_MEDIA_KEY = "todo_coach_media_v1";
 const uuid = () => Math.random().toString(36).slice(2) + Date.now().toString(36);
 
 // Fonctions utilitaires pour le dashboard
@@ -390,12 +388,11 @@ const exportToCSV = (budgetItems) => {
 // Traductions des priorités
 const PRIORITY_LABELS = {
   urgent: "À faire rapidement",
-  normal: "À faire prochainement", 
-  low: "À faire plus tard"
+  normal: "À faire prochainement"
 };
 
 // Ordre des priorités
-const PRIORITY_ORDER = { urgent: 0, normal: 1, low: 2 };
+const PRIORITY_ORDER = { urgent: 0, normal: 1 };
 
 // Catégories des courses
 const SHOPPING_CATEGORIES = {
@@ -466,13 +463,122 @@ const BUDGET_CATEGORIES = {
   }
 };
 
+// Catégories de médias
+const MEDIA_TYPES = {
+  movie: "Film",
+  tv: "Série",
+  anime: "Animé",
+  documentary: "Documentaire"
+};
+
+const MEDIA_STATUS = {
+  watched: "Déjà vu",
+  towatch: "À regarder",
+  watching: "En cours"
+};
+
+const SORT_OPTIONS = {
+  dateAdded: "Date d'ajout",
+  title: "Titre (A-Z)",
+  rating: "Ma note",
+  releaseDate: "Date de sortie"
+};
+
+// --- API Functions ------------------------------------------------------
+const TMDB_API_KEY = 'YOUR_TMDB_API_KEY'; // À remplacer par votre clé API TMDB
+const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
+const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
+
+const searchTMDB = async (query, type = 'multi') => {
+  if (!query || !TMDB_API_KEY || TMDB_API_KEY === 'YOUR_TMDB_API_KEY') return [];
+
+  try {
+    const response = await fetch(
+      `${TMDB_BASE_URL}/search/${type}?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}&language=fr-FR`
+    );
+    const data = await response.json();
+
+    return data.results?.slice(0, 8).map(item => ({
+      id: item.id,
+      title: item.title || item.name,
+      originalTitle: item.original_title || item.original_name,
+      overview: item.overview,
+      posterPath: item.poster_path ? `${TMDB_IMAGE_BASE_URL}${item.poster_path}` : null,
+      releaseDate: item.release_date || item.first_air_date,
+      mediaType: item.media_type === 'tv' ? 'tv' : 'movie',
+      voteAverage: item.vote_average,
+      genres: item.genre_ids || []
+    })) || [];
+  } catch (error) {
+    console.error('TMDB API Error:', error);
+    return [];
+  }
+};
+
+const searchAniList = async (query) => {
+  if (!query) return [];
+
+  const queryQL = `
+    query ($search: String) {
+      Page(page: 1, perPage: 8) {
+        media(search: $search, type: ANIME) {
+          id
+          title {
+            romaji
+            english
+            native
+          }
+          description
+          coverImage {
+            large
+          }
+          startDate {
+            year
+          }
+          averageScore
+          genres
+        }
+      }
+    }
+  `;
+
+  try {
+    const response = await fetch('https://graphql.anilist.co', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        query: queryQL,
+        variables: { search: query }
+      })
+    });
+
+    const data = await response.json();
+
+    return data.data?.Page?.media?.map(item => ({
+      id: item.id,
+      title: item.title.romaji || item.title.english,
+      originalTitle: item.title.native,
+      overview: item.description?.replace(/<[^>]*>/g, '').substring(0, 300) + '...',
+      posterPath: item.coverImage.large,
+      releaseDate: item.startDate?.year,
+      mediaType: 'anime',
+      voteAverage: item.averageScore ? item.averageScore / 10 : null,
+      genres: item.genres || []
+    })) || [];
+  } catch (error) {
+    console.error('AniList API Error:', error);
+    return [];
+  }
+};
+
 // --- NLP simplifié ------------------------------------------------------
 function parseTaskNLP(raw) {
   if (!raw) return { title: "", priority: "normal" };
   let text = raw.trim();
   let priority = "normal";
   if (/(!|#p1)/i.test(text)) { priority = "urgent"; text = text.replace(/(!|#p1)/i, "").trim(); }
-  else if (/#p3/i.test(text)) { priority = "low"; text = text.replace(/#p3/i, "").trim(); }
   return { title: text, priority };
 }
 
@@ -490,21 +596,7 @@ function ding() {
 
 // --- Main App ---------------------------------------------------------------
 export default function App() {
-  // Authentification Supabase
-  const { user, loading: authLoading, isOnline, supabase } = useSupabaseData();
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const [authLoading2, setAuthLoading2] = useState(false);
-  
-  // Hooks Supabase pour toutes les données
-  const { budgetItems, loading: budgetLoading, addBudgetItem, updateBudgetItem, deleteBudgetItem } = useBudgetItems(user);
-  const { tasks: supabaseTasks, loading: tasksLoading, addTask: addSupabaseTask, updateTask, deleteTask } = useTasks(user);
-  const { notes: supabaseNotes, loading: notesLoading, addNote: addSupabaseNote, updateNote, deleteNote } = useNotes(user);
-  const { shoppingItems: supabaseShoppingItems, loading: shoppingLoading, addShoppingItem: addSupabaseShoppingItem, updateShoppingItem, deleteShoppingItem } = useShoppingItems(user);
-  
-  // États pour l'interface (UI seulement - les données viennent de Supabase)
   const [tasks, setTasks] = useState([]);
-  const [notes, setNotes] = useState([]);
-  const [shoppingItems, setShoppingItems] = useState([]);
   const [filter, setFilter] = useState({ q: "" });
   const [input, setInput] = useState("");
   const [priorityChoice, setPriorityChoice] = useState("normal");
@@ -607,15 +699,15 @@ export default function App() {
     year: new Date().getFullYear()
   });
   
-  // États pour les notes (local)
-  const [localNotes, setLocalNotes] = useState([]);
+  // États pour les notes
+  const [notes, setNotes] = useState([]);
   const [noteTitle, setNoteTitle] = useState("");
   const [noteContent, setNoteContent] = useState("");
   const [editingNote, setEditingNote] = useState(null);
   const [noteFilter, setNoteFilter] = useState({ q: "" });
   
-  // États pour les courses (local)
-  const [localShoppingItems, setLocalShoppingItems] = useState([]);
+  // États pour les courses
+  const [shoppingItems, setShoppingItems] = useState([]);
   const [itemName, setItemName] = useState("");
   const [itemQuantity, setItemQuantity] = useState(1);
   const [itemUnit, setItemUnit] = useState("p");
@@ -623,8 +715,26 @@ export default function App() {
   const [editingItem, setEditingItem] = useState(null);
   const [shoppingFilter, setShoppingFilter] = useState({});
 
-  // États pour le budget (local - sera remplacé par Supabase)
-  const [localBudgetItems, setLocalBudgetItems] = useState([]);
+  // États pour les médias
+  const [mediaItems, setMediaItems] = useState([]);
+  const [mediaTitle, setMediaTitle] = useState("");
+  const [mediaType, setMediaType] = useState("movie");
+  const [mediaStatus, setMediaStatus] = useState("watched");
+  const [mediaRating, setMediaRating] = useState(5);
+  const [mediaComment, setMediaComment] = useState("");
+  const [editingMedia, setEditingMedia] = useState(null);
+  const [mediaFilter, setMediaFilter] = useState({ q: "", type: "all", status: "all" });
+
+  // Nouveaux états pour l'interface améliorée
+  const [searchSuggestions, setSearchSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [selectedApiResult, setSelectedApiResult] = useState(null);
+  const [sortBy, setSortBy] = useState("dateAdded");
+  const [viewMode, setViewMode] = useState("grid"); // 'grid' ou 'list'
+
+  // États pour le budget
+  const [budgetItems, setBudgetItems] = useState([]);
   const [budgetDescription, setBudgetDescription] = useState("");
   const [budgetAmount, setBudgetAmount] = useState("");
   const [budgetType, setBudgetType] = useState("revenus");
@@ -632,134 +742,6 @@ export default function App() {
   const [budgetDate, setBudgetDate] = useState(new Date().toISOString().split('T')[0]);
   const [editingBudgetItem, setEditingBudgetItem] = useState(null);
   const [budgetFilter, setBudgetFilter] = useState({});
-
-  // Fonctions d'authentification
-  const handleAuth = async (email, password, isLogin) => {
-    setAuthLoading2(true);
-    try {
-      if (!supabase || !supabase.auth) {
-        throw new Error('Service d\'authentification non disponible. Vérifiez votre configuration.');
-      }
-
-      let result;
-      if (isLogin) {
-        result = await supabase.auth.signInWithPassword({ email, password });
-      } else {
-        // Déterminer l'URL de redirection basée sur l'environnement
-        const isProduction = window.location.hostname !== 'localhost';
-        const redirectUrl = isProduction ? 'https://optima.dev-swiss.ch' : 'http://localhost:3000';
-        
-        result = await supabase.auth.signUp({ 
-          email, 
-          password,
-          options: {
-            emailRedirectTo: redirectUrl
-          }
-        });
-      }
-      
-      if (result.error) {
-        throw new Error(result.error.message);
-      }
-      
-      if (!isLogin && result.data.user && !result.data.session) {
-        throw new Error('Inscription réussie ! Vérifiez votre email pour confirmer votre compte.');
-      }
-      
-      setShowAuthModal(false);
-    } catch (error) {
-      throw error;
-    } finally {
-      setAuthLoading2(false);
-    }
-  };
-
-  const handleLogout = async () => {
-    try {
-      if (!supabase || !supabase.auth) {
-        console.error('Service d\'authentification non disponible');
-        return;
-      }
-      await supabase.auth.signOut();
-    } catch (error) {
-      console.error('Erreur lors de la déconnexion:', error.message);
-    }
-  };
-
-  // Gérer la vérification email au chargement
-  useEffect(() => {
-    const handleEmailVerification = async () => {
-      const hash = window.location.hash;
-      if (hash && hash.includes('access_token')) {
-        try {
-          if (!supabase || !supabase.auth) {
-            console.error('Service d\'authentification non disponible pour vérification email');
-            return;
-          }
-          const { data, error } = await supabase.auth.getSession();
-          if (error) throw error;
-          
-          if (data.session) {
-            console.log('✅ Email vérifié avec succès !');
-            setShowAuthModal(false);
-            // Nettoyer l'URL pour éviter les problèmes de cache
-            window.history.replaceState({}, document.title, window.location.pathname);
-          }
-        } catch (error) {
-          console.error('❌ Erreur lors de la vérification email:', error.message);
-        }
-      }
-    };
-
-    handleEmailVerification();
-  }, []);
-
-  // Forcer l'authentification dès le chargement de l'application
-  useEffect(() => {
-    if (!authLoading && !user) {
-      setShowAuthModal(true);
-    }
-  }, [user, authLoading]);
-
-  // Synchroniser toutes les données Supabase avec les états locaux
-  useEffect(() => {
-    if (user && supabaseTasks.length >= 0) {
-      setTasks(supabaseTasks.map(task => ({
-        id: task.id,
-        text: task.title || task.description,
-        done: task.completed,
-        priority: task.priority || 'normal',
-        date: task.created_at
-      })));
-    }
-  }, [supabaseTasks, user]);
-
-  // Synchroniser les notes
-  useEffect(() => {
-    if (user && supabaseNotes.length >= 0) {
-      setNotes(supabaseNotes.map(note => ({
-        id: note.id,
-        text: note.content,
-        title: note.title,
-        createdAt: note.created_at
-      })));
-    }
-  }, [supabaseNotes, user]);
-
-  // Synchroniser les éléments de shopping
-  useEffect(() => {
-    if (user && supabaseShoppingItems.length >= 0) {
-      setShoppingItems(supabaseShoppingItems.map(item => ({
-        id: item.id,
-        name: item.name,
-        quantity: item.quantity,
-        unit: item.unit,
-        category: item.category,
-        checked: item.completed,
-        createdAt: item.created_at
-      })));
-    }
-  }, [supabaseShoppingItems, user]);
 
   useEffect(() => {
     try { const raw = localStorage.getItem(LS_KEY); if (raw) setTasks(JSON.parse(raw)); } catch {}
@@ -811,10 +793,23 @@ export default function App() {
     try { localStorage.setItem(LS_RECURRING_KEY, JSON.stringify(recurringExpenses)); } catch {}
   }, [recurringExpenses]);
 
-  // Sauvegarder les limites de budget dans le localStorage  
+  // Sauvegarder les limites de budget dans le localStorage
   useEffect(() => {
     try { localStorage.setItem(LS_BUDGET_LIMITS_KEY, JSON.stringify(budgetLimits)); } catch {}
   }, [budgetLimits]);
+
+  // Charger les médias depuis le localStorage
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(LS_MEDIA_KEY);
+      if (raw) setMediaItems(JSON.parse(raw));
+    } catch {}
+  }, []);
+
+  // Sauvegarder les médias dans le localStorage
+  useEffect(() => {
+    try { localStorage.setItem(LS_MEDIA_KEY, JSON.stringify(mediaItems)); } catch {}
+  }, [mediaItems]);
 
   // Gérer la fermeture du menu de priorité au clic externe
   useEffect(() => {
@@ -1017,18 +1012,43 @@ export default function App() {
     }
   }, [recurringExpenses, budgetItems]);
 
-  // Charger le budget depuis le localStorage (désactivé car utilisation de Supabase)
+  // Charger le budget depuis le localStorage ou forcer les données de test
   useEffect(() => {
-    // DONNÉES DE TEST DÉSACTIVÉES - L'application utilise maintenant Supabase
-    const FORCE_TEST_DATA = false; // Désactivé car incompatible avec Supabase
+    // FORCER LES DONNÉES DE TEST (à décommenter pour réinitialiser)
+    const FORCE_TEST_DATA = true; // Mettre à false après test
     
     if (FORCE_TEST_DATA) {
-      console.log("Mode test désactivé - utilisation de Supabase");
+      const testData = generateTestData();
+      setBudgetItems(testData);
+      localStorage.setItem(LS_BUDGET_KEY, JSON.stringify(testData));
       return;
     }
 
-    // Avec Supabase, les données sont automatiquement chargées via le hook useBudgetItems
-    console.log("Application utilise Supabase pour le budget - localStorage désactivé");
+    try { 
+      const raw = localStorage.getItem(LS_BUDGET_KEY); 
+      if (raw) {
+        const parsedData = JSON.parse(raw);
+        // Vérifier si on a des données valides
+        if (parsedData && parsedData.length > 0) {
+          setBudgetItems(parsedData);
+        } else {
+          // Si array vide, charger les données de test
+          const testData = generateTestData();
+          setBudgetItems(testData);
+          localStorage.setItem(LS_BUDGET_KEY, JSON.stringify(testData));
+        }
+      } else {
+        // Si pas de données sauvegardées, charger les données de test
+        const testData = generateTestData();
+        setBudgetItems(testData);
+        localStorage.setItem(LS_BUDGET_KEY, JSON.stringify(testData));
+      }
+    } catch {
+      // En cas d'erreur, charger les données de test
+      const testData = generateTestData();
+      setBudgetItems(testData);
+      localStorage.setItem(LS_BUDGET_KEY, JSON.stringify(testData));
+    }
   }, []);
 
   // Sauvegarder le budget dans le localStorage
@@ -1036,70 +1056,38 @@ export default function App() {
     try { localStorage.setItem(LS_BUDGET_KEY, JSON.stringify(budgetItems)); } catch {}
   }, [budgetItems]);
 
-  const addTask = async () => {
-    if (!user) {
-      setShowAuthModal(true);
-      return;
-    }
-    
+  const addTask = () => {
     const parsed = parseTaskNLP(input);
     if (!parsed.title) return;
-    
-    try {
-      await addSupabaseTask({
-        title: parsed.title,
-        priority: priorityChoice || parsed.priority,
-        status: 'pending',
-        completed: false
-      });
-      setInput("");
-      setPriorityChoice("normal");
-    } catch (error) {
-      console.error('Erreur lors de l\'ajout de la tâche:', error);
-      alert('Erreur lors de la sauvegarde. Vérifiez votre connexion.');
-    }
+    const t = { id: uuid(), title: parsed.title, priority: priorityChoice || parsed.priority, completed: false };
+    setTasks(prev => [t, ...prev]);
+    setInput("");
+    setPriorityChoice("normal");
   };
 
-  const completeTask = async (id) => {
-    if (!user) {
-      setShowAuthModal(true);
-      return;
-    }
-    
-    try {
-      await updateTask(id, { completed: true, status: 'completed' });
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour de la tâche:', error);
-      alert('Erreur lors de la sauvegarde. Vérifiez votre connexion.');
-    }
+  const completeTask = (id) => {
+    setTasks(prev => prev.filter(t => t.id !== id));
     ding();
   };
 
   const removeTask = (id) => setTasks(prev => prev.filter(t => t.id !== id));
 
   // Fonctions pour les notes
-  const addNote = async () => {
-    if (!user) {
-      setShowAuthModal(true);
-      return;
-    }
-    
+  const addNote = () => {
     if (!noteTitle.trim() && !noteContent.trim()) return;
-    
-    try {
-      await addSupabaseNote({
-        title: noteTitle.trim() || "Note sans titre",
-        content: noteContent.trim()
-      });
-      setNoteTitle("");
-      setNoteContent("");
-    } catch (error) {
-      console.error('Erreur lors de l\'ajout de la note:', error);
-      alert('Erreur lors de la sauvegarde. Vérifiez votre connexion.');
-    }
+    const newNote = {
+      id: uuid(),
+      title: noteTitle.trim() || "Note sans titre",
+      content: noteContent.trim(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    setNotes(prev => [newNote, ...prev]);
+    setNoteTitle("");
+    setNoteContent("");
   };
 
-  const updateNoteLocal = () => {
+  const updateNote = () => {
     if (!editingNote) return;
     const updatedNote = {
       ...editingNote,
@@ -1113,7 +1101,7 @@ export default function App() {
     setNoteContent("");
   };
 
-  const deleteNoteLocal = (id) => {
+  const deleteNote = (id) => {
     setNotes(prev => prev.filter(note => note.id !== id));
     if (editingNote && editingNote.id === id) {
       setEditingNote(null);
@@ -1146,34 +1134,26 @@ export default function App() {
   }, [notes, noteFilter]);
 
   // Fonctions pour les courses
-  const addShoppingItem = async () => {
-    if (!user) {
-      setShowAuthModal(true);
-      return;
-    }
-    
+  const addShoppingItem = () => {
     if (!itemName.trim()) return;
-    const quantity = Math.max(1, itemQuantity || 1);
-    
-    try {
-      await addSupabaseShoppingItem({
-        name: itemName.trim(),
-        quantity: quantity,
-        unit: itemUnit,
-        category: itemCategory,
-        completed: false
-      });
-      setItemName("");
-      setItemQuantity(1);
-      setItemUnit("p");
-      setItemCategory("courant");
-    } catch (error) {
-      console.error('Erreur lors de l\'ajout de l\'élément de shopping:', error);
-      alert('Erreur lors de la sauvegarde. Vérifiez votre connexion.');
-    }
+    const quantity = Math.max(1, itemQuantity || 1); // Assurer une quantité valide
+    const newItem = {
+      id: uuid(),
+      name: itemName.trim(),
+      quantity: quantity,
+      unit: itemUnit,
+      category: itemCategory,
+      purchased: false,
+      createdAt: new Date().toISOString()
+    };
+    setShoppingItems(prev => [newItem, ...prev]);
+    setItemName("");
+    setItemQuantity(1);
+    setItemUnit("p");
+    setItemCategory("courant");
   };
 
-  const updateShoppingItemLocal = () => {
+  const updateShoppingItem = () => {
     if (!editingItem) return;
     const quantity = Math.max(1, itemQuantity || 1); // Assurer une quantité valide
     const updatedItem = {
@@ -1192,7 +1172,7 @@ export default function App() {
     setItemCategory("courant");
   };
 
-  const deleteShoppingItemLocal = (id) => {
+  const deleteShoppingItem = (id) => {
     setShoppingItems(prev => prev.filter(item => item.id !== id));
     if (editingItem && editingItem.id === id) {
       setEditingItem(null);
@@ -1256,38 +1236,27 @@ export default function App() {
   }, [shoppingItems]);
 
   // Fonctions pour le budget
-  const addBudgetItemLocal = async () => {
+  const addBudgetItem = () => {
     if (!budgetAmount) return;
     const amount = parseFloat(budgetAmount);
     if (isNaN(amount)) return;
     
-    // Vérifier si l'utilisateur est connecté
-    if (!user) {
-      setShowAuthModal(true);
-      return;
-    }
-    
     const newItem = {
-      name: budgetDescription.trim() || BUDGET_CATEGORIES[budgetType][budgetCategory],
+      id: uuid(),
+      description: budgetDescription.trim() || BUDGET_CATEGORIES[budgetType][budgetCategory],
       amount: amount,
       type: budgetType,
       category: budgetCategory,
       date: budgetDate,
-      description: budgetDescription.trim()
+      createdAt: new Date().toISOString()
     };
-    
-    try {
-      await addBudgetItem(newItem);
-      setBudgetDescription("");
-      setBudgetAmount("");
-      setBudgetDate(new Date().toISOString().split('T')[0]);
-    } catch (error) {
-      console.error('Erreur lors de l\'ajout du budget item:', error);
-      alert('Erreur lors de la sauvegarde. Vérifiez votre connexion.');
-    }
+    setBudgetItems(prev => [newItem, ...prev]);
+    setBudgetDescription("");
+    setBudgetAmount("");
+    setBudgetDate(new Date().toISOString().split('T')[0]);
   };
 
-  const updateBudgetItemLocal = () => {
+  const updateBudgetItem = () => {
     if (!editingBudgetItem || !budgetAmount) return;
     const amount = parseFloat(budgetAmount);
     if (isNaN(amount)) return;
@@ -1310,7 +1279,7 @@ export default function App() {
     setBudgetDate(new Date().toISOString().split('T')[0]);
   };
 
-  const deleteBudgetItemLocal = (id) => {
+  const deleteBudgetItem = (id) => {
     setBudgetItems(prev => prev.filter(item => item.id !== id));
     if (editingBudgetItem && editingBudgetItem.id === id) {
       setEditingBudgetItem(null);
@@ -1347,6 +1316,114 @@ export default function App() {
     setBudgetCategory(firstCategory);
   };
 
+  // Fonctions pour l'auto-complétion
+  const handleSearchMedia = async (query) => {
+    if (!query || query.length < 2) {
+      setSearchSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    setSearchLoading(true);
+    try {
+      let results = [];
+
+      if (mediaType === 'anime') {
+        results = await searchAniList(query);
+      } else {
+        const searchType = mediaType === 'movie' ? 'movie' : mediaType === 'tv' ? 'tv' : 'multi';
+        results = await searchTMDB(query, searchType);
+      }
+
+      setSearchSuggestions(results);
+      setShowSuggestions(true);
+    } catch (error) {
+      console.error('Search error:', error);
+    } finally {
+      setSearchLoading(false);
+    }
+  };
+
+  const selectApiResult = (result) => {
+    setSelectedApiResult(result);
+    setMediaTitle(result.title);
+    setMediaType(result.mediaType);
+    setShowSuggestions(false);
+  };
+
+  // Fonctions pour les médias
+  const addMedia = () => {
+    if (!mediaTitle.trim()) return;
+
+    const newMedia = {
+      id: uuid(),
+      title: mediaTitle.trim(),
+      originalTitle: selectedApiResult?.originalTitle || '',
+      overview: selectedApiResult?.overview || '',
+      posterPath: selectedApiResult?.posterPath || null,
+      releaseDate: selectedApiResult?.releaseDate || null,
+      voteAverage: selectedApiResult?.voteAverage || null,
+      genres: selectedApiResult?.genres || [],
+      type: mediaType,
+      status: mediaStatus,
+      rating: mediaStatus === 'watched' ? mediaRating : null,
+      comment: mediaStatus === 'watched' ? mediaComment.trim() : '',
+      dateAdded: new Date().toISOString(),
+      dateWatched: mediaStatus === 'watched' ? new Date().toISOString() : null,
+      apiId: selectedApiResult?.id || null
+    };
+
+    if (editingMedia) {
+      setMediaItems(prev => prev.map(item =>
+        item.id === editingMedia.id ? { ...newMedia, id: editingMedia.id, dateAdded: editingMedia.dateAdded } : item
+      ));
+      setEditingMedia(null);
+    } else {
+      setMediaItems(prev => [newMedia, ...prev]);
+    }
+
+    resetMediaForm();
+  };
+
+  const resetMediaForm = () => {
+    setMediaTitle("");
+    setMediaType("movie");
+    setMediaStatus("watched");
+    setMediaRating(5);
+    setMediaComment("");
+    setSelectedApiResult(null);
+    setSearchSuggestions([]);
+    setShowSuggestions(false);
+  };
+
+  const deleteMedia = (id) => {
+    setMediaItems(prev => prev.filter(item => item.id !== id));
+    if (editingMedia && editingMedia.id === id) {
+      setEditingMedia(null);
+      resetMediaForm();
+    }
+  };
+
+  const startEditMedia = (media) => {
+    setEditingMedia(media);
+    setMediaTitle(media.title);
+    setMediaType(media.type);
+    setMediaStatus(media.status);
+    setMediaRating(media.rating || 5);
+    setMediaComment(media.comment || "");
+    setSelectedApiResult({
+      title: media.title,
+      originalTitle: media.originalTitle,
+      overview: media.overview,
+      posterPath: media.posterPath,
+      releaseDate: media.releaseDate,
+      voteAverage: media.voteAverage,
+      genres: media.genres,
+      mediaType: media.type,
+      id: media.apiId
+    });
+  };
+
   const filtered = useMemo(() => {
     const q = filter.q.toLowerCase();
     return tasks
@@ -1357,13 +1434,57 @@ export default function App() {
   const tasksByPriority = useMemo(() => {
     const q = filter.q.toLowerCase();
     const filteredTasks = tasks.filter(t => (q ? t.title.toLowerCase().includes(q) : true));
-    
+
     return {
       urgent: filteredTasks.filter(t => t.priority === 'urgent'),
-      normal: filteredTasks.filter(t => t.priority === 'normal'),
-      low: filteredTasks.filter(t => t.priority === 'low')
+      normal: filteredTasks.filter(t => t.priority === 'normal' || t.priority === 'low')
     };
   }, [tasks, filter]);
+
+  const filteredMedia = useMemo(() => {
+    const q = mediaFilter.q.toLowerCase();
+    let filtered = mediaItems.filter(media => {
+      const matchesQuery = q ? media.title.toLowerCase().includes(q) : true;
+      const matchesType = mediaFilter.type === 'all' || media.type === mediaFilter.type;
+      const matchesStatus = mediaFilter.status === 'all' || media.status === mediaFilter.status;
+      return matchesQuery && matchesType && matchesStatus;
+    });
+
+    // Tri selon l'option sélectionnée
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'title':
+          return a.title.localeCompare(b.title);
+        case 'rating':
+          const aRating = a.rating || 0;
+          const bRating = b.rating || 0;
+          return bRating - aRating;
+        case 'releaseDate':
+          const aDate = new Date(a.releaseDate || '1900-01-01');
+          const bDate = new Date(b.releaseDate || '1900-01-01');
+          return bDate - aDate;
+        case 'dateAdded':
+        default:
+          return new Date(b.dateAdded) - new Date(a.dateAdded);
+      }
+    });
+
+    return filtered;
+  }, [mediaItems, mediaFilter, sortBy]);
+
+  // Statistiques pour le dashboard
+  const mediaStats = useMemo(() => {
+    return {
+      total: mediaItems.length,
+      watched: mediaItems.filter(m => m.status === 'watched').length,
+      toWatch: mediaItems.filter(m => m.status === 'towatch').length,
+      watching: mediaItems.filter(m => m.status === 'watching').length,
+      averageRating: mediaItems
+        .filter(m => m.rating)
+        .reduce((sum, m, _, arr) => sum + m.rating / arr.length, 0)
+        .toFixed(1)
+    };
+  }, [mediaItems]);
 
   const PriorityBadge = ({ p }) => (
     <Badge className={`ml-2 rounded px-3 py-1 text-xs font-bold ${
@@ -1408,313 +1529,99 @@ export default function App() {
     </motion.div>
   );
 
-  // Écran de chargement
-  if (authLoading) {
-    return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="w-16 h-16 mx-auto border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-gray-300">Chargement...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Page de connexion OPTIMA moderne et premium
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white relative overflow-hidden">
-        {/* Premium Background Elements */}
-        <div className="absolute inset-0">
-          {/* Gradient overlays */}
-          <div className="absolute inset-0 bg-gradient-to-br from-red-900/5 via-transparent to-red-900/5"></div>
-          <div className="absolute inset-0" style={{
-            backgroundImage: `
-              radial-gradient(circle at 25% 25%, rgba(239, 68, 68, 0.1) 0%, transparent 40%),
-              radial-gradient(circle at 75% 75%, rgba(239, 68, 68, 0.08) 0%, transparent 40%),
-              radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.03) 0%, transparent 50%)
-            `
-          }}></div>
-          
-          {/* Geometric pattern */}
-          <div className="absolute inset-0 opacity-5" style={{
-            backgroundImage: `
-              linear-gradient(30deg, transparent 40%, rgba(255,255,255,0.02) 41%, rgba(255,255,255,0.02) 42%, transparent 43%),
-              linear-gradient(-30deg, transparent 40%, rgba(255,255,255,0.02) 41%, rgba(255,255,255,0.02) 42%, transparent 43%)
-            `,
-            backgroundSize: '60px 60px'
-          }}></div>
-        </div>
-
-        {/* Floating particles */}
-        <div className="absolute inset-0 overflow-hidden">
-          {[...Array(12)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-2 h-2 bg-red-500/20 rounded-full"
-              style={{
-                left: Math.random() * 100 + '%',
-                top: Math.random() * 100 + '%',
-              }}
-              animate={{
-                y: [-10, -30, -10],
-                opacity: [0, 1, 0],
-                scale: [1, 1.5, 1],
-              }}
-              transition={{
-                duration: Math.random() * 4 + 3,
-                repeat: Infinity,
-                delay: Math.random() * 2,
-              }}
-            />
-          ))}
-        </div>
-        
-        <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4">
-          {/* Logo OPTIMA Section */}
-          <motion.div 
-            className="mb-12 text-center"
-            initial={{ opacity: 0, y: -30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, ease: "easeOut" }}
-          >
-            {/* Logo OPTIMA clean et moderne */}
-            <div className="mb-8">
-              <LogoDevSwiss className="w-64 h-64 text-white mx-auto drop-shadow-2xl" showText={false} />
+  return (
+    <div className="min-h-screen bg-black text-white p-3">
+      <div className="max-w-4xl mx-auto space-y-6 pt-8">
+        {/* Titre principal avec logo */}
+        <div className="text-center">
+          <div className="flex flex-col items-center mb-6 space-y-4">
+            <div>
+              <LogoDevSwiss className="w-48 h-48 text-white" showText={false} />
             </div>
-            
-            {/* Brand Name */}
-            <h1 className="text-9xl font-black tracking-tight mb-6" style={{ 
-              fontFamily: '"Bebas Neue", "Arial Black", sans-serif',
-              background: 'linear-gradient(135deg, #ef4444, #dc2626, #b91c1c)',
+            <h1 className="text-7xl font-black tracking-tight uppercase" style={{ 
+              fontFamily: '"Bebas Neue", "Arial Black", "Helvetica Neue", sans-serif',
+              fontWeight: '900',
+              letterSpacing: '-0.02em',
+              background: 'linear-gradient(135deg, #ef4444, #dc2626)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
-              filter: 'drop-shadow(0 4px 8px rgba(239, 68, 68, 0.3))'
+              textShadow: '2px 2px 0px rgba(220, 38, 38, 0.3)'
             }}>
               OPTIMA
             </h1>
-            
-            {/* Tagline */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5, duration: 0.8 }}
-            >
-              <p className="text-2xl text-gray-300 mb-2 font-light tracking-wide">
-                Organisez. <span className="text-red-400">Gérez.</span> <span className="text-red-500">Optimisez.</span>
-              </p>
-              <p className="text-gray-500 text-sm tracking-widest uppercase font-medium">
-                L'excellence à portée de main
-              </p>
-            </motion.div>
-          </motion.div>
-
-          {/* CTA Section propre */}
-          <motion.div 
-            className="space-y-6 w-full max-w-md"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7, duration: 0.6 }}
-          >
-            {/* Bouton principal moderne */}
-            <Button
-              onClick={() => setShowAuthModal(true)}
-              className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-6 px-8 rounded-2xl text-lg transition-all duration-300 transform hover:scale-[1.02] shadow-xl hover:shadow-2xl hover:shadow-red-500/25 border border-red-500/50"
-            >
-              Commencer gratuitement
-            </Button>
-            
-            {/* Lien de connexion */}
-            <div className="text-center">
-              <button 
-                onClick={() => setShowAuthModal(true)}
-                className="text-gray-400 hover:text-white text-base transition-all duration-300 font-medium hover:underline underline-offset-4"
-              >
-                Déjà membre ? <span className="text-red-400 font-semibold">Connectez-vous</span>
-              </button>
-            </div>
-          </motion.div>
-
-          {/* Indicateurs de confiance */}
-          <motion.div 
-            className="mt-20 grid grid-cols-3 gap-8 max-w-lg mx-auto"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1, duration: 0.8 }}
-          >
-            <div className="text-center">
-              <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Check className="w-6 h-6 text-green-400" />
-              </div>
-              <p className="text-green-400 text-sm font-semibold">Sécurisé</p>
-              <p className="text-gray-500 text-xs">Chiffrement SSL</p>
-            </div>
-            
-            <div className="text-center">
-              <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                <TrendingUp className="w-6 h-6 text-blue-400" />
-              </div>
-              <p className="text-blue-400 text-sm font-semibold">Version gratuite</p>
-              <p className="text-gray-500 text-xs">disponible</p>
-            </div>
-            
-            <div className="text-center">
-              <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                <User className="w-6 h-6 text-purple-400" />
-              </div>
-              <p className="text-purple-400 text-sm font-semibold">Options Premium</p>
-              <p className="text-gray-500 text-xs">à venir</p>
-            </div>
-          </motion.div>
+          </div>
         </div>
 
-        {/* Modal d'authentification */}
-        <AuthModal 
-          isOpen={showAuthModal}
-          onClose={() => setShowAuthModal(false)}
-          onAuth={handleAuth}
-          isLoading={authLoading2}
-        />
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0">
-        <div className="absolute top-10 left-10 w-96 h-96 bg-red-500/3 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-10 right-10 w-80 h-80 bg-blue-500/3 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-purple-500/3 rounded-full blur-3xl animate-pulse" style={{animationDelay: '4s'}}></div>
-      </div>
-
-      <div className="relative z-10 max-w-7xl mx-auto p-6 pt-8">
-        {/* Premium Header */}
-        <motion.div 
-          className="text-center mb-12"
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.8 }}
-        >
-          <div className="flex flex-col lg:flex-row items-center justify-between mb-8">
-            {/* Logo and Brand */}
-            <div className="flex items-center space-x-4 mb-6 lg:mb-0">
-              <div className="relative">
-                <div className="absolute inset-0 bg-red-500/20 rounded-full blur-xl animate-pulse"></div>
-                <div className="relative bg-gradient-to-br from-red-400 to-red-600 p-4 rounded-full shadow-2xl">
-                  <LogoDevSwiss className="w-12 h-12 text-white" showText={false} />
-                </div>
-              </div>
-              <div>
-                <h1 className="text-4xl lg:text-5xl font-black tracking-tight uppercase" style={{ 
-                  fontFamily: '"Bebas Neue", "Arial Black", "Helvetica Neue", sans-serif',
-                  background: 'linear-gradient(135deg, #ef4444, #dc2626)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text'
-                }}>
-                  OPTIMA
-                </h1>
-                <p className="text-gray-400 text-sm font-light">Votre assistant personnel</p>
-              </div>
-            </div>
-
-            {/* User Menu */}
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-3 bg-gray-800/50 backdrop-blur-sm rounded-full px-6 py-3 border border-gray-700/50">
-                <div className="w-10 h-10 bg-gradient-to-br from-red-400 to-red-600 rounded-full flex items-center justify-center shadow-lg">
-                  <User className="w-5 h-5 text-white" />
-                </div>
-                <div className="text-left">
-                  <p className="text-white font-medium text-sm">{user?.email?.split('@')[0] || 'Utilisateur'}</p>
-                  <p className="text-gray-400 text-xs">Premium</p>
-                </div>
-                <Button
-                  onClick={handleLogout}
-                  variant="ghost"
-                  size="sm"
-                  className="text-gray-400 hover:text-white p-2 rounded-full hover:bg-red-500/20"
-                >
-                  <LogOut className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Premium Navigation Tabs */}
-        <motion.div 
-          className="flex justify-center mb-12"
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2, duration: 0.6 }}
-        >
-          <div className="flex bg-gray-900/80 backdrop-blur-sm rounded-2xl p-2 border border-gray-700/50 shadow-2xl">
-            <button
-              onClick={() => setActiveTab("dashboard")}
-              className={`flex items-center gap-3 px-8 py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 ${
-                activeTab === "dashboard" 
-                  ? "bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg shadow-red-500/25" 
-                  : "text-gray-400 hover:text-white hover:bg-gray-800/50"
-              }`}
-            >
-              <BarChart3 className="w-5 h-5" />
-              <span className="hidden sm:inline">Dashboard</span>
-            </button>
-            <button
-              onClick={() => setActiveTab("tasks")}
-              className={`flex items-center gap-3 px-8 py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 ${
-                activeTab === "tasks" 
-                  ? "bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg shadow-red-500/25" 
-                  : "text-gray-400 hover:text-white hover:bg-gray-800/50"
-              }`}
-            >
-              <List className="w-5 h-5" />
-              <span className="hidden sm:inline">Tâches</span>
-            </button>
-            <button
-              onClick={() => setActiveTab("notes")}
-              className={`flex items-center gap-3 px-8 py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 ${
-                activeTab === "notes" 
-                  ? "bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg shadow-red-500/25" 
-                  : "text-gray-400 hover:text-white hover:bg-gray-800/50"
-              }`}
-            >
-              <FileText className="w-5 h-5" />
-              <span className="hidden sm:inline">Notes</span>
-            </button>
-            <button
-              onClick={() => setActiveTab("shopping")}
-              className={`flex items-center gap-3 px-8 py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 ${
-                activeTab === "shopping" 
-                  ? "bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg shadow-red-500/25" 
-                  : "text-gray-400 hover:text-white hover:bg-gray-800/50"
-              }`}
-            >
-              <ShoppingCart className="w-5 h-5" />
-              <span className="hidden sm:inline">Courses</span>
-            </button>
-            <button
-              onClick={() => setActiveTab("budget")}
-              className={`flex items-center gap-3 px-8 py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 ${
-                activeTab === "budget" 
-                  ? "bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg shadow-red-500/25" 
-                  : "text-gray-400 hover:text-white hover:bg-gray-800/50"
-              }`}
+        {/* Onglets */}
+        <div className="flex space-x-2 mb-12">
+          <button
+            onClick={() => setActiveTab("dashboard")}
+            className={`flex items-center gap-2 px-6 py-3 rounded-md font-medium transition-all duration-300 ${
+              activeTab === "dashboard" 
+                ? "bg-red-600 text-white shadow-lg" 
+                : "text-gray-300 hover:text-white"
+            }`}
+          >
+            <BarChart3 className="w-5 h-5" />
+            Dashboard
+          </button>
+          <button
+            onClick={() => setActiveTab("tasks")}
+            className={`flex items-center gap-2 px-6 py-3 rounded-md font-medium transition-all duration-300 ${
+              activeTab === "tasks" 
+                ? "bg-red-600 text-white shadow-lg" 
+                : "text-gray-300 hover:text-white"
+            }`}
+          >
+            <List className="w-5 h-5" />
+            Tâches
+          </button>
+          <button
+            onClick={() => setActiveTab("notes")}
+            className={`flex items-center gap-2 px-6 py-3 rounded-md font-medium transition-all duration-300 ${
+              activeTab === "notes" 
+                ? "bg-red-600 text-white shadow-lg" 
+                : "text-gray-300 hover:text-white"
+            }`}
+          >
+            <FileText className="w-5 h-5" />
+            Notes
+          </button>
+          <button
+            onClick={() => setActiveTab("shopping")}
+            className={`flex items-center gap-2 px-6 py-3 rounded-md font-medium transition-all duration-300 ${
+              activeTab === "shopping" 
+                ? "bg-red-600 text-white shadow-lg" 
+                : "text-gray-300 hover:text-white"
+            }`}
+          >
+            <ShoppingCart className="w-5 h-5" />
+            Courses
+          </button>
+          <button
+            onClick={() => setActiveTab("budget")}
+            className={`flex items-center gap-2 px-6 py-3 rounded-md font-medium transition-all duration-300 ${
+              activeTab === "budget"
+                ? "bg-red-600 text-white shadow-lg"
+                : "text-gray-300 hover:text-white"
+            }`}
           >
             <Wallet className="w-5 h-5" />
-            <span className="hidden sm:inline">Budget</span>
+            Budget
           </button>
-          </div>
-        </motion.div>
-        
-        {/* Content Container */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.6 }}
-        >
+          <button
+            onClick={() => setActiveTab("media")}
+            className={`flex items-center gap-2 px-6 py-3 rounded-md font-medium transition-all duration-300 ${
+              activeTab === "media"
+                ? "bg-red-600 text-white shadow-lg"
+                : "text-gray-300 hover:text-white"
+            }`}
+          >
+            <Play className="w-5 h-5" />
+            Médias
+          </button>
+        </div>
 
         {/* Section Dashboard Global */}
         {activeTab === "dashboard" && (
@@ -3377,7 +3284,7 @@ export default function App() {
 
             {/* Zone d'affichage des tâches */}
             <div className="bg-gray-800 rounded-xl p-6 min-h-96">
-              {(tasksByPriority.urgent.length === 0 && tasksByPriority.normal.length === 0 && tasksByPriority.low.length === 0) ? (
+              {(tasksByPriority.urgent.length === 0 && tasksByPriority.normal.length === 0) ? (
                 <div className="text-center text-gray-400 py-16">
                   <div className="text-2xl mb-4">📝</div>
                   <div className="text-xl font-semibold mb-2">Aucune tâche pour le moment</div>
@@ -3432,29 +3339,6 @@ export default function App() {
                     </motion.div>
                   )}
 
-                  {/* Section À faire plus tard */}
-                  {tasksByPriority.low.length > 0 && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.2 }}
-                      className="space-y-4"
-                    >
-                      <div className="flex items-center gap-3 pb-3 border-b border-gray-500/30">
-                        <div className="flex items-center gap-2 text-gray-400 font-bold text-lg">
-                          À faire plus tard
-                          <span className="text-sm bg-gray-600 text-white rounded w-6 h-6 flex items-center justify-center">
-                            {tasksByPriority.low.length}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex flex-col gap-4">
-                        <AnimatePresence initial={false}>
-                          {tasksByPriority.low.map(t => <TaskRow key={t.id} t={t} />)}
-                        </AnimatePresence>
-                      </div>
-                    </motion.div>
-                  )}
                 </div>
               )}
             </div>
@@ -4267,7 +4151,7 @@ export default function App() {
                     whileTap={{ scale: 0.95 }}
                   >
                     <Button 
-                      onClick={editingBudgetItem ? updateBudgetItem : addBudgetItemLocal} 
+                      onClick={editingBudgetItem ? updateBudgetItem : addBudgetItem} 
                       className="h-12 px-6 bg-red-600 hover:bg-red-500 text-white rounded-lg shadow-lg hover:shadow-xl text-lg font-bold transition-all duration-300 border-0"
                     >
                       <Plus className="w-5 h-5 mr-2" />
@@ -4861,8 +4745,221 @@ export default function App() {
           </>
         )}
 
+        {/* Section des médias */}
+        {activeTab === "media" && (
+          <>
+            {/* Zone d'ajout de média */}
+            <div className="bg-gray-800 rounded-xl p-6 space-y-4">
+              <div className="flex items-center gap-3 mb-4">
+                <Play className="w-6 h-6 text-red-400" />
+                <h2 className="text-xl font-bold text-white">
+                  {mediaStatus === "watched" ? "Ajouter un média déjà vu" : "Ajouter un média à regarder"}
+                </h2>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <Input
+                  value={mediaTitle}
+                  onChange={(e) => setMediaTitle(e.target.value)}
+                  placeholder="Titre du film, série, animé..."
+                  className="h-12 text-lg rounded-lg border-0 bg-gray-700 text-white placeholder:text-gray-400 font-medium focus:bg-gray-600 focus:ring-2 focus:ring-red-500 transition-all duration-300"
+                />
+
+                <Select value={mediaType} onValueChange={setMediaType}>
+                  <SelectTrigger className="h-12 rounded-lg border-0 bg-gray-700 text-white focus:bg-gray-600 focus:ring-2 focus:ring-red-500">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-700 border-gray-600">
+                    {Object.entries(MEDIA_TYPES).map(([key, value]) => (
+                      <SelectItem key={key} value={key} className="text-white focus:bg-gray-600">
+                        {value}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select value={mediaStatus} onValueChange={setMediaStatus}>
+                  <SelectTrigger className="h-12 rounded-lg border-0 bg-gray-700 text-white focus:bg-gray-600 focus:ring-2 focus:ring-red-500">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-700 border-gray-600">
+                    {Object.entries(MEDIA_STATUS).map(([key, value]) => (
+                      <SelectItem key={key} value={key} className="text-white focus:bg-gray-600">
+                        {value}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                {mediaStatus === "watched" && (
+                  <div className="flex items-center gap-2 bg-gray-800 p-3 rounded-lg">
+                    <span className="text-white text-sm font-medium">Ma note:</span>
+                    <div className="flex gap-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          onClick={() => setMediaRating(star)}
+                          className="transition-all duration-200 hover:scale-110"
+                        >
+                          <Star
+                            className={`w-6 h-6 ${star <= mediaRating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-500 hover:text-yellow-300'}`}
+                          />
+                        </button>
+                      ))}
+                    </div>
+                    <span className="text-yellow-400 font-bold ml-2">{mediaRating}/5</span>
+                  </div>
+                )}
+              </div>
+
+              {mediaStatus === "watched" && (
+                <Input
+                  value={mediaComment}
+                  onChange={(e) => setMediaComment(e.target.value)}
+                  placeholder="Commentaire optionnel..."
+                  className="h-12 text-lg rounded-lg border-0 bg-gray-700 text-white placeholder:text-gray-400 font-medium focus:bg-gray-600 focus:ring-2 focus:ring-red-500 transition-all duration-300"
+                />
+              )}
+
+              <Button
+                onClick={() => addMedia()}
+                className="w-full h-12 bg-red-600 hover:bg-red-500 text-white rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-95"
+              >
+                <Plus className="w-5 h-5 mr-2" />
+                {editingMedia ? "Modifier" : "Ajouter"} {MEDIA_TYPES[mediaType]}
+              </Button>
+            </div>
+
+            {/* Filtres */}
+            <div className="bg-gray-800 rounded-xl p-4">
+              <div className="flex flex-wrap items-center gap-4">
+                <div className="flex-1 min-w-64">
+                  <Input
+                    value={mediaFilter.q}
+                    onChange={(e) => setMediaFilter({...mediaFilter, q: e.target.value})}
+                    placeholder="Rechercher un média..."
+                    className="h-10 rounded-lg border-0 bg-gray-700 text-white placeholder:text-gray-400 focus:bg-gray-600 focus:ring-2 focus:ring-red-500"
+                  />
+                </div>
+
+                <Select value={mediaFilter.type} onValueChange={(v) => setMediaFilter({...mediaFilter, type: v})}>
+                  <SelectTrigger className="w-40 h-10 rounded-lg border-0 bg-gray-700 text-white focus:bg-gray-600 focus:ring-2 focus:ring-red-500">
+                    <SelectValue placeholder="Type" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-700 border-gray-600">
+                    <SelectItem value="all" className="text-white focus:bg-gray-600">Tous les types</SelectItem>
+                    {Object.entries(MEDIA_TYPES).map(([key, value]) => (
+                      <SelectItem key={key} value={key} className="text-white focus:bg-gray-600">
+                        {value}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select value={mediaFilter.status} onValueChange={(v) => setMediaFilter({...mediaFilter, status: v})}>
+                  <SelectTrigger className="w-40 h-10 rounded-lg border-0 bg-gray-700 text-white focus:bg-gray-600 focus:ring-2 focus:ring-red-500">
+                    <SelectValue placeholder="Statut" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-700 border-gray-600">
+                    <SelectItem value="all" className="text-white focus:bg-gray-600">Tous les statuts</SelectItem>
+                    {Object.entries(MEDIA_STATUS).map(([key, value]) => (
+                      <SelectItem key={key} value={key} className="text-white focus:bg-gray-600">
+                        {value}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Liste des médias */}
+            <div className="bg-gray-800 rounded-xl p-6 min-h-96">
+              {filteredMedia.length === 0 ? (
+                <div className="text-center text-gray-400 py-16">
+                  <div className="text-2xl mb-4">🎬</div>
+                  <div className="text-xl font-semibold mb-2">Aucun média pour le moment</div>
+                  <div className="text-lg">Commencez par ajouter votre premier film, série ou animé</div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <AnimatePresence initial={false}>
+                    {filteredMedia.map(media => (
+                      <motion.div
+                        key={media.id}
+                        initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -20, scale: 0.95 }}
+                        whileHover={{ scale: 1.02, y: -2 }}
+                        className="bg-gray-700 rounded-lg p-4 border border-gray-600 relative overflow-hidden group hover:border-red-500/30 transition-all duration-300"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                              <h3 className="text-lg font-semibold text-white">{media.title}</h3>
+                              <Badge className="bg-red-600 text-white text-xs">
+                                {MEDIA_TYPES[media.type]}
+                              </Badge>
+                              <Badge className={`text-xs ${
+                                media.status === 'watched' ? 'bg-green-600 text-white' : 'bg-blue-600 text-white'
+                              }`}>
+                                {MEDIA_STATUS[media.status]}
+                              </Badge>
+                            </div>
+
+                            {media.status === "watched" && (
+                              <div className="flex items-center gap-2 mb-2">
+                                <span className="text-gray-300 text-sm">Note:</span>
+                                <div className="flex gap-1">
+                                  {[1, 2, 3, 4, 5].map((star) => (
+                                    <Star
+                                      key={star}
+                                      className={`w-4 h-4 ${star <= media.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-500'}`}
+                                    />
+                                  ))}
+                                </div>
+                                <span className="text-yellow-400 text-sm font-medium">({media.rating}/5)</span>
+                              </div>
+                            )}
+
+                            {media.comment && (
+                              <p className="text-gray-300 text-sm italic">"{media.comment}"</p>
+                            )}
+
+                            <div className="text-xs text-gray-400 mt-2">
+                              Ajouté le {new Date(media.dateAdded).toLocaleDateString('fr-FR')}
+                            </div>
+                          </div>
+
+                          <div className="flex gap-2">
+                            <Button
+                              size="icon"
+                              variant="outline"
+                              onClick={() => startEditMedia(media)}
+                              className="rounded-full bg-gray-600 hover:bg-gray-500 border-0"
+                            >
+                              ✏️
+                            </Button>
+                            <Button
+                              size="icon"
+                              variant="outline"
+                              onClick={() => deleteMedia(media.id)}
+                              className="rounded-full bg-red-600 hover:bg-red-500 border-0"
+                            >
+                              <Trash2 className="w-4 h-4 text-white" />
+                            </Button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
+              )}
+            </div>
+          </>
+        )}
+
         {/* Footer */}
-        <footer className="text-center py-8 border-t border-gray-800 mt-16">
+        <footer className="text-center py-8 border-t border-gray-800">
           <div className="flex flex-col items-center justify-center gap-3">
             {/* Logo et nom */}
             <div className="flex flex-col items-center">
@@ -4876,8 +4973,6 @@ export default function App() {
             </div>
           </div>
         </footer>
-        
-        </motion.div>
       </div>
     </div>
   );

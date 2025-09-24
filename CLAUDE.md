@@ -95,45 +95,8 @@ No external state management library is used - all state is local component stat
 ## Path Alias Configuration
 The `@` alias points to `./src` directory (configured in vite.config.js).
 
-## Supabase Configuration
-
-### Authentication Setup
-The application uses Supabase for user authentication and data persistence.
-
-**Required Supabase Redirect URLs:**
-Configure these URLs in your Supabase Dashboard > Authentication > URL Configuration:
-```
-# Development URLs
-http://localhost:5173
-http://localhost:3000
-http://localhost:3001
-http://localhost:3002
-http://localhost:3003
-
-# Production URL
-https://optima.dev-swiss.ch
-```
-
-**Environment Variables:**
-```bash
-VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key
-```
-
-**Client Configuration:**
-- Main client: `src/lib/supabase.js` (JavaScript with null safety)
-- TypeScript client: `src/lib/supabaseClient.ts` (TypeScript with assertions)
-- Uses Supabase v2 syntax for all auth operations
-
-### Database Tables
-- `tasks` - User tasks with priority and completion tracking
-- `notes` - User notes with title/content
-- `shopping_items` - Shopping list items with quantities
-- `budget_items` - Budget tracking entries
-- `user_preferences` - User settings and preferences
-
 ## Development Considerations
 - The main App.jsx component is quite large and could benefit from feature-based component extraction
-- All business logic is currently client-side with Supabase backend
+- All business logic is currently client-side with no backend integration
 - The app uses modern React patterns (hooks, functional components) throughout
 - Styling relies heavily on Tailwind utility classes with some custom CSS
