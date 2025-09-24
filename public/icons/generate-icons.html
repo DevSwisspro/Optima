@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur d'icônes Optima</title>
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            padding: 2rem;
+            background: #111827;
+            color: #e5e7eb;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        canvas {
+            border: 1px solid #374151;
+            margin: 1rem 0;
+            border-radius: 8px;
+        }
+        .icons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        .icon-preview {
+            text-align: center;
+            padding: 1rem;
+            background: #1f2937;
+            border-radius: 8px;
+        }
+        button {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 0.5rem;
+        }
+        button:hover {
+            background: #b91c1c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Générateur d'icônes Optima PWA</h1>
+        <p>Cette page génère automatiquement toutes les icônes nécessaires pour la PWA.</p>
+
+        <button onclick="generateAllIcons()">Générer toutes les icônes</button>
+        <button onclick="downloadAllIcons()">Télécharger toutes les icônes</button>
+
+        <div id="icons-container" class="icons-grid"></div>
+
+        <canvas id="canvas" style="display: none;"></canvas>
+    </div>
+
+    <script>
+        const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+        const generatedIcons = new Map();
+
+        function generateIcon(size) {
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+
+            canvas.width = size;
+            canvas.height = size;
+
+            // Fond gradient rouge Optima
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#dc2626');
+            gradient.addColorStop(1, '#991b1b');
+
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, size, size);
+
+            // Ajout d'un effet de relief
+            const innerSize = size * 0.8;
+            const offset = (size - innerSize) / 2;
+
+            const innerGradient = ctx.createLinearGradient(offset, offset, offset + innerSize, offset + innerSize);
+            innerGradient.addColorStop(0, '#ef4444');
+            innerGradient.addColorStop(1, '#dc2626');
+
+            ctx.fillStyle = innerGradient;
+            ctx.fillRect(offset, offset, innerSize, innerSize);
+
+            // Texte "O" stylisé
+            const fontSize = size * 0.6;
+            ctx.font = `bold ${fontSize}px system-ui, -apple-system, sans-serif`;
+            ctx.fillStyle = 'white';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('O', size / 2, size / 2);
+
+            // Ombre du texte
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+            ctx.shadowBlur = size * 0.02;
+            ctx.shadowOffsetX = size * 0.01;
+            ctx.shadowOffsetY = size * 0.01;
+
+            return canvas.toDataURL('image/png');
+        }
+
+        function generateAllIcons() {
+            const container = document.getElementById('icons-container');
+            container.innerHTML = '';
+
+            sizes.forEach(size => {
+                const dataUrl = generateIcon(size);
+                generatedIcons.set(size, dataUrl);
+
+                const iconDiv = document.createElement('div');
+                iconDiv.className = 'icon-preview';
+                iconDiv.innerHTML = `
+                    <img src="${dataUrl}" alt="Icon ${size}x${size}" width="64" height="64" style="border-radius: 12px;">
+                    <p>${size}x${size}</p>
+                    <button onclick="downloadIcon(${size})">Télécharger</button>
+                `;
+                container.appendChild(iconDiv);
+            });
+
+            console.log('✅ Toutes les icônes générées!');
+        }
+
+        function downloadIcon(size) {
+            const dataUrl = generatedIcons.get(size);
+            if (!dataUrl) return;
+
+            const link = document.createElement('a');
+            link.download = `icon-${size}x${size}.png`;
+            link.href = dataUrl;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function downloadAllIcons() {
+            if (generatedIcons.size === 0) {
+                alert('Veuillez d\'abord générer les icônes!');
+                return;
+            }
+
+            generatedIcons.forEach((dataUrl, size) => {
+                setTimeout(() => downloadIcon(size), size * 10); // Délai pour éviter de bloquer le navigateur
+            });
+        }
+
+        // Génération automatique au chargement
+        window.onload = () => {
+            generateAllIcons();
+        };
+    </script>
+</body>
+</html>

@@ -1602,7 +1602,7 @@ export default function App() {
   );
 
   return (
-    <div className="min-h-screen bg-black text-white p-3">
+    <div className="min-h-screen bg-black text-white p-4 md:p-3">
       <div className="max-w-4xl mx-auto space-y-6 pt-8">
         {/* Titre principal avec logo */}
         <div className="text-center">
@@ -1625,13 +1625,13 @@ export default function App() {
           </div>
         </div>
 
-        {/* Onglets */}
-        <div className="flex space-x-2 mb-12">
+        {/* Navigation Mobile - Version desktop (cachée sur mobile) */}
+        <div className="hidden md:flex space-x-2 mb-12">
           <button
             onClick={() => setActiveTab("dashboard")}
             className={`flex items-center gap-2 px-6 py-3 rounded-md font-medium transition-all duration-300 ${
-              activeTab === "dashboard" 
-                ? "bg-red-600 text-white shadow-lg" 
+              activeTab === "dashboard"
+                ? "bg-red-600 text-white shadow-lg"
                 : "text-gray-300 hover:text-white"
             }`}
           >
@@ -1641,8 +1641,8 @@ export default function App() {
           <button
             onClick={() => setActiveTab("tasks")}
             className={`flex items-center gap-2 px-6 py-3 rounded-md font-medium transition-all duration-300 ${
-              activeTab === "tasks" 
-                ? "bg-red-600 text-white shadow-lg" 
+              activeTab === "tasks"
+                ? "bg-red-600 text-white shadow-lg"
                 : "text-gray-300 hover:text-white"
             }`}
           >
@@ -1652,8 +1652,8 @@ export default function App() {
           <button
             onClick={() => setActiveTab("notes")}
             className={`flex items-center gap-2 px-6 py-3 rounded-md font-medium transition-all duration-300 ${
-              activeTab === "notes" 
-                ? "bg-red-600 text-white shadow-lg" 
+              activeTab === "notes"
+                ? "bg-red-600 text-white shadow-lg"
                 : "text-gray-300 hover:text-white"
             }`}
           >
@@ -1663,8 +1663,8 @@ export default function App() {
           <button
             onClick={() => setActiveTab("shopping")}
             className={`flex items-center gap-2 px-6 py-3 rounded-md font-medium transition-all duration-300 ${
-              activeTab === "shopping" 
-                ? "bg-red-600 text-white shadow-lg" 
+              activeTab === "shopping"
+                ? "bg-red-600 text-white shadow-lg"
                 : "text-gray-300 hover:text-white"
             }`}
           >
@@ -1695,12 +1695,15 @@ export default function App() {
           </button>
         </div>
 
-        {/* Section Dashboard Global */}
-        {activeTab === "dashboard" && (
-          <>
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+        {/* Contenu Principal avec Transitions Fluides */}
+        <AnimatePresence mode="wait">
+          {activeTab === "dashboard" && (
+            <motion.div
+              key="dashboard"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
               className="space-y-8"
             >
               {/* Titre et filtres */}
@@ -1716,7 +1719,7 @@ export default function App() {
                   <select 
                     value={dashboardFilter.year} 
                     onChange={(e) => setDashboardFilter(prev => ({ ...prev, year: parseInt(e.target.value) }))}
-                    className="bg-gray-700 text-white px-4 py-2 rounded-lg border border-gray-600 focus:border-red-500 focus:ring-red-500"
+                    className="bg-gray-700 text-white px-4 py-3 h-12 rounded-lg border border-gray-600 focus:border-red-500 focus:ring-red-500 text-base"
                   >
                     {getAvailableYears(budgetItems).length > 0 ? getAvailableYears(budgetItems).map(year => (
                       <option key={year} value={year}>{year}</option>
@@ -1727,7 +1730,7 @@ export default function App() {
                   <select 
                     value={dashboardFilter.month} 
                     onChange={(e) => setDashboardFilter(prev => ({ ...prev, month: e.target.value }))}
-                    className="bg-gray-700 text-white px-4 py-2 rounded-lg border border-gray-600 focus:border-red-500 focus:ring-red-500"
+                    className="bg-gray-700 text-white px-4 py-3 h-12 rounded-lg border border-gray-600 focus:border-red-500 focus:ring-red-500 text-base"
                   >
                     <option value="all">Toute l'année</option>
                     {Array.from({ length: 12 }, (_, i) => (
@@ -1740,7 +1743,7 @@ export default function App() {
                   {/* Navigation vers budget avancé */}
                   <button
                     onClick={() => setActiveTab("budget-dashboard")}
-                    className="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-lg transition-colors duration-200 font-medium"
+                    className="bg-red-600 hover:bg-red-500 text-white px-6 py-3 h-12 rounded-lg transition-colors duration-200 font-medium text-base"
                   >
                     Budget Avancé
                   </button>
@@ -2032,22 +2035,22 @@ export default function App() {
                   <p className="text-gray-500 text-sm mt-2">Commencez par ajouter des opérations dans l'onglet Budget</p>
                   <button
                     onClick={() => setActiveTab("budget")}
-                    className="mt-4 bg-red-600 hover:bg-red-500 text-white px-6 py-2 rounded-lg transition-colors duration-200"
+                    className="mt-4 bg-red-600 hover:bg-red-500 text-white px-6 py-3 h-12 rounded-lg transition-colors duration-200 text-base font-medium"
                   >
                     Aller au Budget
                   </button>
                 </div>
               )}
             </motion.div>
-          </>
-        )}
+          )}
 
-        {/* Section Budget Avancé */}
-        {activeTab === "budget-dashboard" && (
-          <>
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+          {activeTab === "budget-dashboard" && (
+            <motion.div
+              key="budget-dashboard"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
               className="space-y-8"
             >
               {/* Header avec navigation et tabs */}
@@ -2075,7 +2078,7 @@ export default function App() {
                 <div className="flex flex-wrap gap-2">
                   <button
                     onClick={() => setBudgetDashboardView("monthly")}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
+                    className={`flex items-center gap-2 px-5 py-3 h-12 rounded-lg font-medium transition-all duration-300 text-base ${
                       budgetDashboardView === "monthly" 
                         ? "bg-red-600 text-white shadow-lg" 
                         : "text-gray-300 hover:text-white hover:bg-gray-700/50"
@@ -2086,7 +2089,7 @@ export default function App() {
                   </button>
                   <button
                     onClick={() => setBudgetDashboardView("categories")}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
+                    className={`flex items-center gap-2 px-5 py-3 h-12 rounded-lg font-medium transition-all duration-300 text-base ${
                       budgetDashboardView === "categories" 
                         ? "bg-red-600 text-white shadow-lg" 
                         : "text-gray-300 hover:text-white hover:bg-gray-700/50"
@@ -2097,7 +2100,7 @@ export default function App() {
                   </button>
                   <button
                     onClick={() => setBudgetDashboardView("comparative")}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
+                    className={`flex items-center gap-2 px-5 py-3 h-12 rounded-lg font-medium transition-all duration-300 text-base ${
                       budgetDashboardView === "comparative" 
                         ? "bg-red-600 text-white shadow-lg" 
                         : "text-gray-300 hover:text-white hover:bg-gray-700/50"
@@ -2108,7 +2111,7 @@ export default function App() {
                   </button>
                   <button
                     onClick={() => setBudgetDashboardView("table")}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
+                    className={`flex items-center gap-2 px-5 py-3 h-12 rounded-lg font-medium transition-all duration-300 text-base ${
                       budgetDashboardView === "table" 
                         ? "bg-red-600 text-white shadow-lg" 
                         : "text-gray-300 hover:text-white hover:bg-gray-700/50"
@@ -3265,20 +3268,24 @@ export default function App() {
                   <p className="text-gray-500 text-sm mt-2">Commencez par ajouter des opérations dans l'onglet Budget</p>
                   <button
                     onClick={() => setActiveTab("budget")}
-                    className="mt-4 bg-red-600 hover:bg-red-500 text-white px-6 py-2 rounded-lg transition-colors duration-200"
+                    className="mt-4 bg-red-600 hover:bg-red-500 text-white px-6 py-3 h-12 rounded-lg transition-colors duration-200 text-base font-medium"
                   >
                     Aller au Budget
                   </button>
                 </div>
               )}
             </motion.div>
-          </>
-        )}
+          )}
 
-        {/* Section des tâches */}
-        {activeTab === "tasks" && (
-          <>
-            {/* Zone d'ajout de tâche */}
+          {activeTab === "tasks" && (
+            <motion.div
+              key="tasks"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+            >
+              {/* Zone d'ajout de tâche */}
             <div className="bg-gray-800 rounded-xl p-6 space-y-4">
               <div className="flex gap-3 items-center">
                 <Input 
@@ -3414,11 +3421,10 @@ export default function App() {
                 </div>
               )}
             </div>
-          </>
-        )}
+            </motion.div>
+          )}
 
-        {/* Section des notes */}
-        {activeTab === "notes" && (
+          {activeTab === "notes" && (
           <>
             {/* Zone d'ajout de note */}
             <div className="bg-gray-800 rounded-xl p-6 space-y-4">
@@ -4869,6 +4875,8 @@ export default function App() {
                                   src={result.posterPath}
                                   alt={result.title}
                                   className="w-12 h-16 object-cover rounded flex-shrink-0"
+                                  loading="lazy"
+                                  decoding="async"
                                 />
                               )}
                               <div className="flex-1 min-w-0">
@@ -5031,6 +5039,7 @@ export default function App() {
                                   alt={media.title}
                                   className="w-full h-64 sm:w-28 sm:h-40 object-cover rounded-lg shadow-md"
                                   loading="lazy"
+                                  decoding="async"
                                 />
                               ) : (
                                 <div className="w-full h-64 sm:w-28 sm:h-40 bg-gray-700/50 flex items-center justify-center rounded-lg">
@@ -5137,16 +5146,106 @@ export default function App() {
             </div>
           </>
         )}
+        </AnimatePresence>
+
+        {/* Navigation Mobile Fixe en Bas - Visible uniquement sur mobile */}
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-gray-900/95 backdrop-blur-md border-t border-gray-700/50">
+          <div className="flex items-center justify-around px-2 py-4 max-w-lg mx-auto">
+            <motion.button
+              onClick={() => setActiveTab("dashboard")}
+              className={`flex flex-col items-center justify-center p-4 rounded-xl transition-all duration-300 min-w-[70px] min-h-[70px] ${
+                activeTab === "dashboard"
+                  ? "bg-red-600/20 text-red-400 scale-110"
+                  : "text-gray-400 hover:text-white active:scale-95"
+              }`}
+              whileTap={{ scale: 0.9 }}
+              whileHover={{ scale: 1.05 }}
+            >
+              <BarChart3 className={`w-6 h-6 mb-1 ${activeTab === "dashboard" ? "text-red-400" : ""}`} />
+              <span className="text-xs font-medium">Stats</span>
+            </motion.button>
+
+            <motion.button
+              onClick={() => setActiveTab("tasks")}
+              className={`flex flex-col items-center justify-center p-4 rounded-xl transition-all duration-300 min-w-[70px] min-h-[70px] ${
+                activeTab === "tasks"
+                  ? "bg-red-600/20 text-red-400 scale-110"
+                  : "text-gray-400 hover:text-white active:scale-95"
+              }`}
+              whileTap={{ scale: 0.9 }}
+              whileHover={{ scale: 1.05 }}
+            >
+              <List className={`w-6 h-6 mb-1 ${activeTab === "tasks" ? "text-red-400" : ""}`} />
+              <span className="text-xs font-medium">Tâches</span>
+            </motion.button>
+
+            <motion.button
+              onClick={() => setActiveTab("notes")}
+              className={`flex flex-col items-center justify-center p-4 rounded-xl transition-all duration-300 min-w-[70px] min-h-[70px] ${
+                activeTab === "notes"
+                  ? "bg-red-600/20 text-red-400 scale-110"
+                  : "text-gray-400 hover:text-white active:scale-95"
+              }`}
+              whileTap={{ scale: 0.9 }}
+              whileHover={{ scale: 1.05 }}
+            >
+              <FileText className={`w-6 h-6 mb-1 ${activeTab === "notes" ? "text-red-400" : ""}`} />
+              <span className="text-xs font-medium">Notes</span>
+            </motion.button>
+
+            <motion.button
+              onClick={() => setActiveTab("shopping")}
+              className={`flex flex-col items-center justify-center p-4 rounded-xl transition-all duration-300 min-w-[70px] min-h-[70px] ${
+                activeTab === "shopping"
+                  ? "bg-red-600/20 text-red-400 scale-110"
+                  : "text-gray-400 hover:text-white active:scale-95"
+              }`}
+              whileTap={{ scale: 0.9 }}
+              whileHover={{ scale: 1.05 }}
+            >
+              <ShoppingCart className={`w-6 h-6 mb-1 ${activeTab === "shopping" ? "text-red-400" : ""}`} />
+              <span className="text-xs font-medium">Courses</span>
+            </motion.button>
+
+            <motion.button
+              onClick={() => setActiveTab("budget")}
+              className={`flex flex-col items-center justify-center p-4 rounded-xl transition-all duration-300 min-w-[70px] min-h-[70px] ${
+                activeTab === "budget"
+                  ? "bg-red-600/20 text-red-400 scale-110"
+                  : "text-gray-400 hover:text-white active:scale-95"
+              }`}
+              whileTap={{ scale: 0.9 }}
+              whileHover={{ scale: 1.05 }}
+            >
+              <Wallet className={`w-6 h-6 mb-1 ${activeTab === "budget" ? "text-red-400" : ""}`} />
+              <span className="text-xs font-medium">Budget</span>
+            </motion.button>
+
+            <motion.button
+              onClick={() => setActiveTab("media")}
+              className={`flex flex-col items-center justify-center p-4 rounded-xl transition-all duration-300 min-w-[70px] min-h-[70px] ${
+                activeTab === "media"
+                  ? "bg-red-600/20 text-red-400 scale-110"
+                  : "text-gray-300 hover:text-white active:scale-95"
+              }`}
+              whileTap={{ scale: 0.9 }}
+              whileHover={{ scale: 1.05 }}
+            >
+              <Play className={`w-6 h-6 mb-1 ${activeTab === "media" ? "text-red-400" : ""}`} />
+              <span className="text-xs font-medium">Médias</span>
+            </motion.button>
+          </div>
+        </div>
 
         {/* Footer */}
-        <footer className="text-center py-8 border-t border-gray-800">
+        <footer className="text-center py-8 border-t border-gray-800 mb-16 md:mb-0">
           <div className="flex flex-col items-center justify-center gap-3">
             {/* Logo et nom */}
             <div className="flex flex-col items-center">
               <LogoDevSwiss className="w-16 h-16 text-white" showText={false} />
               <span className="text-white text-xl font-bold">Dev-Swiss</span>
             </div>
-            
+
             {/* Texte descriptif séparé */}
             <div className="border-t border-gray-700 pt-2 mt-1">
               <span className="text-white text-sm">Solutions web & apps sur mesure</span>
