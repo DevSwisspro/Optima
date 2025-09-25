@@ -133,3 +133,144 @@
     padding-bottom: max(1rem, env(safe-area-inset-bottom));
   }
 }
+
+/* ====== SYSTÈME RESPONSIVE MOBILE-FIRST ====== */
+
+/* Typography responsive avec clamp() pour fluidité */
+.text-responsive-xs { font-size: clamp(0.75rem, 2vw, 0.875rem); }
+.text-responsive-sm { font-size: clamp(0.875rem, 2.5vw, 1rem); }
+.text-responsive-base { font-size: clamp(1rem, 3vw, 1.125rem); }
+.text-responsive-lg { font-size: clamp(1.125rem, 3.5vw, 1.25rem); }
+.text-responsive-xl { font-size: clamp(1.25rem, 4vw, 1.5rem); }
+.text-responsive-2xl { font-size: clamp(1.5rem, 5vw, 2rem); }
+.text-responsive-3xl { font-size: clamp(1.875rem, 6vw, 2.5rem); }
+.text-responsive-4xl { font-size: clamp(2.25rem, 7vw, 3rem); }
+.text-responsive-5xl { font-size: clamp(2.5rem, 8vw, 4rem); }
+
+/* Titre principal responsive */
+.title-main {
+  font-size: clamp(2rem, 8vw, 4.5rem);
+  line-height: clamp(2.2rem, 8.5vw, 4.8rem);
+}
+
+/* Logo responsive */
+.logo-responsive {
+  width: clamp(6rem, 20vw, 12rem);
+  height: clamp(6rem, 20vw, 12rem);
+}
+
+/* Espacements responsive */
+.spacing-responsive-xs { margin: clamp(0.25rem, 1vw, 0.5rem); }
+.spacing-responsive-sm { margin: clamp(0.5rem, 2vw, 1rem); }
+.spacing-responsive-md { margin: clamp(1rem, 3vw, 1.5rem); }
+.spacing-responsive-lg { margin: clamp(1.5rem, 4vw, 2rem); }
+.spacing-responsive-xl { margin: clamp(2rem, 5vw, 3rem); }
+
+/* Padding responsive */
+.p-responsive-sm { padding: clamp(0.5rem, 2vw, 1rem); }
+.p-responsive-md { padding: clamp(1rem, 3vw, 1.5rem); }
+.p-responsive-lg { padding: clamp(1.5rem, 4vw, 2rem); }
+
+/* Boutons responsive avec touch targets optimaux */
+.btn-responsive {
+  padding: clamp(0.75rem, 3vw, 1rem) clamp(1.5rem, 4vw, 2rem);
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
+  min-height: clamp(2.75rem, 8vw, 3.5rem);
+}
+
+/* Cartes responsive */
+.card-responsive {
+  padding: clamp(1rem, 4vw, 1.5rem);
+  margin-bottom: clamp(0.75rem, 3vw, 1rem);
+  border-radius: clamp(0.75rem, 2vw, 1rem);
+}
+
+/* Navigation mobile native */
+.nav-mobile {
+  padding: clamp(0.75rem, 3vw, 1rem);
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
+}
+
+/* Container responsive */
+.container-responsive {
+  padding-left: clamp(1rem, 4vw, 1.5rem);
+  padding-right: clamp(1rem, 4vw, 1.5rem);
+}
+
+/* Icônes responsive */
+.icon-responsive-sm { width: clamp(1rem, 3vw, 1.25rem); height: clamp(1rem, 3vw, 1.25rem); }
+.icon-responsive-md { width: clamp(1.25rem, 4vw, 1.5rem); height: clamp(1.25rem, 4vw, 1.5rem); }
+.icon-responsive-lg { width: clamp(1.5rem, 5vw, 2rem); height: clamp(1.5rem, 5vw, 2rem); }
+
+/* Mobile-specific optimizations */
+@media (max-width: 768px) {
+  .mobile-text-tight { line-height: 1.3; }
+  .mobile-compact {
+    padding-top: clamp(0.5rem, 2vw, 1rem);
+    padding-bottom: clamp(0.5rem, 2vw, 1rem);
+  }
+  .mobile-spacing { gap: clamp(0.5rem, 2vw, 1rem); }
+}
+
+/* ====== OPTIMISATIONS AVANCÉES ULTRA-FLUIDES ====== */
+
+/* Breakpoints personnalisés pour expérience optimale */
+@media (max-width: 480px) {
+  /* Très petits mobiles - optimisation extrême */
+  .title-main { font-size: clamp(1.5rem, 6vw, 2.5rem); }
+  .card-responsive { padding: clamp(0.75rem, 3vw, 1rem); }
+  .btn-responsive { min-height: clamp(2.5rem, 7vw, 3rem); }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  /* Mobiles moyens/grands - équilibre parfait */
+  .title-main { font-size: clamp(2rem, 7vw, 3.5rem); }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  /* Tablettes - transition douce vers desktop */
+  .container-responsive { padding-left: 2rem; padding-right: 2rem; }
+  .text-responsive-xl { font-size: clamp(1.5rem, 3vw, 1.75rem); }
+}
+
+@media (min-width: 1025px) {
+  /* Desktop - expérience premium */
+  .card-responsive { padding: 2rem; border-radius: 1.5rem; }
+  .btn-responsive { padding: 1rem 2.5rem; font-size: 1.125rem; }
+}
+
+/* Optimisations performance extrême */
+.ultra-smooth {
+  transform: translateZ(0);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Micro-interactions avancées */
+.hover-lift {
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px) scale(1.02);
+}
+
+/* Optimisation lisibilité mobile */
+@media (max-width: 768px) {
+  .mobile-readability {
+    font-weight: 500;
+    letter-spacing: 0.015em;
+    line-height: 1.4;
+  }
+}
+
+/* Gestion orientation mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+  .landscape-compact {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .title-main { font-size: clamp(1.25rem, 5vw, 2rem); }
+}

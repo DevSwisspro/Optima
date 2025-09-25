@@ -1592,15 +1592,15 @@ export default function App() {
         t.completed ? "opacity-60" : ""
       }`}
     >
-      <div className="relative flex items-center gap-4 p-5 min-h-[72px]">
-        {/* Touch target amélioré pour iPhone avec zone cliquable plus large */}
+      <div className="relative flex items-center mobile-spacing p-responsive-sm touch-target">
+        {/* Touch target responsive pour mobile */}
         <motion.button
           onClick={() => completeTask(t.id)}
           whileTap={{ scale: 0.92 }}
           whileHover={{ scale: 1.08 }}
-          className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-red-500 to-red-600 hover:from-red-400 hover:to-red-500 shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center touch-target iphone-optimized performance-optimized group-hover:shadow-red-500/40"
+          className="relative touch-target rounded-2xl bg-gradient-to-br from-red-500 to-red-600 hover:from-red-400 hover:to-red-500 shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center iphone-optimized performance-optimized group-hover:shadow-red-500/40"
         >
-          <Check className="w-6 h-6 text-white drop-shadow-sm" />
+          <Check className="icon-responsive-md text-white drop-shadow-sm" />
 
           {/* Effet de brillance au survol */}
           <motion.div
@@ -1611,9 +1611,9 @@ export default function App() {
           />
         </motion.button>
 
-        <div className="flex-1 min-w-0 py-1">
-          <div className="flex items-start gap-3 sm:gap-4">
-            <span className="font-semibold text-lg sm:text-xl break-words leading-tight flex-1 text-white group-hover:text-gray-100 transition-colors duration-300 cursor-pointer">
+        <div className="flex-1 min-w-0 mobile-compact">
+          <div className="flex items-start mobile-spacing">
+            <span className="font-semibold text-responsive-lg break-words leading-tight flex-1 text-white group-hover:text-gray-100 transition-colors duration-300 cursor-pointer mobile-text-tight mobile-readability">
               {t.title}
             </span>
 
@@ -1653,15 +1653,15 @@ export default function App() {
   );
 
   return (
-    <div className="min-h-screen bg-black text-white p-4 md:p-3">
-      <div className="max-w-4xl mx-auto space-y-6 pt-8">
-        {/* Titre principal avec logo */}
-        <div className="text-center">
-          <div className="flex flex-col items-center mb-6 space-y-4">
+    <div className="min-h-screen bg-black text-white container-responsive">
+      <div className="max-w-4xl mx-auto space-y-4 md:space-y-6 pt-4 md:pt-8">
+        {/* Titre principal avec logo responsive */}
+        <div className="text-center mobile-compact">
+          <div className="flex flex-col items-center spacing-responsive-md mobile-spacing">
             <div>
-              <LogoDevSwiss className="w-48 h-48 text-white" showText={false} />
+              <LogoDevSwiss className="logo-responsive text-white" showText={false} />
             </div>
-            <h1 className="text-7xl font-black tracking-tight uppercase" style={{ 
+            <h1 className="title-main font-black tracking-tight uppercase mobile-text-tight ultra-smooth landscape-compact" style={{
               fontFamily: '"Bebas Neue", "Arial Black", "Helvetica Neue", sans-serif',
               fontWeight: '900',
               letterSpacing: '-0.02em',
@@ -1676,73 +1676,73 @@ export default function App() {
           </div>
         </div>
 
-        {/* Navigation Mobile - Version desktop (cachée sur mobile) */}
+        {/* Navigation Desktop - Version cachée sur mobile */}
         <div className="hidden md:flex space-x-2 mb-12">
           <button
             onClick={() => setActiveTab("dashboard")}
-            className={`flex items-center gap-2 px-6 py-3 rounded-md font-medium transition-all duration-300 ${
+            className={`btn-responsive hover-lift ultra-smooth flex items-center gap-2 rounded-lg font-medium transition-all duration-300 ${
               activeTab === "dashboard"
                 ? "bg-red-600 text-white shadow-lg"
                 : "text-gray-300 hover:text-white"
             }`}
           >
-            <BarChart3 className="w-5 h-5" />
-            Dashboard
+            <BarChart3 className="icon-responsive-sm" />
+            <span className="text-responsive-sm">Dashboard</span>
           </button>
           <button
             onClick={() => setActiveTab("tasks")}
-            className={`flex items-center gap-2 px-6 py-3 rounded-md font-medium transition-all duration-300 ${
+            className={`btn-responsive hover-lift ultra-smooth flex items-center gap-2 rounded-lg font-medium transition-all duration-300 ${
               activeTab === "tasks"
                 ? "bg-red-600 text-white shadow-lg"
                 : "text-gray-300 hover:text-white"
             }`}
           >
-            <List className="w-5 h-5" />
-            Tâches
+            <List className="icon-responsive-sm" />
+            <span className="text-responsive-sm">Tâches</span>
           </button>
           <button
             onClick={() => setActiveTab("notes")}
-            className={`flex items-center gap-2 px-6 py-3 rounded-md font-medium transition-all duration-300 ${
+            className={`btn-responsive hover-lift ultra-smooth flex items-center gap-2 rounded-lg font-medium transition-all duration-300 ${
               activeTab === "notes"
                 ? "bg-red-600 text-white shadow-lg"
                 : "text-gray-300 hover:text-white"
             }`}
           >
-            <FileText className="w-5 h-5" />
-            Notes
+            <FileText className="icon-responsive-sm" />
+            <span className="text-responsive-sm">Notes</span>
           </button>
           <button
             onClick={() => setActiveTab("shopping")}
-            className={`flex items-center gap-2 px-6 py-3 rounded-md font-medium transition-all duration-300 ${
+            className={`btn-responsive hover-lift ultra-smooth flex items-center gap-2 rounded-lg font-medium transition-all duration-300 ${
               activeTab === "shopping"
                 ? "bg-red-600 text-white shadow-lg"
                 : "text-gray-300 hover:text-white"
             }`}
           >
-            <ShoppingCart className="w-5 h-5" />
-            Courses
+            <ShoppingCart className="icon-responsive-sm" />
+            <span className="text-responsive-sm">Courses</span>
           </button>
           <button
             onClick={() => setActiveTab("budget")}
-            className={`flex items-center gap-2 px-6 py-3 rounded-md font-medium transition-all duration-300 ${
+            className={`btn-responsive hover-lift ultra-smooth flex items-center gap-2 rounded-lg font-medium transition-all duration-300 ${
               activeTab === "budget"
                 ? "bg-red-600 text-white shadow-lg"
                 : "text-gray-300 hover:text-white"
             }`}
           >
-            <Wallet className="w-5 h-5" />
-            Budget
+            <Wallet className="icon-responsive-sm" />
+            <span className="text-responsive-sm">Budget</span>
           </button>
           <button
             onClick={() => setActiveTab("media")}
-            className={`flex items-center gap-2 px-6 py-3 rounded-md font-medium transition-all duration-300 ${
+            className={`btn-responsive hover-lift ultra-smooth flex items-center gap-2 rounded-lg font-medium transition-all duration-300 ${
               activeTab === "media"
                 ? "bg-red-600 text-white shadow-lg"
                 : "text-gray-300 hover:text-white"
             }`}
           >
-            <Play className="w-5 h-5" />
-            Médias
+            <Play className="icon-responsive-sm" />
+            <span className="text-responsive-sm">Médias</span>
           </button>
         </div>
 
@@ -1758,19 +1758,19 @@ export default function App() {
               className="space-y-8"
             >
               {/* Titre et filtres */}
-              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-gradient-to-r from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center mobile-spacing bg-gradient-to-r from-gray-800/50 to-gray-900/50 backdrop-blur-sm card-responsive border border-gray-700/50 ultra-smooth">
                 <div>
-                  <h2 className="text-2xl font-bold text-white mb-2">Dashboard Global</h2>
-                  <p className="text-gray-400">Vue d'ensemble de vos finances</p>
+                  <h2 className="text-responsive-2xl font-bold text-white spacing-responsive-sm mobile-readability">Dashboard Global</h2>
+                  <p className="text-responsive-base text-gray-400 mobile-readability">Vue d'ensemble de vos finances</p>
                 </div>
                 
                 {/* Filtres */}
-                <div className="flex flex-wrap gap-3">
+                <div className="flex flex-wrap mobile-spacing">
                   {/* Filtre Année */}
                   <select 
                     value={dashboardFilter.year} 
                     onChange={(e) => setDashboardFilter(prev => ({ ...prev, year: parseInt(e.target.value) }))}
-                    className="bg-gray-700 text-white px-4 py-3 h-12 rounded-lg border border-gray-600 focus:border-red-500 focus:ring-red-500 text-base"
+                    className="bg-gray-700 text-white btn-responsive rounded-lg border border-gray-600 focus:border-red-500 focus:ring-red-500 text-responsive-base hover-lift ultra-smooth"
                   >
                     {getAvailableYears(budgetItems).length > 0 ? getAvailableYears(budgetItems).map(year => (
                       <option key={year} value={year}>{year}</option>
@@ -1781,7 +1781,7 @@ export default function App() {
                   <select 
                     value={dashboardFilter.month} 
                     onChange={(e) => setDashboardFilter(prev => ({ ...prev, month: e.target.value }))}
-                    className="bg-gray-700 text-white px-4 py-3 h-12 rounded-lg border border-gray-600 focus:border-red-500 focus:ring-red-500 text-base"
+                    className="bg-gray-700 text-white btn-responsive rounded-lg border border-gray-600 focus:border-red-500 focus:ring-red-500 text-responsive-base hover-lift ultra-smooth"
                   >
                     <option value="all">Toute l'année</option>
                     {Array.from({ length: 12 }, (_, i) => (
@@ -1794,7 +1794,7 @@ export default function App() {
                   {/* Navigation vers budget avancé */}
                   <button
                     onClick={() => setActiveTab("budget-dashboard")}
-                    className="bg-red-600 hover:bg-red-500 text-white px-6 py-3 h-12 rounded-lg transition-colors duration-200 font-medium text-base"
+                    className="bg-red-600 hover:bg-red-500 text-white btn-responsive rounded-lg transition-colors duration-200 font-medium text-responsive-base hover-lift ultra-smooth"
                   >
                     Budget Avancé
                   </button>
@@ -1804,7 +1804,7 @@ export default function App() {
               {budgetItems.length > 0 ? (
                 <>
                   {/* Tableau de synthèse */}
-                  <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-5 mobile-spacing">
                     {Object.entries({
                       revenus: { label: 'Revenus', color: 'text-green-400' },
                       depenses_fixes: { label: 'Dépenses fixes', color: 'text-red-400' },
@@ -1825,12 +1825,12 @@ export default function App() {
                         <motion.div
                           key={type}
                           whileHover={{ scale: 1.02, y: -5 }}
-                          className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-4 border border-gray-700/30"
+                          className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm card-responsive border border-gray-700/30 hover-lift ultra-smooth"
                         >
-                          <div className={`text-sm font-medium mb-2 ${config.color}`}>
+                          <div className={`text-responsive-sm font-medium spacing-responsive-xs ${config.color} mobile-readability`}>
                             {config.label}
                           </div>
-                          <div className="text-white text-xl font-bold">
+                          <div className="text-white text-responsive-xl font-bold">
                             {type === 'revenus' || type === 'epargne' || type === 'investissements' ? '+' : '-'}{formatCurrency(total).replace(' CHF', '')} CHF
                           </div>
                         </motion.div>
@@ -1843,7 +1843,7 @@ export default function App() {
                     <motion.div 
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/30"
+                      className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm card-responsive border border-gray-700/30 hover-lift ultra-smooth"
                     >
                       <h3 className="text-xl font-bold text-white mb-4">Progression des objectifs</h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1956,7 +1956,7 @@ export default function App() {
                     <motion.div 
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
-                      className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/30"
+                      className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm card-responsive border border-gray-700/30 hover-lift ultra-smooth"
                     >
                       <h3 className="text-xl font-bold text-white mb-4">Évolution mensuelle {dashboardFilter.year}</h3>
                       <ResponsiveContainer width="100%" height={300}>
@@ -1987,7 +1987,7 @@ export default function App() {
                     <motion.div 
                       initial={{ opacity: 0, x: 20 }}
                       animate={{ opacity: 1, x: 0 }}
-                      className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/30"
+                      className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm card-responsive border border-gray-700/30 hover-lift ultra-smooth"
                     >
                       <h3 className="text-xl font-bold text-white mb-4">Répartition {dashboardFilter.month === 'all' ? dashboardFilter.year : `${new Date(dashboardFilter.year, dashboardFilter.month - 1).toLocaleDateString('fr-FR', { month: 'long' })} ${dashboardFilter.year}`}</h3>
                       <ResponsiveContainer width="100%" height={300}>
@@ -3337,39 +3337,39 @@ export default function App() {
               transition={{ duration: 0.3, ease: "easeInOut" }}
               className="performance-optimized smooth-scroll safe-area-inset"
             >
-              {/* Zone d'ajout de tâche */}
+              {/* Zone d'ajout de tâche responsive */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="glass-dark rounded-2xl p-6 neo-shadow border border-white/10 space-y-6"
+              className="glass-dark card-responsive neo-shadow border border-white/10 mobile-spacing"
             >
-              {/* Header avec icône et titre */}
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-gradient-to-br from-red-500 to-red-600 rounded-xl shadow-lg">
-                  <Plus className="w-6 h-6 text-white" />
+              {/* Header responsive avec icône et titre */}
+              <div className="flex items-center mobile-spacing">
+                <div className="p-responsive-sm bg-gradient-to-br from-red-500 to-red-600 rounded-xl shadow-lg">
+                  <Plus className="icon-responsive-md text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-white">Nouvelle tâche</h3>
+                <h3 className="text-responsive-xl font-bold text-white">Nouvelle tâche</h3>
               </div>
 
-              {/* Interface mobile optimisée */}
-              <div className="space-y-4">
-                {/* Input principal */}
+              {/* Interface responsive optimisée */}
+              <div className="mobile-spacing">
+                {/* Input principal responsive */}
                 <Input
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Que voulez-vous accomplir ?"
                   onKeyDown={(e) => { if (e.key === "Enter") addTask(); }}
-                  className="w-full h-14 text-lg rounded-2xl border-0 bg-white/10 text-white placeholder:text-gray-300 font-medium focus:bg-white/15 focus:ring-2 focus:ring-red-500 transition-all duration-300 px-5"
+                  className="w-full btn-responsive text-responsive-base rounded-2xl border-0 bg-white/10 text-white placeholder:text-gray-300 font-medium focus:bg-white/15 focus:ring-2 focus:ring-red-500 transition-all duration-300 container-responsive"
                 />
 
-                {/* Mobile layout: Priority et bouton stack verticalement sur très petit écran */}
-                <div className="flex flex-col sm:flex-row gap-3">
-                  {/* Sélecteur de priorité mobile-friendly */}
+                {/* Layout responsive: Priority et bouton */}
+                <div className="flex flex-col sm:flex-row mobile-spacing">
+                  {/* Sélecteur de priorité responsive */}
                   <div className="flex-1 relative" ref={priorityMenuRef}>
                     <motion.button
                       onClick={() => setShowPriorityMenu(!showPriorityMenu)}
                       whileTap={{ scale: 0.98 }}
-                      className={`w-full h-14 rounded-2xl text-white border-0 text-base px-5 flex items-center justify-between focus:outline-none transition-all duration-300 font-semibold ${
+                      className={`w-full btn-responsive rounded-2xl text-white border-0 text-responsive-base container-responsive flex items-center justify-between focus:outline-none transition-all duration-300 font-semibold touch-target iphone-optimized ${
                         priorityChoice === "urgent" ? "bg-gradient-to-r from-red-600 to-red-700 shadow-lg shadow-red-500/25" :
                         priorityChoice === "normal" ? "bg-gradient-to-r from-orange-500 to-orange-600 shadow-lg shadow-orange-500/25" :
                         "bg-gradient-to-r from-gray-600 to-gray-700 shadow-lg"
@@ -3434,18 +3434,18 @@ export default function App() {
                     )}
                   </div>
 
-                  {/* Bouton d'ajout optimisé mobile avec haptic feedback */}
+                  {/* Bouton d'ajout responsive avec haptic feedback */}
                   <motion.button
                     onClick={addTask}
                     whileTap={{ scale: 0.95 }}
                     whileHover={{ scale: 1.02 }}
-                    className="sm:w-auto w-full h-14 px-6 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-2xl hover:from-red-500 hover:to-red-600 text-lg font-bold shadow-lg shadow-red-500/25 transition-all duration-300 flex items-center justify-center gap-3 min-w-[140px] touch-target iphone-optimized performance-optimized"
+                    className="sm:w-auto w-full btn-responsive bg-gradient-to-r from-red-600 to-red-700 text-white rounded-2xl hover:from-red-500 hover:to-red-600 text-responsive-base font-bold shadow-lg shadow-red-500/25 transition-all duration-300 flex items-center justify-center mobile-spacing min-w-[140px] touch-target iphone-optimized performance-optimized"
                   >
                     <motion.div
                       whileHover={{ rotate: 90 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <Plus className="w-5 h-5" />
+                      <Plus className="icon-responsive-sm" />
                     </motion.div>
                     <span>Ajouter</span>
                   </motion.button>
@@ -3453,32 +3453,32 @@ export default function App() {
               </div>
             </motion.div>
 
-            {/* Barre de recherche optimisée iPhone */}
+            {/* Barre de recherche responsive */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="glass-dark rounded-2xl p-5 neo-shadow border border-white/10"
+              className="glass-dark card-responsive neo-shadow border border-white/10"
             >
-              <div className="flex items-center gap-4">
-                <div className="p-2 bg-gradient-to-br from-gray-600 to-gray-700 rounded-xl">
-                  <Search className="w-5 h-5 text-white" />
+              <div className="flex items-center mobile-spacing">
+                <div className="p-responsive-sm bg-gradient-to-br from-gray-600 to-gray-700 rounded-xl">
+                  <Search className="icon-responsive-sm text-white" />
                 </div>
                 <Input
                   placeholder="Rechercher vos tâches..."
-                  className="flex-1 h-12 bg-white/10 border-0 rounded-2xl text-white placeholder:text-gray-300 text-lg font-medium focus:bg-white/15 focus:ring-2 focus:ring-red-500/60 transition-all duration-300 px-4"
+                  className="flex-1 btn-responsive bg-white/10 border-0 rounded-2xl text-white placeholder:text-gray-300 text-responsive-base font-medium focus:bg-white/15 focus:ring-2 focus:ring-red-500/60 transition-all duration-300 touch-target iphone-optimized"
                   value={filter.q}
                   onChange={(e) => setFilter({ ...filter, q: e.target.value })}
                 />
               </div>
             </motion.div>
 
-            {/* Zone d'affichage des tâches optimisée iPhone */}
+            {/* Zone d'affichage des tâches responsive */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="glass-dark rounded-2xl p-6 min-h-96 neo-shadow border border-white/10"
+              className="glass-dark card-responsive min-h-96 neo-shadow border border-white/10"
             >
               {(tasksByPriority.urgent.length === 0 && tasksByPriority.normal.length === 0) ? (
                 <motion.div
@@ -3489,12 +3489,12 @@ export default function App() {
                   <motion.div
                     animate={{ rotate: [0, 5, -5, 0] }}
                     transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                    className="text-4xl mb-6"
+                    className="text-responsive-4xl spacing-responsive-md"
                   >
                     📝
                   </motion.div>
-                  <div className="text-2xl font-bold mb-3 text-white">Aucune tâche</div>
-                  <div className="text-lg text-gray-400">Créez votre première tâche pour commencer</div>
+                  <div className="text-responsive-2xl font-bold spacing-responsive-sm text-white">Aucune tâche</div>
+                  <div className="text-responsive-lg text-gray-400">Créez votre première tâche pour commencer</div>
                 </motion.div>
               ) : (
                 <div className="space-y-8">
@@ -3508,24 +3508,24 @@ export default function App() {
                       <motion.div
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        className="flex items-center gap-4 pb-4 border-b border-red-500/40"
+                        className="flex items-center mobile-spacing p-responsive-sm border-b border-red-500/40"
                       >
-                        <div className="p-2 bg-gradient-to-br from-red-500 to-red-600 rounded-xl shadow-lg">
-                          <Sparkles className="w-5 h-5 text-white" />
+                        <div className="p-responsive-sm bg-gradient-to-br from-red-500 to-red-600 rounded-xl shadow-lg">
+                          <Sparkles className="icon-responsive-sm text-white" />
                         </div>
-                        <div className="flex items-center gap-3 text-red-400 font-bold text-xl">
+                        <div className="flex items-center mobile-spacing text-red-400 font-bold text-responsive-xl">
                           À faire rapidement
                           <motion.span
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
                             transition={{ type: "spring", bounce: 0.5 }}
-                            className="text-sm bg-gradient-to-r from-red-500 to-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg"
+                            className="text-responsive-xs bg-gradient-to-r from-red-500 to-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg"
                           >
                             {tasksByPriority.urgent.length}
                           </motion.span>
                         </div>
                       </motion.div>
-                      <div className="flex flex-col gap-3">
+                      <div className="flex flex-col mobile-spacing">
                         <AnimatePresence initial={false}>
                           {tasksByPriority.urgent.map(t => <TaskRow key={t.id} t={t} />)}
                         </AnimatePresence>
@@ -3545,24 +3545,24 @@ export default function App() {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.1 }}
-                        className="flex items-center gap-4 pb-4 border-b border-orange-500/40"
+                        className="flex items-center mobile-spacing p-responsive-sm border-b border-orange-500/40"
                       >
-                        <div className="p-2 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg">
-                          <Calendar className="w-5 h-5 text-white" />
+                        <div className="p-responsive-sm bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg">
+                          <Calendar className="icon-responsive-sm text-white" />
                         </div>
-                        <div className="flex items-center gap-3 text-orange-400 font-bold text-xl">
+                        <div className="flex items-center mobile-spacing text-orange-400 font-bold text-responsive-xl">
                           À faire prochainement
                           <motion.span
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
                             transition={{ type: "spring", bounce: 0.5, delay: 0.1 }}
-                            className="text-sm bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg"
+                            className="text-responsive-xs bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg"
                           >
                             {tasksByPriority.normal.length}
                           </motion.span>
                         </div>
                       </motion.div>
-                      <div className="flex flex-col gap-3">
+                      <div className="flex flex-col mobile-spacing">
                         <AnimatePresence initial={false}>
                           {tasksByPriority.normal.map(t => <TaskRow key={t.id} t={t} />)}
                         </AnimatePresence>
@@ -3578,9 +3578,9 @@ export default function App() {
 
           {activeTab === "notes" && (
           <>
-            {/* Zone d'ajout de note */}
-            <div className="bg-gray-800 rounded-xl p-6 space-y-4">
-              <div className="space-y-3">
+            {/* Zone d'ajout de note responsive */}
+            <div className="glass-dark card-responsive mobile-spacing hover-lift ultra-smooth">
+              <div className="mobile-spacing">
                 <Input 
                   value={noteTitle} 
                   onChange={(e) => setNoteTitle(e.target.value)} 
@@ -5300,12 +5300,12 @@ export default function App() {
         )}
         </AnimatePresence>
 
-        {/* Navigation Mobile Fixe en Bas - Visible uniquement sur mobile */}
-        <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-gray-900/95 backdrop-blur-md border-t border-gray-700/50">
-          <div className="flex items-center justify-around px-2 py-4 max-w-lg mx-auto">
+        {/* Navigation Mobile Responsive - Style natif */}
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-gray-900/95 backdrop-blur-md border-t border-gray-700/50 safe-area-inset">
+          <div className="flex items-center justify-around container-responsive max-w-lg mx-auto mobile-compact">
             <motion.button
               onClick={() => setActiveTab("dashboard")}
-              className={`flex flex-col items-center justify-center p-4 rounded-xl transition-all duration-300 min-w-[70px] min-h-[70px] ${
+              className={`nav-mobile flex flex-col items-center justify-center rounded-xl transition-all duration-300 touch-target iphone-optimized ${
                 activeTab === "dashboard"
                   ? "bg-red-600/20 text-red-400 scale-110"
                   : "text-gray-400 hover:text-white active:scale-95"
@@ -5313,13 +5313,13 @@ export default function App() {
               whileTap={{ scale: 0.9 }}
               whileHover={{ scale: 1.05 }}
             >
-              <BarChart3 className={`w-6 h-6 mb-1 ${activeTab === "dashboard" ? "text-red-400" : ""}`} />
-              <span className="text-xs font-medium">Stats</span>
+              <BarChart3 className={`icon-responsive-md mb-1 ${activeTab === "dashboard" ? "text-red-400" : ""}`} />
+              <span className="text-responsive-xs font-medium">Stats</span>
             </motion.button>
 
             <motion.button
               onClick={() => setActiveTab("tasks")}
-              className={`flex flex-col items-center justify-center p-4 rounded-xl transition-all duration-300 min-w-[70px] min-h-[70px] ${
+              className={`nav-mobile flex flex-col items-center justify-center rounded-xl transition-all duration-300 touch-target iphone-optimized ${
                 activeTab === "tasks"
                   ? "bg-red-600/20 text-red-400 scale-110"
                   : "text-gray-400 hover:text-white active:scale-95"
@@ -5327,13 +5327,13 @@ export default function App() {
               whileTap={{ scale: 0.9 }}
               whileHover={{ scale: 1.05 }}
             >
-              <List className={`w-6 h-6 mb-1 ${activeTab === "tasks" ? "text-red-400" : ""}`} />
-              <span className="text-xs font-medium">Tâches</span>
+              <List className={`icon-responsive-md mb-1 ${activeTab === "tasks" ? "text-red-400" : ""}`} />
+              <span className="text-responsive-xs font-medium">Tâches</span>
             </motion.button>
 
             <motion.button
               onClick={() => setActiveTab("notes")}
-              className={`flex flex-col items-center justify-center p-4 rounded-xl transition-all duration-300 min-w-[70px] min-h-[70px] ${
+              className={`nav-mobile flex flex-col items-center justify-center rounded-xl transition-all duration-300 touch-target iphone-optimized ${
                 activeTab === "notes"
                   ? "bg-red-600/20 text-red-400 scale-110"
                   : "text-gray-400 hover:text-white active:scale-95"
@@ -5341,13 +5341,13 @@ export default function App() {
               whileTap={{ scale: 0.9 }}
               whileHover={{ scale: 1.05 }}
             >
-              <FileText className={`w-6 h-6 mb-1 ${activeTab === "notes" ? "text-red-400" : ""}`} />
-              <span className="text-xs font-medium">Notes</span>
+              <FileText className={`icon-responsive-md mb-1 ${activeTab === "notes" ? "text-red-400" : ""}`} />
+              <span className="text-responsive-xs font-medium">Notes</span>
             </motion.button>
 
             <motion.button
               onClick={() => setActiveTab("shopping")}
-              className={`flex flex-col items-center justify-center p-4 rounded-xl transition-all duration-300 min-w-[70px] min-h-[70px] ${
+              className={`nav-mobile flex flex-col items-center justify-center rounded-xl transition-all duration-300 touch-target iphone-optimized ${
                 activeTab === "shopping"
                   ? "bg-red-600/20 text-red-400 scale-110"
                   : "text-gray-400 hover:text-white active:scale-95"
@@ -5355,13 +5355,13 @@ export default function App() {
               whileTap={{ scale: 0.9 }}
               whileHover={{ scale: 1.05 }}
             >
-              <ShoppingCart className={`w-6 h-6 mb-1 ${activeTab === "shopping" ? "text-red-400" : ""}`} />
-              <span className="text-xs font-medium">Courses</span>
+              <ShoppingCart className={`icon-responsive-md mb-1 ${activeTab === "shopping" ? "text-red-400" : ""}`} />
+              <span className="text-responsive-xs font-medium">Courses</span>
             </motion.button>
 
             <motion.button
               onClick={() => setActiveTab("budget")}
-              className={`flex flex-col items-center justify-center p-4 rounded-xl transition-all duration-300 min-w-[70px] min-h-[70px] ${
+              className={`nav-mobile flex flex-col items-center justify-center rounded-xl transition-all duration-300 touch-target iphone-optimized ${
                 activeTab === "budget"
                   ? "bg-red-600/20 text-red-400 scale-110"
                   : "text-gray-400 hover:text-white active:scale-95"
@@ -5369,13 +5369,13 @@ export default function App() {
               whileTap={{ scale: 0.9 }}
               whileHover={{ scale: 1.05 }}
             >
-              <Wallet className={`w-6 h-6 mb-1 ${activeTab === "budget" ? "text-red-400" : ""}`} />
-              <span className="text-xs font-medium">Budget</span>
+              <Wallet className={`icon-responsive-md mb-1 ${activeTab === "budget" ? "text-red-400" : ""}`} />
+              <span className="text-responsive-xs font-medium">Budget</span>
             </motion.button>
 
             <motion.button
               onClick={() => setActiveTab("media")}
-              className={`flex flex-col items-center justify-center p-4 rounded-xl transition-all duration-300 min-w-[70px] min-h-[70px] ${
+              className={`nav-mobile flex flex-col items-center justify-center rounded-xl transition-all duration-300 touch-target iphone-optimized ${
                 activeTab === "media"
                   ? "bg-red-600/20 text-red-400 scale-110"
                   : "text-gray-300 hover:text-white active:scale-95"
@@ -5383,19 +5383,19 @@ export default function App() {
               whileTap={{ scale: 0.9 }}
               whileHover={{ scale: 1.05 }}
             >
-              <Play className={`w-6 h-6 mb-1 ${activeTab === "media" ? "text-red-400" : ""}`} />
-              <span className="text-xs font-medium">Médias</span>
+              <Play className={`icon-responsive-md mb-1 ${activeTab === "media" ? "text-red-400" : ""}`} />
+              <span className="text-responsive-xs font-medium">Médias</span>
             </motion.button>
           </div>
         </div>
 
-        {/* Footer */}
-        <footer className="text-center py-8 border-t border-gray-800 mb-16 md:mb-0">
-          <div className="flex flex-col items-center justify-center gap-3">
-            {/* Logo et nom */}
-            <div className="flex flex-col items-center">
-              <LogoDevSwiss className="w-16 h-16 text-white" showText={false} />
-              <span className="text-white text-xl font-bold">Dev-Swiss</span>
+        {/* Footer responsive */}
+        <footer className="text-center mobile-compact border-t border-gray-800 mb-16 md:mb-0 p-responsive-md">
+          <div className="flex flex-col items-center justify-center mobile-spacing">
+            {/* Logo et nom responsive */}
+            <div className="flex flex-col items-center mobile-spacing">
+              <LogoDevSwiss className="icon-responsive-lg text-white" showText={false} />
+              <span className="text-white text-responsive-lg font-bold">Dev-Swiss</span>
             </div>
 
             {/* Texte descriptif séparé */}
