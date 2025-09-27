@@ -1683,8 +1683,8 @@ export default function App() {
   );
 
   return (
-    <div className="min-h-screen bg-black text-white container-responsive">
-      <div className="max-w-4xl mx-auto space-y-4 md:space-y-6 pt-4 md:pt-8">
+    <div className="min-h-screen bg-black text-white container-safe overflow-fix pwa-optimized">
+      <div className="max-w-4xl mx-auto space-y-4 md:space-y-6 pt-4 md:pt-8 section-alignment-fix">
         {/* Titre principal avec logo responsive */}
         <div className="text-center mobile-compact">
           <div className="flex flex-col items-center spacing-responsive-md mobile-spacing">
@@ -4366,9 +4366,9 @@ export default function App() {
                 <div className="flex gap-3">
                   {editingItem ? (
                     <>
-                      <Button 
-                        onClick={updateShoppingItem} 
-                        className="flex-1 h-12 bg-green-600 text-white rounded hover:bg-green-500 text-lg font-bold"
+                      <Button
+                        onClick={updateShoppingItem}
+                        className="flex-1 h-12 bg-red-600 text-white rounded hover:bg-red-500 text-lg font-bold"
                       >
                         Sauvegarder
                       </Button>
@@ -5780,7 +5780,7 @@ export default function App() {
                   />
                   {/* Suggestions API */}
                   {showSuggestions && searchSuggestions.length > 0 && (
-                    <div className="absolute top-full left-0 right-0 z-50 bg-gray-800 border border-gray-600 rounded-lg mt-1 max-h-80 overflow-y-auto shadow-2xl">
+                    <div className="absolute top-full left-0 right-0 z-[9998] bg-gray-800 border border-gray-600 rounded-lg mt-1 max-h-80 overflow-y-auto shadow-2xl">
                       {searchLoading ? (
                         <div className="p-4 text-center text-gray-400">
                           🔍 Recherche en cours...
@@ -6025,9 +6025,9 @@ export default function App() {
 
                               {/* Ma note personnelle - uniquement si vu */}
                               {media.status === "watched" && media.rating && (
-                                <div className="flex items-center gap-1 text-xs">
+                                <div className="flex items-center gap-1 text-xs media-stars-container">
                                   <span className="text-gray-400 font-medium shrink-0">Note:</span>
-                                  <div className="flex gap-px">
+                                  <div className="star-rating">
                                     {[1, 2, 3, 4, 5].map((star) => (
                                       <Star
                                         key={star}
@@ -6065,11 +6065,11 @@ export default function App() {
         </AnimatePresence>
 
         {/* Navigation Mobile Responsive - Style natif */}
-        <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-gray-900/95 backdrop-blur-md border-t border-gray-700/50 safe-area-inset">
-          <div className="flex items-center justify-around container-responsive max-w-lg mx-auto mobile-compact">
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-gray-900/95 backdrop-blur-md border-t border-gray-700/50 safe-area-inset bottom-nav-optimized pwa-navigation">
+          <div className="flex items-center justify-around container-safe max-w-lg mx-auto mobile-compact">
             <motion.button
               onClick={() => setActiveTab("dashboard")}
-              className={`nav-mobile flex flex-col items-center justify-center rounded-xl transition-all duration-300 touch-target iphone-optimized ${
+              className={`nav-mobile flex flex-col items-center justify-center rounded-xl transition-all duration-300 touch-target ios-touch-optimized ${
                 activeTab === "dashboard"
                   ? "bg-red-600/20 text-red-400 scale-110"
                   : "text-gray-400 hover:text-white active:scale-95"
@@ -6077,13 +6077,13 @@ export default function App() {
               whileTap={{ scale: 0.9 }}
               whileHover={{ scale: 1.05 }}
             >
-              <BarChart3 className={`icon-responsive-md mb-1 ${activeTab === "dashboard" ? "text-red-400" : ""}`} />
-              <span className="text-responsive-xs font-medium">Stats</span>
+              <BarChart3 className={`bottom-nav-icon mb-1 ${activeTab === "dashboard" ? "text-red-400" : ""}`} />
+              <span className="bottom-nav-text">Stats</span>
             </motion.button>
 
             <motion.button
               onClick={() => setActiveTab("tasks")}
-              className={`nav-mobile flex flex-col items-center justify-center rounded-xl transition-all duration-300 touch-target iphone-optimized ${
+              className={`nav-mobile flex flex-col items-center justify-center rounded-xl transition-all duration-300 touch-target ios-touch-optimized ${
                 activeTab === "tasks"
                   ? "bg-red-600/20 text-red-400 scale-110"
                   : "text-gray-400 hover:text-white active:scale-95"
@@ -6091,13 +6091,13 @@ export default function App() {
               whileTap={{ scale: 0.9 }}
               whileHover={{ scale: 1.05 }}
             >
-              <List className={`icon-responsive-md mb-1 ${activeTab === "tasks" ? "text-red-400" : ""}`} />
-              <span className="text-responsive-xs font-medium">Tâches</span>
+              <List className={`bottom-nav-icon mb-1 ${activeTab === "tasks" ? "text-red-400" : ""}`} />
+              <span className="bottom-nav-text">Tâches</span>
             </motion.button>
 
             <motion.button
               onClick={() => setActiveTab("notes")}
-              className={`nav-mobile flex flex-col items-center justify-center rounded-xl transition-all duration-300 touch-target iphone-optimized ${
+              className={`nav-mobile flex flex-col items-center justify-center rounded-xl transition-all duration-300 touch-target ios-touch-optimized ${
                 activeTab === "notes"
                   ? "bg-red-600/20 text-red-400 scale-110"
                   : "text-gray-400 hover:text-white active:scale-95"
@@ -6105,13 +6105,13 @@ export default function App() {
               whileTap={{ scale: 0.9 }}
               whileHover={{ scale: 1.05 }}
             >
-              <FileText className={`icon-responsive-md mb-1 ${activeTab === "notes" ? "text-red-400" : ""}`} />
-              <span className="text-responsive-xs font-medium">Notes</span>
+              <FileText className={`bottom-nav-icon mb-1 ${activeTab === "notes" ? "text-red-400" : ""}`} />
+              <span className="bottom-nav-text">Notes</span>
             </motion.button>
 
             <motion.button
               onClick={() => setActiveTab("shopping")}
-              className={`nav-mobile flex flex-col items-center justify-center rounded-xl transition-all duration-300 touch-target iphone-optimized ${
+              className={`nav-mobile flex flex-col items-center justify-center rounded-xl transition-all duration-300 touch-target ios-touch-optimized ${
                 activeTab === "shopping"
                   ? "bg-red-600/20 text-red-400 scale-110"
                   : "text-gray-400 hover:text-white active:scale-95"
@@ -6119,13 +6119,13 @@ export default function App() {
               whileTap={{ scale: 0.9 }}
               whileHover={{ scale: 1.05 }}
             >
-              <ShoppingCart className={`icon-responsive-md mb-1 ${activeTab === "shopping" ? "text-red-400" : ""}`} />
-              <span className="text-responsive-xs font-medium">Courses</span>
+              <ShoppingCart className={`bottom-nav-icon mb-1 ${activeTab === "shopping" ? "text-red-400" : ""}`} />
+              <span className="bottom-nav-text">Courses</span>
             </motion.button>
 
             <motion.button
               onClick={() => setActiveTab("budget")}
-              className={`nav-mobile flex flex-col items-center justify-center rounded-xl transition-all duration-300 touch-target iphone-optimized ${
+              className={`nav-mobile flex flex-col items-center justify-center rounded-xl transition-all duration-300 touch-target ios-touch-optimized ${
                 activeTab === "budget"
                   ? "bg-red-600/20 text-red-400 scale-110"
                   : "text-gray-400 hover:text-white active:scale-95"
@@ -6133,13 +6133,13 @@ export default function App() {
               whileTap={{ scale: 0.9 }}
               whileHover={{ scale: 1.05 }}
             >
-              <Wallet className={`icon-responsive-md mb-1 ${activeTab === "budget" ? "text-red-400" : ""}`} />
-              <span className="text-responsive-xs font-medium">Budget</span>
+              <Wallet className={`bottom-nav-icon mb-1 ${activeTab === "budget" ? "text-red-400" : ""}`} />
+              <span className="bottom-nav-text">Budget</span>
             </motion.button>
 
             <motion.button
               onClick={() => setActiveTab("media")}
-              className={`nav-mobile flex flex-col items-center justify-center rounded-xl transition-all duration-300 touch-target iphone-optimized ${
+              className={`nav-mobile flex flex-col items-center justify-center rounded-xl transition-all duration-300 touch-target ios-touch-optimized ${
                 activeTab === "media"
                   ? "bg-red-600/20 text-red-400 scale-110"
                   : "text-gray-300 hover:text-white active:scale-95"
@@ -6147,8 +6147,8 @@ export default function App() {
               whileTap={{ scale: 0.9 }}
               whileHover={{ scale: 1.05 }}
             >
-              <Play className={`icon-responsive-md mb-1 ${activeTab === "media" ? "text-red-400" : ""}`} />
-              <span className="text-responsive-xs font-medium">Médias</span>
+              <Play className={`bottom-nav-icon mb-1 ${activeTab === "media" ? "text-red-400" : ""}`} />
+              <span className="bottom-nav-text">Médias</span>
             </motion.button>
           </div>
         </div>
