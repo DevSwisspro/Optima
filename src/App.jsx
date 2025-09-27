@@ -656,6 +656,9 @@ export default function App() {
   const [priorityChoice, setPriorityChoice] = useState("normal");
   const [showPriorityMenu, setShowPriorityMenu] = useState(false);
   const priorityMenuRef = useRef(null);
+  const priorityButtonMobileRef = useRef(null);
+  const priorityButtonDesktopRef = useRef(null);
+  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0, width: 0 });
   const [activeTab, setActiveTab] = useState("dashboard");
   
   // États pour le dashboard
@@ -830,6 +833,13 @@ export default function App() {
   useEffect(() => {
     try { localStorage.setItem(LS_SHOPPING_KEY, JSON.stringify(shoppingItems)); } catch {}
   }, [shoppingItems]);
+
+  // Corriger priorityChoice si il contient une valeur invalide
+  useEffect(() => {
+    if (!PRIORITY_LABELS[priorityChoice]) {
+      setPriorityChoice("normal");
+    }
+  }, [priorityChoice]);
 
   // Charger les paramètres depuis le localStorage
   useEffect(() => {
@@ -1125,6 +1135,26 @@ export default function App() {
   };
 
   const removeTask = (id) => setTasks(prev => prev.filter(t => t.id !== id));
+
+  // Fonction pour calculer la position du menu priorité
+  const calculateMenuPosition = (buttonRef) => {
+    if (!buttonRef.current) return;
+
+    const rect = buttonRef.current.getBoundingClientRect();
+    setMenuPosition({
+      top: rect.bottom + 8, // 8px de marge
+      left: rect.left,
+      width: rect.width
+    });
+  };
+
+  const togglePriorityMenu = (isMobile = false) => {
+    const buttonRef = isMobile ? priorityButtonMobileRef : priorityButtonDesktopRef;
+    if (!showPriorityMenu) {
+      calculateMenuPosition(buttonRef);
+    }
+    setShowPriorityMenu(!showPriorityMenu);
+  };
 
   // Fonctions pour les notes
   const addNote = () => {
@@ -1509,7 +1539,7 @@ export default function App() {
 
     return {
       urgent: filteredTasks.filter(t => t.priority === 'urgent'),
-      normal: filteredTasks.filter(t => t.priority === 'normal' || t.priority === 'low')
+      normal: filteredTasks.filter(t => t.priority === 'normal')
     };
   }, [tasks, filter]);
 
@@ -1708,7 +1738,7 @@ export default function App() {
                 : "text-gray-300 hover:text-white"
             }`}
           >
-            <FileText className="icon-responsive-sm" />
+            <FileText className={`icon-responsive-sm ${activeTab === "notes" ? "text-red-400" : ""}`} />
             <span className="text-responsive-sm">Notes</span>
           </button>
           <button
@@ -1719,7 +1749,7 @@ export default function App() {
                 : "text-gray-300 hover:text-white"
             }`}
           >
-            <ShoppingCart className="icon-responsive-sm" />
+            <ShoppingCart className={`icon-responsive-sm ${activeTab === "shopping" ? "text-red-400" : ""}`} />
             <span className="text-responsive-sm">Courses</span>
           </button>
           <button
@@ -1730,7 +1760,7 @@ export default function App() {
                 : "text-gray-300 hover:text-white"
             }`}
           >
-            <Wallet className="icon-responsive-sm" />
+            <Wallet className={`icon-responsive-sm ${activeTab === "budget" ? "text-red-400" : ""}`} />
             <span className="text-responsive-sm">Budget</span>
           </button>
           <button
@@ -1741,7 +1771,7 @@ export default function App() {
                 : "text-gray-300 hover:text-white"
             }`}
           >
-            <Play className="icon-responsive-sm" />
+            <Play className={`icon-responsive-sm ${activeTab === "media" ? "text-red-400" : ""}`} />
             <span className="text-responsive-sm">Médias</span>
           </button>
         </div>
@@ -1757,85 +1787,258 @@ export default function App() {
               transition={{ duration: 0.3, ease: "easeInOut" }}
               className="space-y-8"
             >
-              {/* Titre et filtres */}
-              <div className="flex flex-col md:flex-row justify-between items-start md:items-center mobile-spacing bg-gradient-to-r from-gray-800/50 to-gray-900/50 backdrop-blur-sm card-responsive border border-gray-700/50 ultra-smooth">
-                <div>
-                  <h2 className="text-responsive-2xl font-bold text-white spacing-responsive-sm mobile-readability">Dashboard Global</h2>
-                  <p className="text-responsive-base text-gray-400 mobile-readability">Vue d'ensemble de vos finances</p>
-                </div>
-                
-                {/* Filtres */}
-                <div className="flex flex-wrap mobile-spacing">
-                  {/* Filtre Année */}
-                  <select 
-                    value={dashboardFilter.year} 
-                    onChange={(e) => setDashboardFilter(prev => ({ ...prev, year: parseInt(e.target.value) }))}
-                    className="bg-gray-700 text-white btn-responsive rounded-lg border border-gray-600 focus:border-red-500 focus:ring-red-500 text-responsive-base hover-lift ultra-smooth"
+              {/* Header Dashboard - Mobile vs Desktop */}
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="text-center"
+              >
+                {/* Mobile Header - Centré et épuré */}
+                <div className="md:hidden">
+                  <motion.div
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.2, type: "spring", bounce: 0.3 }}
+                    className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 mx-auto max-w-sm"
                   >
-                    {getAvailableYears(budgetItems).length > 0 ? getAvailableYears(budgetItems).map(year => (
-                      <option key={year} value={year}>{year}</option>
-                    )) : <option value={new Date().getFullYear()}>{new Date().getFullYear()}</option>}
-                  </select>
-                  
-                  {/* Filtre Mois */}
-                  <select 
-                    value={dashboardFilter.month} 
-                    onChange={(e) => setDashboardFilter(prev => ({ ...prev, month: e.target.value }))}
-                    className="bg-gray-700 text-white btn-responsive rounded-lg border border-gray-600 focus:border-red-500 focus:ring-red-500 text-responsive-base hover-lift ultra-smooth"
-                  >
-                    <option value="all">Toute l'année</option>
-                    {Array.from({ length: 12 }, (_, i) => (
-                      <option key={i + 1} value={i + 1}>
-                        {new Date(2024, i).toLocaleDateString('fr-FR', { month: 'long' })}
-                      </option>
-                    ))}
-                  </select>
+                    <div className="flex flex-col items-center gap-4">
+                      <div className="p-4 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl shadow-xl">
+                        <BarChart3 className="w-8 h-8 text-white" />
+                      </div>
+                      <div>
+                        <h2 className="text-2xl font-bold text-white mb-1">Dashboard</h2>
+                        <p className="text-sm text-gray-300">Vue d'ensemble</p>
+                      </div>
+                    </div>
+                  </motion.div>
 
-                  {/* Navigation vers budget avancé */}
-                  <button
-                    onClick={() => setActiveTab("budget-dashboard")}
-                    className="bg-red-600 hover:bg-red-500 text-white btn-responsive rounded-lg transition-colors duration-200 font-medium text-responsive-base hover-lift ultra-smooth"
-                  >
-                    Budget Avancé
-                  </button>
+                  {/* Filtres Mobile - Style Cards */}
+                  <div className="mt-6 space-y-3">
+                    <motion.select
+                      initial={{ x: -50, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ delay: 0.3 }}
+                      value={dashboardFilter.year}
+                      onChange={(e) => setDashboardFilter(prev => ({ ...prev, year: parseInt(e.target.value) }))}
+                      className="w-full glass-dark text-white text-center py-4 px-6 rounded-2xl border border-white/20 focus:border-red-500 focus:ring-2 focus:ring-red-500/30 text-lg font-semibold transition-all duration-300"
+                    >
+                      {getAvailableYears(budgetItems).length > 0 ? getAvailableYears(budgetItems).map(year => (
+                        <option key={year} value={year} className="bg-gray-800">{year}</option>
+                      )) : <option value={new Date().getFullYear()} className="bg-gray-800">{new Date().getFullYear()}</option>}
+                    </motion.select>
+
+                    <motion.select
+                      initial={{ x: 50, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ delay: 0.4 }}
+                      value={dashboardFilter.month}
+                      onChange={(e) => setDashboardFilter(prev => ({ ...prev, month: e.target.value }))}
+                      className="w-full glass-dark text-white text-center py-4 px-6 rounded-2xl border border-white/20 focus:border-red-500 focus:ring-2 focus:ring-red-500/30 text-lg font-semibold transition-all duration-300"
+                    >
+                      <option value="all" className="bg-gray-800">Toute l'année</option>
+                      {Array.from({ length: 12 }, (_, i) => (
+                        <option key={i + 1} value={i + 1} className="bg-gray-800">
+                          {new Date(2024, i).toLocaleDateString('fr-FR', { month: 'long' })}
+                        </option>
+                      ))}
+                    </motion.select>
+
+                    <motion.button
+                      initial={{ y: 50, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.5 }}
+                      whileTap={{ scale: 0.98 }}
+                      whileHover={{ scale: 1.02 }}
+                      onClick={() => setActiveTab("budget-dashboard")}
+                      className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white py-4 px-6 rounded-2xl text-lg font-bold shadow-lg shadow-red-500/25 transition-all duration-300 flex items-center justify-center gap-3"
+                    >
+                      <TrendingUp className="w-5 h-5" />
+                      Budget Avancé
+                    </motion.button>
+                  </div>
                 </div>
-              </div>
+
+                {/* Desktop Header - Style traditionnel amélioré */}
+                <div className="hidden md:block">
+                  <div className="glass-dark rounded-3xl p-8 border border-white/10">
+                    <div className="flex flex-row justify-between items-center">
+                      <motion.div
+                        initial={{ x: -30, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ delay: 0.2 }}
+                        className="flex items-center gap-6"
+                      >
+                        <div className="p-4 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl shadow-xl">
+                          <BarChart3 className="w-10 h-10 text-white" />
+                        </div>
+                        <div className="text-left">
+                          <h2 className="text-4xl font-bold text-white mb-2">Dashboard Global</h2>
+                          <p className="text-xl text-gray-300">Analyse complète de vos finances</p>
+                        </div>
+                      </motion.div>
+
+                      <motion.div
+                        initial={{ x: 30, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ delay: 0.3 }}
+                        className="flex items-center gap-4"
+                      >
+                        <select
+                          value={dashboardFilter.year}
+                          onChange={(e) => setDashboardFilter(prev => ({ ...prev, year: parseInt(e.target.value) }))}
+                          className="glass-dark text-white px-6 py-3 rounded-xl border border-white/20 focus:border-red-500 focus:ring-2 focus:ring-red-500/30 text-base font-semibold hover-lift"
+                        >
+                          {getAvailableYears(budgetItems).length > 0 ? getAvailableYears(budgetItems).map(year => (
+                            <option key={year} value={year} className="bg-gray-800">{year}</option>
+                          )) : <option value={new Date().getFullYear()} className="bg-gray-800">{new Date().getFullYear()}</option>}
+                        </select>
+
+                        <select
+                          value={dashboardFilter.month}
+                          onChange={(e) => setDashboardFilter(prev => ({ ...prev, month: e.target.value }))}
+                          className="glass-dark text-white px-6 py-3 rounded-xl border border-white/20 focus:border-red-500 focus:ring-2 focus:ring-red-500/30 text-base font-semibold hover-lift"
+                        >
+                          <option value="all" className="bg-gray-800">Toute l'année</option>
+                          {Array.from({ length: 12 }, (_, i) => (
+                            <option key={i + 1} value={i + 1} className="bg-gray-800">
+                              {new Date(2024, i).toLocaleDateString('fr-FR', { month: 'long' })}
+                            </option>
+                          ))}
+                        </select>
+
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => setActiveTab("budget-dashboard")}
+                          className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-3"
+                        >
+                          <TrendingUp className="w-5 h-5" />
+                          Budget Avancé
+                        </motion.button>
+                      </motion.div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
 
               {budgetItems.length > 0 ? (
                 <>
-                  {/* Tableau de synthèse */}
-                  <div className="grid grid-cols-1 md:grid-cols-5 mobile-spacing">
-                    {Object.entries({
-                      revenus: { label: 'Revenus', color: 'text-green-400' },
-                      depenses_fixes: { label: 'Dépenses fixes', color: 'text-red-400' },
-                      depenses_variables: { label: 'Dépenses variables', color: 'text-orange-400' },
-                      epargne: { label: 'Épargne', color: 'text-blue-400' },
-                      investissements: { label: 'Investissements', color: 'text-purple-400' }
-                    }).map(([type, config]) => {
-                      const total = budgetItems
-                        .filter(item => {
-                          const itemDate = new Date(item.date);
-                          const yearMatch = itemDate.getFullYear() === dashboardFilter.year;
-                          const monthMatch = dashboardFilter.month === 'all' || itemDate.getMonth() + 1 === parseInt(dashboardFilter.month);
-                          return item.type === type && yearMatch && monthMatch;
-                        })
-                        .reduce((sum, item) => sum + parseFloat(item.amount), 0);
+                  {/* Statistiques - Mobile vs Desktop différenciés */}
 
-                      return (
-                        <motion.div
-                          key={type}
-                          whileHover={{ scale: 1.02, y: -5 }}
-                          className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm card-responsive border border-gray-700/30 hover-lift ultra-smooth"
-                        >
-                          <div className={`text-responsive-sm font-medium spacing-responsive-xs ${config.color} mobile-readability`}>
-                            {config.label}
-                          </div>
-                          <div className="text-white text-responsive-xl font-bold">
-                            {type === 'revenus' || type === 'epargne' || type === 'investissements' ? '+' : '-'}{formatCurrency(total).replace(' CHF', '')} CHF
-                          </div>
-                        </motion.div>
-                      );
-                    })}
+                  {/* Version Mobile - Cards verticales centrées */}
+                  <div className="md:hidden">
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.6 }}
+                      className="space-y-4"
+                    >
+                      {Object.entries({
+                        revenus: { label: 'Revenus', color: 'text-green-400', icon: TrendingUp, bgColor: 'from-green-500/20 to-green-600/10' },
+                        depenses_fixes: { label: 'Dépenses fixes', color: 'text-red-400', icon: Wallet, bgColor: 'from-red-500/20 to-red-600/10' },
+                        depenses_variables: { label: 'Dépenses variables', color: 'text-orange-400', icon: ShoppingCart, bgColor: 'from-orange-500/20 to-orange-600/10' },
+                        epargne: { label: 'Épargne', color: 'text-blue-400', icon: PieChartIcon, bgColor: 'from-blue-500/20 to-blue-600/10' },
+                        investissements: { label: 'Investissements', color: 'text-red-400', icon: BarChart3, bgColor: 'from-red-500/20 to-red-600/10' }
+                      }).map(([type, config], index) => {
+                        const total = budgetItems
+                          .filter(item => {
+                            const itemDate = new Date(item.date);
+                            const yearMatch = itemDate.getFullYear() === dashboardFilter.year;
+                            const monthMatch = dashboardFilter.month === 'all' || itemDate.getMonth() + 1 === parseInt(dashboardFilter.month);
+                            return item.type === type && yearMatch && monthMatch;
+                          })
+                          .reduce((sum, item) => sum + parseFloat(item.amount), 0);
+
+                        const Icon = config.icon;
+
+                        return (
+                          <motion.div
+                            key={type}
+                            initial={{ x: index % 2 === 0 ? -100 : 100, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            transition={{ delay: 0.7 + index * 0.1, type: "spring", bounce: 0.3 }}
+                            whileTap={{ scale: 0.98 }}
+                            className={`glass-dark rounded-3xl p-6 border border-white/20 neo-shadow bg-gradient-to-br ${config.bgColor}`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-4">
+                                <div className={`p-3 bg-gradient-to-br from-gray-600 to-gray-700 rounded-2xl`}>
+                                  <Icon className={`w-6 h-6 ${config.color}`} />
+                                </div>
+                                <div>
+                                  <div className={`text-sm font-semibold ${config.color} mb-1`}>
+                                    {config.label}
+                                  </div>
+                                  <div className="text-2xl font-bold text-white">
+                                    {type === 'revenus' || type === 'epargne' || type === 'investissements' ? '+' : '-'}{formatCurrency(total).replace(' CHF', '')} CHF
+                                  </div>
+                                </div>
+                              </div>
+                              <motion.div
+                                animate={{ rotate: [0, 5, -5, 0] }}
+                                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                                className="text-2xl opacity-20"
+                              >
+                                {type === 'revenus' ? '📈' : type === 'epargne' ? '💰' : type === 'investissements' ? '📊' : '💸'}
+                              </motion.div>
+                            </div>
+                          </motion.div>
+                        );
+                      })}
+                    </motion.div>
+                  </div>
+
+                  {/* Version Desktop - Grid horizontal classique amélioré */}
+                  <div className="hidden md:block">
+                    <motion.div
+                      initial={{ opacity: 0, y: 30 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.4 }}
+                      className="grid grid-cols-5 gap-6"
+                    >
+                      {Object.entries({
+                        revenus: { label: 'Revenus', color: 'text-green-400', icon: TrendingUp },
+                        depenses_fixes: { label: 'Dépenses fixes', color: 'text-red-400', icon: Wallet },
+                        depenses_variables: { label: 'Dépenses variables', color: 'text-orange-400', icon: ShoppingCart },
+                        epargne: { label: 'Épargne', color: 'text-blue-400', icon: PieChartIcon },
+                        investissements: { label: 'Investissements', color: 'text-red-400', icon: BarChart3 }
+                      }).map(([type, config], index) => {
+                        const total = budgetItems
+                          .filter(item => {
+                            const itemDate = new Date(item.date);
+                            const yearMatch = itemDate.getFullYear() === dashboardFilter.year;
+                            const monthMatch = dashboardFilter.month === 'all' || itemDate.getMonth() + 1 === parseInt(dashboardFilter.month);
+                            return item.type === type && yearMatch && monthMatch;
+                          })
+                          .reduce((sum, item) => sum + parseFloat(item.amount), 0);
+
+                        const Icon = config.icon;
+
+                        return (
+                          <motion.div
+                            key={type}
+                            initial={{ y: 50, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ delay: 0.5 + index * 0.1, type: "spring", bounce: 0.2 }}
+                            whileHover={{ y: -8, scale: 1.02 }}
+                            className="glass-dark rounded-3xl p-6 border border-white/10 neo-shadow hover-lift"
+                          >
+                            <div className="text-center">
+                              <div className={`inline-flex p-3 bg-gradient-to-br from-gray-700 to-gray-800 rounded-2xl mb-3 shadow-lg`}>
+                                <Icon className={`w-6 h-6 ${config.color}`} />
+                              </div>
+                              <div className={`text-sm font-semibold ${config.color} mb-2`}>
+                                {config.label}
+                              </div>
+                              <div className="text-xl font-bold text-white">
+                                {type === 'revenus' || type === 'epargne' || type === 'investissements' ? '+' : '-'}{formatCurrency(total).replace(' CHF', '')} CHF
+                              </div>
+                            </div>
+                          </motion.div>
+                        );
+                      })}
+                    </motion.div>
                   </div>
 
                   {/* Jauges de progression des objectifs */}
@@ -3252,7 +3455,7 @@ export default function App() {
                                       item.type === 'depenses_fixes' ? 'bg-red-100 text-red-800' :
                                       item.type === 'depenses_variables' ? 'bg-orange-100 text-orange-800' :
                                       item.type === 'epargne' ? 'bg-blue-100 text-blue-800' :
-                                      'bg-purple-100 text-purple-800'
+                                      'bg-red-100 text-red-800'
                                     }`}>
                                       {item.type.replace('_', ' ')}
                                     </span>
@@ -3335,317 +3538,631 @@ export default function App() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="performance-optimized smooth-scroll safe-area-inset"
+              className="performance-optimized smooth-scroll safe-area-inset space-y-8"
             >
-              {/* Zone d'ajout de tâche responsive */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="glass-dark card-responsive neo-shadow border border-white/10 mobile-spacing"
-            >
-              {/* Header responsive avec icône et titre */}
-              <div className="flex items-center mobile-spacing">
-                <div className="p-responsive-sm bg-gradient-to-br from-red-500 to-red-600 rounded-xl shadow-lg">
-                  <Plus className="icon-responsive-md text-white" />
-                </div>
-                <h3 className="text-responsive-xl font-bold text-white">Nouvelle tâche</h3>
-              </div>
+              {/* Header Tâches - Mobile vs Desktop harmonisé */}
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="text-center"
+              >
+                {/* Mobile Header - Style Dashboard harmonisé */}
+                <div className="md:hidden">
+                  <motion.div
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.2, type: "spring", bounce: 0.3 }}
+                    className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 mx-auto max-w-sm"
+                  >
+                    <div className="text-center space-y-4">
+                      <motion.div
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ delay: 0.4 }}
+                        className="inline-flex items-center justify-center p-4 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl shadow-xl mx-auto"
+                      >
+                        <List className="w-8 h-8 text-white" />
+                      </motion.div>
 
-              {/* Interface responsive optimisée */}
-              <div className="mobile-spacing">
-                {/* Input principal responsive */}
-                <Input
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder="Que voulez-vous accomplir ?"
-                  onKeyDown={(e) => { if (e.key === "Enter") addTask(); }}
-                  className="w-full btn-responsive text-responsive-base rounded-2xl border-0 bg-white/10 text-white placeholder:text-gray-300 font-medium focus:bg-white/15 focus:ring-2 focus:ring-red-500 transition-all duration-300 container-responsive"
-                />
-
-                {/* Layout responsive: Priority et bouton */}
-                <div className="flex flex-col sm:flex-row mobile-spacing">
-                  {/* Sélecteur de priorité responsive */}
-                  <div className="flex-1 relative" ref={priorityMenuRef}>
-                    <motion.button
-                      onClick={() => setShowPriorityMenu(!showPriorityMenu)}
-                      whileTap={{ scale: 0.98 }}
-                      className={`w-full btn-responsive rounded-2xl text-white border-0 text-responsive-base container-responsive flex items-center justify-between focus:outline-none transition-all duration-300 font-semibold touch-target iphone-optimized ${
-                        priorityChoice === "urgent" ? "bg-gradient-to-r from-red-600 to-red-700 shadow-lg shadow-red-500/25" :
-                        priorityChoice === "normal" ? "bg-gradient-to-r from-orange-500 to-orange-600 shadow-lg shadow-orange-500/25" :
-                        "bg-gradient-to-r from-gray-600 to-gray-700 shadow-lg"
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={`w-3 h-3 rounded-full ${
-                          priorityChoice === "urgent" ? "bg-white/80" :
-                          priorityChoice === "normal" ? "bg-white/80" :
-                          "bg-white/80"
-                        }`}></div>
-                        <span>{PRIORITY_LABELS[priorityChoice]}</span>
+                      <div className="space-y-2">
+                        <motion.h1
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.5 }}
+                          className="title-main font-black bg-gradient-to-r from-red-400 via-red-500 to-red-600 bg-clip-text text-transparent"
+                        >
+                          TASKS
+                        </motion.h1>
+                        <motion.p
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 0.6 }}
+                          className="text-responsive-base text-gray-300 font-medium"
+                        >
+                          Organisez et suivez vos objectifs
+                        </motion.p>
                       </div>
-                      <motion.span
-                        className="text-white text-lg"
-                        animate={{ rotate: showPriorityMenu ? 180 : 0 }}
+
+                      <motion.div
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ delay: 0.7, type: "spring" }}
+                        className="bg-white/10 rounded-2xl p-3 backdrop-blur-sm"
+                      >
+                        <div className="text-center">
+                          <div className="text-responsive-xs text-gray-400 font-medium mb-1">Total</div>
+                          <div className="text-responsive-2xl font-bold text-white">{tasks.length}</div>
+                        </div>
+                      </motion.div>
+                    </div>
+                  </motion.div>
+                </div>
+
+                {/* Desktop Header - Style Dashboard */}
+                <div className="hidden md:block">
+                  <div className="glass-dark rounded-3xl p-8 border border-white/10">
+                    <div className="flex flex-row justify-between items-center">
+                      <motion.div
+                        initial={{ x: -30, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ delay: 0.2 }}
+                        className="flex items-center gap-6"
+                      >
+                        <div className="p-4 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl shadow-xl">
+                          <List className="w-10 h-10 text-white" />
+                        </div>
+                        <div className="text-left">
+                          <h2 className="text-4xl font-bold text-white mb-2">Gestionnaire de Tâches</h2>
+                          <p className="text-xl text-gray-300">Organisez et suivez vos objectifs</p>
+                        </div>
+                      </motion.div>
+
+                      <motion.div
+                        initial={{ x: 30, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ delay: 0.3 }}
+                        className="flex items-center gap-4"
+                      >
+                        <div className="text-right">
+                          <div className="text-sm text-gray-400">Tâches totales</div>
+                          <div className="text-3xl font-bold text-white">{tasks.length}</div>
+                        </div>
+                      </motion.div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Zone d'ajout de tâche - Mobile vs Desktop */}
+
+              {/* Mobile - Version centrée et verticale */}
+              <div className="md:hidden">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20"
+                >
+                  <div className="space-y-4">
+                    <div className="text-center mb-4">
+                      <h3 className="text-xl font-bold text-white">Nouvelle Tâche</h3>
+                    </div>
+
+                    {/* Input mobile */}
+                    <Input
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      placeholder="Que voulez-vous accomplir ?"
+                      onKeyDown={(e) => { if (e.key === "Enter") addTask(); }}
+                      className="w-full h-14 text-lg rounded-2xl border-0 bg-white/10 text-white placeholder:text-gray-300 font-medium focus:bg-white/15 focus:ring-2 focus:ring-red-500 transition-all duration-300 px-5"
+                    />
+
+                    {/* Priorité mobile */}
+                    <div className="relative" style={{zIndex: 100}} ref={priorityMenuRef}>
+                      <motion.button
+                        ref={priorityButtonMobileRef}
+                        onClick={() => togglePriorityMenu(true)}
+                        whileTap={{ scale: 0.98 }}
+                        className={`w-full h-14 rounded-2xl text-white border-0 text-lg px-5 flex items-center justify-between focus:outline-none transition-all duration-300 font-semibold ${
+                          priorityChoice === "urgent" ? "bg-gradient-to-r from-red-600 to-red-700 shadow-lg shadow-red-500/25" :
+                          "bg-gradient-to-r from-orange-500 to-orange-600 shadow-lg shadow-orange-500/25"
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-4 h-4 rounded-full bg-white/80"></div>
+                          <span>{PRIORITY_LABELS[priorityChoice] || PRIORITY_LABELS['normal']}</span>
+                        </div>
+                        <motion.span
+                          className="text-white text-xl"
+                          animate={{ rotate: showPriorityMenu ? 180 : 0 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          ▼
+                        </motion.span>
+                      </motion.button>
+
+                    </div>
+
+                    {/* Bouton mobile */}
+                    <motion.button
+                      onClick={addTask}
+                      whileTap={{ scale: 0.95 }}
+                      whileHover={{ scale: 1.02 }}
+                      className="w-full h-14 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white rounded-2xl text-lg font-bold shadow-lg shadow-red-500/25 transition-all duration-300 flex items-center justify-center gap-3"
+                    >
+                      <motion.div
+                        whileHover={{ rotate: 90 }}
                         transition={{ duration: 0.2 }}
                       >
-                        ▼
-                      </motion.span>
+                        <Plus className="w-6 h-6" />
+                      </motion.div>
+                      Ajouter la tâche
                     </motion.button>
+                  </div>
+                </motion.div>
+              </div>
 
-                    {/* Menu déroulant amélioré */}
-                    {showPriorityMenu && (
+              {/* Desktop - Version horizontale compacte */}
+              <div className="hidden md:block">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="glass-dark rounded-3xl p-8 border border-white/10"
+                >
+                  <div className="flex items-center gap-6">
+                    <div className="flex-1">
+                      <Input
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        placeholder="Que voulez-vous accomplir ?"
+                        onKeyDown={(e) => { if (e.key === "Enter") addTask(); }}
+                        className="w-full h-12 text-base rounded-xl border-0 bg-white/10 text-white placeholder:text-gray-300 font-medium focus:bg-white/15 focus:ring-2 focus:ring-red-500 transition-all duration-300 px-4"
+                      />
+                    </div>
+
+                    <div className="relative" style={{zIndex: 100}} ref={priorityMenuRef}>
+                      <motion.button
+                        ref={priorityButtonDesktopRef}
+                        onClick={() => {
+                          calculateMenuPosition(priorityButtonDesktopRef);
+                          setShowPriorityMenu(!showPriorityMenu);
+                        }}
+                        whileTap={{ scale: 0.98 }}
+                        className={`h-12 px-6 rounded-xl text-white border-0 text-base flex items-center gap-3 focus:outline-none transition-all duration-300 font-semibold min-w-[180px] ${
+                          priorityChoice === "urgent" ? "bg-gradient-to-r from-red-600 to-red-700 shadow-lg" :
+                          "bg-gradient-to-r from-orange-500 to-orange-600 shadow-lg"
+                        }`}
+                      >
+                        <div className="w-3 h-3 rounded-full bg-white/80"></div>
+                        <span>{PRIORITY_LABELS[priorityChoice] || PRIORITY_LABELS['normal']}</span>
+                        <motion.span
+                          className="text-white ml-auto"
+                          animate={{ rotate: showPriorityMenu ? 180 : 0 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          ▼
+                        </motion.span>
+                      </motion.button>
+
+                    </div>
+
+                    <motion.button
+                      onClick={addTask}
+                      whileTap={{ scale: 0.95 }}
+                      whileHover={{ scale: 1.05 }}
+                      className="h-12 px-8 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-3"
+                    >
+                      <Plus className="w-5 h-5" />
+                      Ajouter
+                    </motion.button>
+                  </div>
+                </motion.div>
+              </div>
+
+              {/* Barre de recherche harmonisée */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6 }}
+                className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-gradient-to-br from-gray-600 to-gray-700 rounded-2xl shadow-lg">
+                    <Search className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <Input
+                      placeholder="Rechercher vos tâches..."
+                      className="w-full h-12 bg-white/10 border-0 rounded-2xl text-white placeholder:text-gray-300 text-lg font-medium focus:bg-white/15 focus:ring-2 focus:ring-red-500/60 transition-all duration-300 px-4"
+                      value={filter.q}
+                      onChange={(e) => setFilter({ ...filter, q: e.target.value })}
+                    />
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Zone d'affichage des tâches harmonisée */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8 }}
+                className="glass-dark rounded-3xl p-6 min-h-96 neo-shadow border border-white/20"
+              >
+                {(tasksByPriority.urgent.length === 0 && tasksByPriority.normal.length === 0) ? (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="text-center text-gray-300 py-16"
+                  >
+                    <motion.div
+                      animate={{ rotate: [0, 5, -5, 0] }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                      className="text-responsive-4xl spacing-responsive-md"
+                    >
+                      📝
+                    </motion.div>
+                    <div className="text-responsive-2xl font-bold spacing-responsive-sm text-white">Aucune tâche</div>
+                    <div className="text-responsive-lg text-gray-400">Créez votre première tâche pour commencer</div>
+                  </motion.div>
+                ) : (
+                  <div className="space-y-8">
+                    {/* Section À faire rapidement */}
+                    {tasksByPriority.urgent.length > 0 && (
                       <motion.div
-                        initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                        className="absolute top-full left-0 right-0 mt-3 glass-dark rounded-2xl border border-white/20 z-20 overflow-hidden neo-shadow"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="space-y-5"
                       >
                         <motion.div
-                          className="py-4 px-5 hover:bg-red-600/20 cursor-pointer text-white text-base font-semibold transition-colors duration-200 active:bg-red-600/30"
-                          whileTap={{ scale: 0.98 }}
-                          onClick={() => { setPriorityChoice("urgent"); setShowPriorityMenu(false); }}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          className="flex items-center mobile-spacing p-responsive-sm border-b border-red-500/40"
                         >
-                          <div className="flex items-center gap-4">
-                            <div className="w-4 h-4 bg-red-500 rounded-full shadow-lg"></div>
-                            <span>{PRIORITY_LABELS["urgent"]}</span>
+                          <div className="p-responsive-sm bg-gradient-to-br from-red-500 to-red-600 rounded-xl shadow-lg">
+                            <Sparkles className="icon-responsive-sm text-white" />
+                          </div>
+                          <div className="flex items-center mobile-spacing text-red-400 font-bold text-responsive-xl">
+                            À faire rapidement
+                            <motion.span
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              transition={{ type: "spring", bounce: 0.5 }}
+                              className="text-responsive-xs bg-gradient-to-r from-red-500 to-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg"
+                            >
+                              {tasksByPriority.urgent.length}
+                            </motion.span>
                           </div>
                         </motion.div>
-                        <motion.div
-                          className="py-4 px-5 hover:bg-orange-600/20 cursor-pointer text-white text-base font-semibold transition-colors duration-200 active:bg-orange-600/30"
-                          whileTap={{ scale: 0.98 }}
-                          onClick={() => { setPriorityChoice("normal"); setShowPriorityMenu(false); }}
-                        >
-                          <div className="flex items-center gap-4">
-                            <div className="w-4 h-4 bg-orange-500 rounded-full shadow-lg"></div>
-                            <span>{PRIORITY_LABELS["normal"]}</span>
-                          </div>
-                        </motion.div>
-                        <motion.div
-                          className="py-4 px-5 hover:bg-gray-600/20 cursor-pointer text-white text-base font-semibold transition-colors duration-200 active:bg-gray-600/30"
-                          whileTap={{ scale: 0.98 }}
-                          onClick={() => { setPriorityChoice("low"); setShowPriorityMenu(false); }}
-                        >
-                          <div className="flex items-center gap-4">
-                            <div className="w-4 h-4 bg-gray-500 rounded-full shadow-lg"></div>
-                            <span>{PRIORITY_LABELS["low"]}</span>
-                          </div>
-                        </motion.div>
+                        <div className="flex flex-col mobile-spacing">
+                          <AnimatePresence initial={false}>
+                            {tasksByPriority.urgent.map(t => <TaskRow key={t.id} t={t} />)}
+                          </AnimatePresence>
+                        </div>
                       </motion.div>
                     )}
-                  </div>
 
-                  {/* Bouton d'ajout responsive avec haptic feedback */}
-                  <motion.button
-                    onClick={addTask}
-                    whileTap={{ scale: 0.95 }}
-                    whileHover={{ scale: 1.02 }}
-                    className="sm:w-auto w-full btn-responsive bg-gradient-to-r from-red-600 to-red-700 text-white rounded-2xl hover:from-red-500 hover:to-red-600 text-responsive-base font-bold shadow-lg shadow-red-500/25 transition-all duration-300 flex items-center justify-center mobile-spacing min-w-[140px] touch-target iphone-optimized performance-optimized"
-                  >
-                    <motion.div
-                      whileHover={{ rotate: 90 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <Plus className="icon-responsive-sm" />
-                    </motion.div>
-                    <span>Ajouter</span>
-                  </motion.button>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Barre de recherche responsive */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="glass-dark card-responsive neo-shadow border border-white/10"
-            >
-              <div className="flex items-center mobile-spacing">
-                <div className="p-responsive-sm bg-gradient-to-br from-gray-600 to-gray-700 rounded-xl">
-                  <Search className="icon-responsive-sm text-white" />
-                </div>
-                <Input
-                  placeholder="Rechercher vos tâches..."
-                  className="flex-1 btn-responsive bg-white/10 border-0 rounded-2xl text-white placeholder:text-gray-300 text-responsive-base font-medium focus:bg-white/15 focus:ring-2 focus:ring-red-500/60 transition-all duration-300 touch-target iphone-optimized"
-                  value={filter.q}
-                  onChange={(e) => setFilter({ ...filter, q: e.target.value })}
-                />
-              </div>
-            </motion.div>
-
-            {/* Zone d'affichage des tâches responsive */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="glass-dark card-responsive min-h-96 neo-shadow border border-white/10"
-            >
-              {(tasksByPriority.urgent.length === 0 && tasksByPriority.normal.length === 0) ? (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="text-center text-gray-300 py-16"
-                >
-                  <motion.div
-                    animate={{ rotate: [0, 5, -5, 0] }}
-                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                    className="text-responsive-4xl spacing-responsive-md"
-                  >
-                    📝
-                  </motion.div>
-                  <div className="text-responsive-2xl font-bold spacing-responsive-sm text-white">Aucune tâche</div>
-                  <div className="text-responsive-lg text-gray-400">Créez votre première tâche pour commencer</div>
-                </motion.div>
-              ) : (
-                <div className="space-y-8">
-                  {/* Section À faire rapidement */}
-                  {tasksByPriority.urgent.length > 0 && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="space-y-5"
-                    >
+                    {/* Section À faire prochainement */}
+                    {tasksByPriority.normal.length > 0 && (
                       <motion.div
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className="flex items-center mobile-spacing p-responsive-sm border-b border-red-500/40"
-                      >
-                        <div className="p-responsive-sm bg-gradient-to-br from-red-500 to-red-600 rounded-xl shadow-lg">
-                          <Sparkles className="icon-responsive-sm text-white" />
-                        </div>
-                        <div className="flex items-center mobile-spacing text-red-400 font-bold text-responsive-xl">
-                          À faire rapidement
-                          <motion.span
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            transition={{ type: "spring", bounce: 0.5 }}
-                            className="text-responsive-xs bg-gradient-to-r from-red-500 to-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg"
-                          >
-                            {tasksByPriority.urgent.length}
-                          </motion.span>
-                        </div>
-                      </motion.div>
-                      <div className="flex flex-col mobile-spacing">
-                        <AnimatePresence initial={false}>
-                          {tasksByPriority.urgent.map(t => <TaskRow key={t.id} t={t} />)}
-                        </AnimatePresence>
-                      </div>
-                    </motion.div>
-                  )}
-
-                  {/* Section À faire prochainement */}
-                  {tasksByPriority.normal.length > 0 && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.1 }}
-                      className="space-y-5"
-                    >
-                      <motion.div
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 }}
-                        className="flex items-center mobile-spacing p-responsive-sm border-b border-orange-500/40"
+                        className="space-y-5"
                       >
-                        <div className="p-responsive-sm bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg">
-                          <Calendar className="icon-responsive-sm text-white" />
-                        </div>
-                        <div className="flex items-center mobile-spacing text-orange-400 font-bold text-responsive-xl">
-                          À faire prochainement
-                          <motion.span
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            transition={{ type: "spring", bounce: 0.5, delay: 0.1 }}
-                            className="text-responsive-xs bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg"
-                          >
-                            {tasksByPriority.normal.length}
-                          </motion.span>
+                        <motion.div
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.1 }}
+                          className="flex items-center mobile-spacing p-responsive-sm border-b border-orange-500/40"
+                        >
+                          <div className="p-responsive-sm bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg">
+                            <Calendar className="icon-responsive-sm text-white" />
+                          </div>
+                          <div className="flex items-center mobile-spacing text-orange-400 font-bold text-responsive-xl">
+                            À faire prochainement
+                            <motion.span
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              transition={{ type: "spring", bounce: 0.5, delay: 0.1 }}
+                              className="text-responsive-xs bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg"
+                            >
+                              {tasksByPriority.normal.length}
+                            </motion.span>
+                          </div>
+                        </motion.div>
+                        <div className="flex flex-col mobile-spacing">
+                          <AnimatePresence initial={false}>
+                            {tasksByPriority.normal.map(t => <TaskRow key={t.id} t={t} />)}
+                          </AnimatePresence>
                         </div>
                       </motion.div>
-                      <div className="flex flex-col mobile-spacing">
-                        <AnimatePresence initial={false}>
-                          {tasksByPriority.normal.map(t => <TaskRow key={t.id} t={t} />)}
-                        </AnimatePresence>
-                      </div>
-                    </motion.div>
-                  )}
+                    )}
 
-                </div>
-              )}
-            </motion.div>
+                  </div>
+                )}
+              </motion.div>
             </motion.div>
           )}
 
           {activeTab === "notes" && (
-          <>
-            {/* Zone d'ajout de note responsive */}
-            <div className="glass-dark card-responsive mobile-spacing hover-lift ultra-smooth">
-              <div className="mobile-spacing">
-                <Input 
-                  value={noteTitle} 
-                  onChange={(e) => setNoteTitle(e.target.value)} 
-                  placeholder="Titre de la note (optionnel)" 
-                  onKeyDown={(e) => { if (e.key === "Enter" && e.ctrlKey) addNote(); }} 
-                  className="h-12 text-lg rounded-lg border-0 bg-gray-700 text-white placeholder:text-gray-400 font-medium focus:bg-gray-600 focus:ring-2 focus:ring-red-500 transition-all duration-300" 
-                />
-                <textarea 
-                  value={noteContent} 
-                  onChange={(e) => setNoteContent(e.target.value)} 
-                  placeholder="Contenu de votre note..." 
-                  onKeyDown={(e) => { if (e.key === "Enter" && e.ctrlKey) addNote(); }} 
-                  className="w-full h-24 p-3 text-lg rounded-lg border-0 bg-gray-700 text-white placeholder:text-gray-400 font-medium focus:bg-gray-600 focus:ring-2 focus:ring-red-500 transition-all duration-300 resize-none" 
-                />
-                <div className="flex gap-3">
-                  {editingNote ? (
-                    <>
-                      <Button 
-                        onClick={updateNote} 
-                        className="flex-1 h-12 bg-green-600 text-white rounded hover:bg-green-500 text-lg font-bold"
-                      >
-                        Sauvegarder
-                      </Button>
-                      <Button 
-                        onClick={cancelEdit} 
-                        className="h-12 px-6 bg-gray-600 text-white rounded hover:bg-gray-500 text-lg font-bold"
-                      >
-                        Annuler
-                      </Button>
-                    </>
-                  ) : (
-                    <Button 
-                      onClick={addNote} 
-                      className="flex-1 h-12 bg-red-600 text-white rounded hover:bg-red-500 text-lg font-bold"
+            <motion.div
+              key="notes"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              className="performance-optimized smooth-scroll safe-area-inset space-y-8"
+            >
+              {/* Header Notes - Mobile vs Desktop harmonisé */}
+
+              {/* Mobile Header - Style centralisé harmonisé */}
+              <div className="md:hidden">
+                <motion.div
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.2, type: "spring", bounce: 0.3 }}
+                  className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 mx-auto max-w-sm"
+                >
+                  <div className="text-center space-y-4">
+                    <motion.div
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ delay: 0.4 }}
+                      className="inline-flex items-center justify-center p-4 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl shadow-xl mx-auto"
                     >
-                      <Plus className="w-5 h-5 mr-2" />
-                      Ajouter une note
-                    </Button>
-                  )}
-                </div>
-              </div>
-            </div>
+                      <FileText className="w-8 h-8 text-white" />
+                    </motion.div>
 
-            {/* Barre de recherche des notes */}
-            <div className="bg-gray-800 rounded-xl p-6">
-              <div className="flex items-center gap-3">
-                <Search className="w-5 h-5 text-gray-400" />
-                <Input 
-                  placeholder="Rechercher dans les notes..." 
-                  className="flex-1 bg-gray-700 border-0 rounded-lg text-white placeholder:text-gray-400 text-base font-medium focus:bg-gray-600 focus:ring-2 focus:ring-red-500 transition-all duration-300" 
-                  value={noteFilter.q} 
-                  onChange={(e) => setNoteFilter({ ...noteFilter, q: e.target.value })} 
-                />
-              </div>
-            </div>
+                    <div className="space-y-2">
+                      <motion.h1
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.5 }}
+                        className="title-main font-black bg-gradient-to-r from-red-400 via-red-500 to-red-600 bg-clip-text text-transparent"
+                      >
+                        NOTES
+                      </motion.h1>
+                      <motion.p
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.6 }}
+                        className="text-responsive-base text-gray-300 font-medium"
+                      >
+                        Organisez vos idées et pensées
+                      </motion.p>
+                    </div>
 
-            {/* Zone d'affichage des notes */}
-            <div className="bg-gray-800 rounded-xl p-6 min-h-96">
-              {filteredNotes.length === 0 ? (
-                <div className="text-center text-gray-400 py-16">
-                  <div className="text-2xl mb-4">📄</div>
-                  <div className="text-xl font-semibold mb-2">Aucune note pour le moment</div>
-                  <div className="text-lg">Commencez par créer votre première note</div>
+                    <motion.div
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ delay: 0.7, type: "spring" }}
+                      className="bg-white/10 rounded-2xl p-3 backdrop-blur-sm"
+                    >
+                      <div className="text-center">
+                        <div className="text-responsive-xs text-gray-400 font-medium mb-1">Total</div>
+                        <div className="text-responsive-2xl font-bold text-white">{notes.length}</div>
+                      </div>
+                    </motion.div>
+                  </div>
+                </motion.div>
+              </div>
+
+              {/* Desktop Header - Style horizontal harmonisé */}
+              <div className="hidden md:block">
+                <motion.div
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
+                  className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20"
+                >
+                  <div className="flex items-center justify-between">
+                    <motion.div
+                      initial={{ x: -30, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ delay: 0.2 }}
+                      className="flex items-center gap-6"
+                    >
+                      <div className="p-4 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl shadow-xl">
+                        <FileText className="w-10 h-10 text-white" />
+                      </div>
+                      <div className="text-left">
+                        <h2 className="text-4xl font-bold text-white mb-2">Gestionnaire de Notes</h2>
+                        <p className="text-xl text-gray-300">Organisez vos idées et pensées</p>
+                      </div>
+                    </motion.div>
+
+                    <motion.div
+                      initial={{ x: 30, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ delay: 0.3 }}
+                      className="flex items-center gap-4"
+                    >
+                      <div className="text-right">
+                        <div className="text-sm text-gray-400">Notes totales</div>
+                        <div className="text-3xl font-bold text-white">{notes.length}</div>
+                      </div>
+                    </motion.div>
+                  </div>
+                </motion.div>
+              </div>
+
+              {/* Zone d'ajout de note - Mobile vs Desktop */}
+
+              {/* Mobile - Version centrée et verticale */}
+              <div className="md:hidden">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20"
+                >
+                  <div className="space-y-4">
+                    <div className="text-center mb-4">
+                      <h3 className="text-xl font-bold text-white">Nouvelle Note</h3>
+                    </div>
+
+                    <Input
+                      value={noteTitle}
+                      onChange={(e) => setNoteTitle(e.target.value)}
+                      placeholder="Titre de la note (optionnel)"
+                      onKeyDown={(e) => { if (e.key === "Enter" && e.ctrlKey) addNote(); }}
+                      className="w-full h-14 text-lg rounded-2xl border-0 bg-white/10 text-white placeholder:text-gray-300 font-medium focus:bg-white/15 focus:ring-2 focus:ring-red-500 transition-all duration-300 px-5"
+                    />
+
+                    <textarea
+                      value={noteContent}
+                      onChange={(e) => setNoteContent(e.target.value)}
+                      placeholder="Contenu de votre note..."
+                      onKeyDown={(e) => { if (e.key === "Enter" && e.ctrlKey) addNote(); }}
+                      className="w-full h-24 p-4 text-lg rounded-2xl border-0 bg-white/10 text-white placeholder:text-gray-300 font-medium focus:bg-white/15 focus:ring-2 focus:ring-red-500 transition-all duration-300 resize-none"
+                    />
+
+                    <div className="flex gap-3">
+                      {editingNote ? (
+                        <>
+                          <motion.button
+                            onClick={updateNote}
+                            whileTap={{ scale: 0.95 }}
+                            whileHover={{ scale: 1.05 }}
+                            className="flex-1 h-14 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                          >
+                            Sauvegarder
+                          </motion.button>
+                          <motion.button
+                            onClick={cancelEdit}
+                            whileTap={{ scale: 0.95 }}
+                            whileHover={{ scale: 1.05 }}
+                            className="h-14 px-6 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                          >
+                            Annuler
+                          </motion.button>
+                        </>
+                      ) : (
+                        <motion.button
+                          onClick={addNote}
+                          whileTap={{ scale: 0.95 }}
+                          whileHover={{ scale: 1.05 }}
+                          className="flex-1 h-14 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2"
+                        >
+                          <Plus className="w-5 h-5" />
+                          Ajouter une note
+                        </motion.button>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+
+              {/* Desktop - Version horizontale intégrée */}
+              <div className="hidden md:block">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20"
+                >
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Input
+                        value={noteTitle}
+                        onChange={(e) => setNoteTitle(e.target.value)}
+                        placeholder="Titre de la note (optionnel)"
+                        onKeyDown={(e) => { if (e.key === "Enter" && e.ctrlKey) addNote(); }}
+                        className="h-14 text-lg rounded-2xl border-0 bg-white/10 text-white placeholder:text-gray-300 font-medium focus:bg-white/15 focus:ring-2 focus:ring-red-500 transition-all duration-300 px-5"
+                      />
+                      <div className="flex gap-3">
+                        {editingNote ? (
+                          <>
+                            <motion.button
+                              onClick={updateNote}
+                              whileTap={{ scale: 0.98 }}
+                              whileHover={{ scale: 1.02 }}
+                              className="flex-1 h-14 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                            >
+                              Sauvegarder
+                            </motion.button>
+                            <motion.button
+                              onClick={cancelEdit}
+                              whileTap={{ scale: 0.98 }}
+                              whileHover={{ scale: 1.02 }}
+                              className="h-14 px-6 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                            >
+                              Annuler
+                            </motion.button>
+                          </>
+                        ) : (
+                          <motion.button
+                            onClick={addNote}
+                            whileTap={{ scale: 0.98 }}
+                            whileHover={{ scale: 1.02 }}
+                            className="flex-1 h-14 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2"
+                          >
+                            <Plus className="w-5 h-5" />
+                            Ajouter
+                          </motion.button>
+                        )}
+                      </div>
+                    </div>
+
+                    <textarea
+                      value={noteContent}
+                      onChange={(e) => setNoteContent(e.target.value)}
+                      placeholder="Contenu de votre note..."
+                      onKeyDown={(e) => { if (e.key === "Enter" && e.ctrlKey) addNote(); }}
+                      className="w-full h-24 p-4 text-lg rounded-2xl border-0 bg-white/10 text-white placeholder:text-gray-300 font-medium focus:bg-white/15 focus:ring-2 focus:ring-red-500 transition-all duration-300 resize-none"
+                    />
+                  </div>
+                </motion.div>
+              </div>
+
+              {/* Barre de recherche harmonisée */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6 }}
+                className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-gradient-to-br from-gray-600 to-gray-700 rounded-2xl shadow-lg">
+                    <Search className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <Input
+                      placeholder="Rechercher dans les notes..."
+                      className="w-full h-12 bg-white/10 border-0 rounded-2xl text-white placeholder:text-gray-300 text-lg font-medium focus:bg-white/15 focus:ring-2 focus:ring-red-500/60 transition-all duration-300 px-4"
+                      value={noteFilter.q}
+                      onChange={(e) => setNoteFilter({ ...noteFilter, q: e.target.value })}
+                    />
+                  </div>
                 </div>
-              ) : (
+              </motion.div>
+
+              {/* Zone d'affichage des notes harmonisée */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8 }}
+                className="glass-dark rounded-3xl p-6 min-h-96 neo-shadow border border-white/20"
+              >
+                {filteredNotes.length === 0 ? (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="text-center text-gray-300 py-16"
+                  >
+                    <motion.div
+                      animate={{ rotate: [0, 5, -5, 0] }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                      className="text-responsive-4xl spacing-responsive-md"
+                    >
+                      📄
+                    </motion.div>
+                    <div className="text-responsive-2xl font-bold spacing-responsive-sm text-white">Aucune note</div>
+                    <div className="text-responsive-lg text-gray-400">Commencez par créer votre première note</div>
+                  </motion.div>
+                ) : (
                 <div className="flex flex-col gap-4">
                   <AnimatePresence initial={false}>
                     {filteredNotes.map(note => (
@@ -3694,15 +4211,115 @@ export default function App() {
                       </motion.div>
                     ))}
                   </AnimatePresence>
-                </div>
-              )}
-            </div>
-          </>
-        )}
+                  </div>
+                )}
+              </motion.div>
+            </motion.div>
+          )}
 
         {/* Section des courses */}
         {activeTab === "shopping" && (
-          <>
+          <motion.div
+            key="shopping"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="performance-optimized smooth-scroll safe-area-inset space-y-8"
+          >
+            {/* Header Courses - Mobile vs Desktop harmonisé */}
+
+            {/* Mobile Header - Style centralisé harmonisé */}
+            <div className="md:hidden">
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.2, type: "spring", bounce: 0.3 }}
+                className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 mx-auto max-w-sm"
+              >
+                <div className="text-center space-y-4">
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.4 }}
+                    className="inline-flex items-center justify-center p-4 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl shadow-xl mx-auto"
+                  >
+                    <ShoppingCart className="w-8 h-8 text-white" />
+                  </motion.div>
+
+                  <div className="space-y-2">
+                    <motion.h1
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.5 }}
+                      className="title-main font-black bg-gradient-to-r from-green-400 via-green-500 to-green-600 bg-clip-text text-transparent"
+                    >
+                      COURSES
+                    </motion.h1>
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.6 }}
+                      className="text-responsive-base text-gray-300 font-medium"
+                    >
+                      Gérez votre liste de courses
+                    </motion.p>
+                  </div>
+
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.7, type: "spring" }}
+                    className="bg-white/10 rounded-2xl p-3 backdrop-blur-sm"
+                  >
+                    <div className="text-center">
+                      <div className="text-responsive-xs text-gray-400 font-medium mb-1">Articles</div>
+                      <div className="text-responsive-2xl font-bold text-white">{shoppingItems.length}</div>
+                    </div>
+                  </motion.div>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Desktop Header - Style horizontal harmonisé */}
+            <div className="hidden md:block">
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20"
+              >
+                <div className="flex items-center justify-between">
+                  <motion.div
+                    initial={{ x: -30, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                    className="flex items-center gap-6"
+                  >
+                    <div className="p-4 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl shadow-xl">
+                      <ShoppingCart className="w-10 h-10 text-white" />
+                    </div>
+                    <div className="text-left">
+                      <h2 className="text-4xl font-bold text-white mb-2">Liste de Courses</h2>
+                      <p className="text-xl text-gray-300">Gérez votre liste de courses</p>
+                    </div>
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ x: 30, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                    className="flex items-center gap-4"
+                  >
+                    <div className="text-right">
+                      <div className="text-sm text-gray-400">Articles totaux</div>
+                      <div className="text-3xl font-bold text-white">{shoppingItems.length}</div>
+                    </div>
+                  </motion.div>
+                </div>
+              </motion.div>
+            </div>
+
             {/* Zone d'ajout d'article */}
             <div className="bg-gray-800 rounded-xl p-6 space-y-4">
               <div className="space-y-3">
@@ -3891,22 +4508,98 @@ export default function App() {
                 </div>
               )}
             </div>
-          </>
+          </motion.div>
         )}
 
         {/* Onglet Budget */}
         {activeTab === "budget" && (
-          <>
-            <motion.div 
+          <motion.div
+            key="budget"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="performance-optimized smooth-scroll safe-area-inset space-y-8"
+          >
+            {/* Header Budget - Mobile vs Desktop harmonisé */}
+
+            {/* Mobile Header - Style centralisé harmonisé */}
+            <div className="md:hidden">
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.2, type: "spring", bounce: 0.3 }}
+                className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 mx-auto max-w-sm"
+              >
+                <div className="text-center space-y-4">
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.4 }}
+                    className="inline-flex items-center justify-center p-4 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl shadow-xl mx-auto"
+                  >
+                    <Wallet className="w-8 h-8 text-white" />
+                  </motion.div>
+
+                  <div className="space-y-2">
+                    <motion.h1
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.5 }}
+                      className="title-main font-black bg-gradient-to-r from-red-400 via-red-500 to-red-600 bg-clip-text text-transparent"
+                    >
+                      BUDGET
+                    </motion.h1>
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.6 }}
+                      className="text-responsive-base text-gray-300 font-medium"
+                    >
+                      Gérez vos finances personnelles
+                    </motion.p>
+                  </div>
+
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Desktop Header - Style horizontal harmonisé */}
+            <div className="hidden md:block">
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20"
+              >
+                <div className="flex items-center justify-between">
+                  <motion.div
+                    initial={{ x: -30, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                    className="flex items-center gap-6"
+                  >
+                    <div className="p-4 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl shadow-xl">
+                      <Wallet className="w-10 h-10 text-white" />
+                    </div>
+                    <div className="text-left">
+                      <h2 className="text-4xl font-bold text-white mb-2">Gestion du Budget</h2>
+                      <p className="text-xl text-gray-300">Gérez vos finances personnelles</p>
+                    </div>
+                  </motion.div>
+
+                </div>
+              </motion.div>
+            </div>
+
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 border border-gray-700/50 shadow-2xl"
+              transition={{ delay: 0.4 }}
+              className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20"
             >
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-                  <Wallet className="w-8 h-8 text-red-400" />
-                  Gestion du Budget
-                </h2>
+                <h3 className="text-2xl font-bold text-white">Gestion des Données</h3>
                 <div className="flex items-center gap-4">
                   <button
                     onClick={() => setShowSettings(!showSettings)}
@@ -3915,36 +4608,6 @@ export default function App() {
                     <Settings className="w-4 h-4" />
                     Paramètres
                   </button>
-                  <div className="text-right">
-                  <div className="text-sm text-gray-400">Solde mensuel</div>
-                  <div className={`text-2xl font-bold tabular-nums ${
-                    (() => {
-                      const currentDate = new Date();
-                      const currentMonthBalance = ['revenus', 'depenses_fixes', 'depenses_variables', 'epargne', 'investissements']
-                        .map(type => budgetItems.filter(item => {
-                          const itemDate = new Date(item.date);
-                          return item.type === type && 
-                                 itemDate.getFullYear() === currentDate.getFullYear() && 
-                                 itemDate.getMonth() === currentDate.getMonth();
-                        }).reduce((sum, item) => sum + parseFloat(item.amount), 0))
-                        .reduce((balance, total, index) => index === 0 ? total : balance - total, 0);
-                      return currentMonthBalance >= 0 ? 'text-green-400' : 'text-red-400';
-                    })()
-                  }`}>
-                    {(() => {
-                      const currentDate = new Date();
-                      const currentMonthBalance = ['revenus', 'depenses_fixes', 'depenses_variables', 'epargne', 'investissements']
-                        .map(type => budgetItems.filter(item => {
-                          const itemDate = new Date(item.date);
-                          return item.type === type && 
-                                 itemDate.getFullYear() === currentDate.getFullYear() && 
-                                 itemDate.getMonth() === currentDate.getMonth();
-                        }).reduce((sum, item) => sum + parseFloat(item.amount), 0))
-                        .reduce((balance, total, index) => index === 0 ? total : balance - total, 0);
-                      return formatCurrency(currentMonthBalance).replace(' CHF', '');
-                    })()} CHF
-                  </div>
-                  </div>
                 </div>
               </div>
               
@@ -4595,7 +5258,7 @@ export default function App() {
                   {/* Investissements */}
                   {Object.values(budgetLimits.investissements).some(limit => limit > 0) && (
                     <div>
-                      <h4 className="text-md font-semibold text-white mb-3 text-purple-400">Investissements</h4>
+                      <h4 className="text-md font-semibold text-white mb-3 text-red-400">Investissements</h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {Object.entries({
                           bourse: "Bourse",
@@ -4777,21 +5440,21 @@ export default function App() {
                 </div>
               </motion.div>
 
-              <motion.div 
+              <motion.div
                 whileHover={{ scale: 1.05, y: -5 }}
-                className="relative overflow-hidden bg-gradient-to-br from-purple-500/20 to-purple-600/20 rounded-xl p-4 border border-purple-500/30 backdrop-blur-sm group cursor-pointer min-h-[100px]"
+                className="relative overflow-hidden bg-gradient-to-br from-red-500/20 to-red-600/20 rounded-xl p-4 border border-red-500/30 backdrop-blur-sm group cursor-pointer min-h-[100px]"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-red-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <div className="relative h-full flex flex-col justify-center">
-                  <div className="text-purple-400 text-sm font-medium mb-3 text-center leading-tight">Investissements</div>
+                  <div className="text-red-400 text-sm font-medium mb-3 text-center leading-tight">Investissements</div>
                   <div className="flex items-center justify-center text-white text-xl font-bold tabular-nums">
-                    <span className="text-purple-400 w-4 text-center">+</span>
+                    <span className="text-red-400 w-4 text-center">+</span>
                     <span className="mx-1">{(() => {
                       const total = budgetItems.filter(item => {
                         const itemDate = new Date(item.date);
                         const currentDate = new Date();
-                        return item.type === 'investissements' && 
-                               itemDate.getFullYear() === currentDate.getFullYear() && 
+                        return item.type === 'investissements' &&
+                               itemDate.getFullYear() === currentDate.getFullYear() &&
                                itemDate.getMonth() === currentDate.getMonth();
                       }).reduce((sum, item) => sum + parseFloat(item.amount), 0);
                       return formatCurrency(total).replace(' CHF', '');
@@ -4801,7 +5464,7 @@ export default function App() {
                 </div>
               </motion.div>
 
-              <motion.div 
+              <motion.div
                 whileHover={{ scale: 1.05, y: -5 }}
                 className={`relative overflow-hidden rounded-xl p-4 backdrop-blur-sm group cursor-pointer border min-h-[100px] ${
                   (() => {
@@ -4809,12 +5472,12 @@ export default function App() {
                     const monthlyBalance = ['revenus', 'depenses_fixes', 'depenses_variables', 'epargne', 'investissements']
                       .map(type => budgetItems.filter(item => {
                         const itemDate = new Date(item.date);
-                        return item.type === type && 
-                               itemDate.getFullYear() === currentDate.getFullYear() && 
+                        return item.type === type &&
+                               itemDate.getFullYear() === currentDate.getFullYear() &&
                                itemDate.getMonth() === currentDate.getMonth();
                       }).reduce((sum, item) => sum + parseFloat(item.amount), 0))
                       .reduce((balance, total, index) => index === 0 ? total : balance - total, 0);
-                    return monthlyBalance >= 0 
+                    return monthlyBalance >= 0
                       ? 'bg-gradient-to-br from-emerald-500/20 to-emerald-600/20 border-emerald-500/30'
                       : 'bg-gradient-to-br from-red-500/20 to-red-600/20 border-red-500/30';
                   })()
@@ -4826,8 +5489,8 @@ export default function App() {
                     const monthlyBalance = ['revenus', 'depenses_fixes', 'depenses_variables', 'epargne', 'investissements']
                       .map(type => budgetItems.filter(item => {
                         const itemDate = new Date(item.date);
-                        return item.type === type && 
-                               itemDate.getFullYear() === currentDate.getFullYear() && 
+                        return item.type === type &&
+                               itemDate.getFullYear() === currentDate.getFullYear() &&
                                itemDate.getMonth() === currentDate.getMonth();
                       }).reduce((sum, item) => sum + parseFloat(item.amount), 0))
                       .reduce((balance, total, index) => index === 0 ? total : balance - total, 0);
@@ -4841,8 +5504,8 @@ export default function App() {
                       const monthlyBalance = ['revenus', 'depenses_fixes', 'depenses_variables', 'epargne', 'investissements']
                         .map(type => budgetItems.filter(item => {
                           const itemDate = new Date(item.date);
-                          return item.type === type && 
-                                 itemDate.getFullYear() === currentDate.getFullYear() && 
+                          return item.type === type &&
+                                 itemDate.getFullYear() === currentDate.getFullYear() &&
                                  itemDate.getMonth() === currentDate.getMonth();
                         }).reduce((sum, item) => sum + parseFloat(item.amount), 0))
                         .reduce((balance, total, index) => index === 0 ? total : balance - total, 0);
@@ -4857,8 +5520,8 @@ export default function App() {
                       const monthlyBalance = ['revenus', 'depenses_fixes', 'depenses_variables', 'epargne', 'investissements']
                         .map(type => budgetItems.filter(item => {
                           const itemDate = new Date(item.date);
-                          return item.type === type && 
-                                 itemDate.getFullYear() === currentDate.getFullYear() && 
+                          return item.type === type &&
+                                 itemDate.getFullYear() === currentDate.getFullYear() &&
                                  itemDate.getMonth() === currentDate.getMonth();
                         }).reduce((sum, item) => sum + parseFloat(item.amount), 0))
                         .reduce((balance, total, index) => index === 0 ? total : balance - total, 0);
@@ -4876,6 +5539,7 @@ export default function App() {
                   </div>
                 </div>
               </motion.div>
+
             </div>
 
             {/* Liste des opérations */}
@@ -4932,7 +5596,7 @@ export default function App() {
                                   item.type === 'revenus' ? 'text-green-400' : 
                                   item.type === 'depenses_fixes' ? 'text-red-400' : 
                                   item.type === 'depenses_variables' ? 'text-orange-400' : 
-                                  item.type === 'epargne' ? 'text-blue-400' : 'text-purple-400'
+                                  item.type === 'epargne' ? 'text-blue-400' : 'text-red-400'
                                 }`}>
                                   {item.type === 'revenus' ? '+' : '-'}{formatCurrency(parseFloat(item.amount))}
                                 </div>
@@ -4972,19 +5636,126 @@ export default function App() {
                 <p className="text-gray-400 text-lg">Aucune opération enregistrée.</p>
               </div>
             )}
-          </>
+          </motion.div>
         )}
 
         {/* Section des médias */}
         {activeTab === "media" && (
-          <>
-            {/* Zone d'ajout de média */}
-            <div className="bg-gray-800 rounded-xl p-6 space-y-4">
-              <div className="flex items-center gap-3 mb-4">
-                <Play className="w-6 h-6 text-red-400" />
-                <h2 className="text-xl font-bold text-white">
+          <motion.div
+            key="media"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="performance-optimized smooth-scroll safe-area-inset space-y-8"
+          >
+            {/* Header Media - Mobile vs Desktop harmonisé */}
+
+            {/* Mobile Header - Style centralisé harmonisé */}
+            <div className="md:hidden">
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.2, type: "spring", bounce: 0.3 }}
+                className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 mx-auto max-w-sm"
+              >
+                <div className="text-center space-y-4">
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.4 }}
+                    className="inline-flex items-center justify-center p-4 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl shadow-xl mx-auto"
+                  >
+                    <Play className="w-8 h-8 text-white" />
+                  </motion.div>
+
+                  <div className="space-y-2">
+                    <motion.h1
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.5 }}
+                      className="title-main font-black bg-gradient-to-r from-red-400 via-red-500 to-red-600 bg-clip-text text-transparent"
+                    >
+                      MEDIA
+                    </motion.h1>
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.6 }}
+                      className="text-responsive-base text-gray-300 font-medium"
+                    >
+                      Suivez vos films et séries
+                    </motion.p>
+                  </div>
+
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.7, type: "spring" }}
+                    className="bg-white/10 rounded-2xl p-3 backdrop-blur-sm"
+                  >
+                    <div className="text-center">
+                      <div className="text-responsive-xs text-gray-400 font-medium mb-1">Médias</div>
+                      <div className="text-responsive-2xl font-bold text-white">{mediaItems.length}</div>
+                    </div>
+                  </motion.div>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Desktop Header - Style horizontal harmonisé */}
+            <div className="hidden md:block">
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20"
+              >
+                <div className="flex items-center justify-between">
+                  <motion.div
+                    initial={{ x: -30, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                    className="flex items-center gap-6"
+                  >
+                    <div className="p-4 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl shadow-xl">
+                      <Play className="w-10 h-10 text-white" />
+                    </div>
+                    <div className="text-left">
+                      <h2 className="text-4xl font-bold text-white mb-2">Gestionnaire de Médias</h2>
+                      <p className="text-xl text-gray-300">Suivez vos films et séries</p>
+                    </div>
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ x: 30, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                    className="flex items-center gap-4"
+                  >
+                    <div className="text-right">
+                      <div className="text-sm text-gray-400">Médias totaux</div>
+                      <div className="text-3xl font-bold text-white">{mediaItems.length}</div>
+                    </div>
+                  </motion.div>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Zone d'ajout de média harmonisée */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20"
+            >
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-3 bg-gradient-to-br from-red-600 to-red-700 rounded-2xl shadow-lg">
+                  <Play className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-white">
                   {mediaStatus === "watched" ? "Ajouter un média déjà vu" : "Ajouter un média à regarder"}
-                </h2>
+                </h3>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -5077,22 +5848,18 @@ export default function App() {
                 </Select>
 
                 {mediaStatus === "watched" && (
-                  <div className="flex items-center gap-2 bg-gray-800 p-3 rounded-lg">
-                    <span className="text-white text-sm font-medium">Ma note:</span>
-                    <div className="flex gap-1">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <button
-                          key={star}
-                          onClick={() => setMediaRating(star)}
-                          className="transition-all duration-200 hover:scale-110"
-                        >
-                          <Star
-                            className={`w-6 h-6 ${star <= mediaRating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-500 hover:text-yellow-300'}`}
-                          />
-                        </button>
-                      ))}
-                    </div>
-                    <span className="text-yellow-400 font-bold ml-2">{mediaRating}/5</span>
+                  <div className="h-12 bg-gray-700 rounded-lg border-0 flex items-center justify-center gap-2 focus-within:bg-gray-600 focus-within:ring-2 focus-within:ring-red-500 transition-all duration-300">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        onClick={() => setMediaRating(star)}
+                        className="p-1 transition-all duration-200 hover:scale-110 rounded focus:outline-none focus:ring-1 focus:ring-red-500"
+                      >
+                        <Star
+                          className={`w-5 h-5 ${star <= mediaRating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-400 hover:text-yellow-300'}`}
+                        />
+                      </button>
+                    ))}
                   </div>
                 )}
               </div>
@@ -5102,18 +5869,18 @@ export default function App() {
                   value={mediaComment}
                   onChange={(e) => setMediaComment(e.target.value)}
                   placeholder="Commentaire optionnel..."
-                  className="h-12 text-lg rounded-lg border-0 bg-gray-700 text-white placeholder:text-gray-400 font-medium focus:bg-gray-600 focus:ring-2 focus:ring-red-500 transition-all duration-300"
+                  className="h-12 text-lg rounded-lg border-0 bg-gray-700 text-white placeholder:text-gray-400 font-medium focus:bg-gray-600 focus:ring-2 focus:ring-red-500 transition-all duration-300 mt-4"
                 />
               )}
 
               <Button
                 onClick={() => addMedia()}
-                className="w-full h-12 bg-red-600 hover:bg-red-500 text-white rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-95"
+                className="w-full h-12 bg-red-600 hover:bg-red-500 text-white rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-95 mt-4"
               >
                 <Plus className="w-5 h-5 mr-2" />
                 {editingMedia ? "Modifier" : "Ajouter"} {MEDIA_TYPES[mediaType]}
               </Button>
-            </div>
+            </motion.div>
 
             {/* Filtres */}
             <div className="bg-gray-800 rounded-xl p-4">
@@ -5258,13 +6025,13 @@ export default function App() {
 
                               {/* Ma note personnelle - uniquement si vu */}
                               {media.status === "watched" && media.rating && (
-                                <div className="flex items-center gap-2">
-                                  <span className="text-xs text-gray-400 font-medium">⭐ Ma note:</span>
-                                  <div className="flex gap-0.5">
+                                <div className="flex items-center gap-1 text-xs">
+                                  <span className="text-gray-400 font-medium shrink-0">Note:</span>
+                                  <div className="flex gap-px">
                                     {[1, 2, 3, 4, 5].map((star) => (
                                       <Star
                                         key={star}
-                                        className={`w-4 h-4 ${
+                                        className={`w-2.5 h-2.5 ${
                                           star <= media.rating
                                             ? 'text-yellow-400 fill-yellow-400'
                                             : 'text-gray-600'
@@ -5272,9 +6039,6 @@ export default function App() {
                                       />
                                     ))}
                                   </div>
-                                  <span className="text-yellow-400 text-sm font-bold">
-                                    {media.rating}/5
-                                  </span>
                                 </div>
                               )}
 
@@ -5296,7 +6060,7 @@ export default function App() {
                 </div>
               )}
             </div>
-          </>
+          </motion.div>
         )}
         </AnimatePresence>
 
@@ -5405,6 +6169,44 @@ export default function App() {
           </div>
         </footer>
       </div>
+
+      {/* Menu priorité fixed - affiché au-dessus de tous les éléments */}
+      {showPriorityMenu && (
+        <motion.div
+          initial={{ opacity: 0, y: -20, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -20, scale: 0.9 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
+          className="fixed bg-gray-900/95 backdrop-blur-xl rounded-2xl border border-white/30 overflow-hidden shadow-2xl shadow-black/50"
+          style={{
+            zIndex: 9999,
+            top: menuPosition.top,
+            left: menuPosition.left,
+            width: menuPosition.width
+          }}
+        >
+          <motion.div
+            className="py-4 px-5 hover:bg-red-600/30 cursor-pointer text-white text-lg font-semibold transition-all duration-200 hover:scale-105 active:scale-95"
+            whileTap={{ scale: 0.98 }}
+            onClick={() => { setPriorityChoice("urgent"); setShowPriorityMenu(false); }}
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-4 h-4 bg-red-500 rounded-full shadow-lg"></div>
+              <span>{PRIORITY_LABELS["urgent"]}</span>
+            </div>
+          </motion.div>
+          <motion.div
+            className="py-4 px-5 hover:bg-orange-600/30 cursor-pointer text-white text-lg font-semibold transition-all duration-200 hover:scale-105 active:scale-95"
+            whileTap={{ scale: 0.98 }}
+            onClick={() => { setPriorityChoice("normal"); setShowPriorityMenu(false); }}
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-4 h-4 bg-orange-500 rounded-full shadow-lg"></div>
+              <span>{PRIORITY_LABELS["normal"]}</span>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
     </div>
   );
 }
