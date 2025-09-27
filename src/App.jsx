@@ -1683,10 +1683,10 @@ export default function App() {
   );
 
   return (
-    <div className="min-h-screen bg-black text-white container-safe overflow-fix pwa-optimized">
-      <div className="max-w-4xl mx-auto space-y-4 md:space-y-6 pt-4 md:pt-8 section-alignment-fix">
+    <div className="min-h-screen bg-black text-white container-safe overflow-fix pwa-optimized mobile-viewport-optimized">
+      <div className="max-w-4xl mx-auto space-y-2 md:space-y-6 pt-2 md:pt-8 section-alignment-fix mobile-main-content">
         {/* Titre principal avec logo responsive */}
-        <div className="text-center mobile-compact">
+        <div className="text-center mobile-header-compact hidden md:block">
           <div className="flex flex-col items-center spacing-responsive-md mobile-spacing">
             <div>
               <LogoDevSwiss className="logo-responsive text-white" showText={false} />
@@ -1774,6 +1774,11 @@ export default function App() {
             <Play className={`icon-responsive-sm ${activeTab === "media" ? "text-red-400" : ""}`} />
             <span className="text-responsive-sm">Médias</span>
           </button>
+        </div>
+
+        {/* Header mobile compact */}
+        <div className="md:hidden mobile-header-compact">
+          <h1 className="mobile-title-compact font-black text-white">OPTIMA</h1>
         </div>
 
         {/* Contenu Principal avec Transitions Fluides */}
@@ -3538,7 +3543,7 @@ export default function App() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="performance-optimized smooth-scroll safe-area-inset space-y-8"
+              className="performance-optimized smooth-scroll safe-area-inset space-y-2 md:space-y-8 mobile-section"
             >
               {/* Header Tâches - Mobile vs Desktop harmonisé */}
               <motion.div
@@ -3547,8 +3552,16 @@ export default function App() {
                 transition={{ duration: 0.5 }}
                 className="text-center"
               >
-                {/* Mobile Header - Style Dashboard harmonisé */}
-                <div className="md:hidden">
+                {/* Mobile Header - Version ultra-compacte */}
+                <div className="md:hidden mobile-section-header">
+                  <div className="flex items-center justify-center gap-2">
+                    <List className="w-5 h-5 text-red-400" />
+                    <h2 className="text-lg font-bold text-white">Mes Tâches</h2>
+                  </div>
+                </div>
+
+                {/* Desktop Header original conservé */}
+                <div className="hidden md:block">
                   <motion.div
                     initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
@@ -3636,37 +3649,28 @@ export default function App() {
 
               {/* Zone d'ajout de tâche - Mobile vs Desktop */}
 
-              {/* Mobile - Version centrée et verticale */}
-              <div className="md:hidden">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 }}
-                  className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20"
-                >
-                  <div className="space-y-4">
-                    <div className="text-center mb-4">
-                      <h3 className="text-xl font-bold text-white">Nouvelle Tâche</h3>
-                    </div>
-
-                    {/* Input mobile */}
+              {/* Mobile - Version ultra-compacte */}
+              <div className="md:hidden mobile-section-content">
+                <div className="mobile-form-compact glass-dark border border-white/20">
+                  <div className="mobile-form-row">
+                    {/* Input mobile compact */}
                     <Input
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
-                      placeholder="Que voulez-vous accomplir ?"
+                      placeholder="Nouvelle tâche..."
                       onKeyDown={(e) => { if (e.key === "Enter") addTask(); }}
-                      className="w-full h-14 text-lg rounded-2xl border-0 bg-white/10 text-white placeholder:text-gray-300 font-medium focus:bg-white/15 focus:ring-2 focus:ring-red-500 transition-all duration-300 px-5"
+                      className="mobile-input-compact bg-white/10 text-white placeholder:text-gray-400 border-0 focus:bg-white/15 focus:ring-2 focus:ring-red-500"
                     />
 
-                    {/* Priorité mobile */}
+                    {/* Priorité mobile compacte */}
                     <div className="relative" style={{zIndex: 100}} ref={priorityMenuRef}>
                       <motion.button
                         ref={priorityButtonMobileRef}
                         onClick={() => togglePriorityMenu(true)}
                         whileTap={{ scale: 0.98 }}
-                        className={`w-full h-14 rounded-2xl text-white border-0 text-lg px-5 flex items-center justify-between focus:outline-none transition-all duration-300 font-semibold ${
-                          priorityChoice === "urgent" ? "bg-gradient-to-r from-red-600 to-red-700 shadow-lg shadow-red-500/25" :
-                          "bg-gradient-to-r from-orange-500 to-orange-600 shadow-lg shadow-orange-500/25"
+                        className={`mobile-button-compact w-full text-white border-0 flex items-center justify-between focus:outline-none transition-all duration-300 ${
+                          priorityChoice === "urgent" ? "bg-gradient-to-r from-red-600 to-red-700" :
+                          "bg-gradient-to-r from-orange-500 to-orange-600"
                         }`}
                       >
                         <div className="flex items-center gap-3">
@@ -3684,23 +3688,17 @@ export default function App() {
 
                     </div>
 
-                    {/* Bouton mobile */}
+                    {/* Bouton mobile compact */}
                     <motion.button
                       onClick={addTask}
-                      whileTap={{ scale: 0.95 }}
-                      whileHover={{ scale: 1.02 }}
-                      className="w-full h-14 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white rounded-2xl text-lg font-bold shadow-lg shadow-red-500/25 transition-all duration-300 flex items-center justify-center gap-3"
+                      whileTap={{ scale: 0.98 }}
+                      className="mobile-button-compact w-full bg-gradient-to-r from-red-600 to-red-700 text-white flex items-center justify-center gap-2"
                     >
-                      <motion.div
-                        whileHover={{ rotate: 90 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        <Plus className="w-6 h-6" />
-                      </motion.div>
-                      Ajouter la tâche
+                      <Plus className="w-4 h-4" />
+                      Ajouter
                     </motion.button>
                   </div>
-                </motion.div>
+                </div>
               </div>
 
               {/* Desktop - Version horizontale compacte */}
@@ -3807,7 +3805,7 @@ export default function App() {
                     <div className="text-responsive-lg text-gray-400">Créez votre première tâche pour commencer</div>
                   </motion.div>
                 ) : (
-                  <div className="space-y-8">
+                  <div className="mobile-scrollable-list space-y-4 md:space-y-8">
                     {/* Section À faire rapidement */}
                     {tasksByPriority.urgent.length > 0 && (
                       <motion.div
@@ -3893,12 +3891,20 @@ export default function App() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="performance-optimized smooth-scroll safe-area-inset space-y-8"
+              className="performance-optimized smooth-scroll safe-area-inset space-y-2 md:space-y-8 mobile-section"
             >
               {/* Header Notes - Mobile vs Desktop harmonisé */}
 
-              {/* Mobile Header - Style centralisé harmonisé */}
-              <div className="md:hidden">
+              {/* Mobile Header - Version ultra-compacte */}
+              <div className="md:hidden mobile-section-header">
+                <div className="flex items-center justify-center gap-2">
+                  <FileText className="w-5 h-5 text-red-400" />
+                  <h2 className="text-lg font-bold text-white">Mes Notes</h2>
+                </div>
+              </div>
+
+              {/* Desktop Header original conservé */}
+              <div className="hidden md:block">
                 <motion.div
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}

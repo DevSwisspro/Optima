@@ -426,3 +426,197 @@
   contain: layout;
   content-visibility: auto;
 }
+
+/* ====== OPTIMISATION HAUTEUR MOBILE COMPACTE ====== */
+
+/* Viewport mobile optimisé pour éviter scroll inutile */
+.mobile-viewport-optimized {
+  min-height: 100vh;
+  min-height: 100dvh; /* Dynamic viewport height */
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 80px); /* Navigation bottom height */
+  max-height: calc(100dvh - 80px);
+  overflow: hidden;
+}
+
+/* Formulaires compacts mobiles */
+.mobile-form-compact {
+  padding: clamp(0.75rem, 2vw, 1rem);
+  margin-bottom: clamp(0.5rem, 1.5vw, 0.75rem);
+  border-radius: clamp(0.5rem, 1.5vw, 0.75rem);
+}
+
+.mobile-form-row {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.5rem, 1.5vw, 0.75rem);
+  margin-bottom: clamp(0.5rem, 1.5vw, 0.75rem);
+}
+
+/* Hauteurs inputs mobiles compactes */
+.mobile-input-compact {
+  height: clamp(2.5rem, 6vw, 3rem);
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
+  padding: clamp(0.5rem, 1.5vw, 0.75rem);
+  border-radius: clamp(0.5rem, 1.5vw, 0.75rem);
+}
+
+.mobile-button-compact {
+  height: clamp(2.5rem, 6vw, 3rem);
+  padding: 0 clamp(1rem, 3vw, 1.5rem);
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
+  font-weight: 600;
+  border-radius: clamp(0.5rem, 1.5vw, 0.75rem);
+}
+
+/* Listes scrollables indépendantes */
+.mobile-scrollable-list {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+  max-height: calc(100vh - 300px); /* Réserve espace pour formulaires */
+  max-height: calc(100dvh - 300px);
+}
+
+.mobile-scrollable-list::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+/* Container sections mobiles optimisées */
+.mobile-section {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: calc(100vh - 120px);
+  max-height: calc(100dvh - 120px);
+}
+
+.mobile-section-header {
+  flex-shrink: 0;
+  padding: clamp(0.75rem, 2vw, 1rem);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+}
+
+.mobile-section-content {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Grids compactes mobiles */
+.mobile-grid-compact {
+  display: grid;
+  gap: clamp(0.5rem, 1.5vw, 0.75rem);
+  padding: clamp(0.5rem, 1.5vw, 0.75rem);
+}
+
+/* Cartes compactes mobiles */
+.mobile-card-compact {
+  padding: clamp(0.75rem, 2vw, 1rem);
+  margin-bottom: clamp(0.5rem, 1.5vw, 0.75rem);
+  border-radius: clamp(0.5rem, 1.5vw, 0.75rem);
+  min-height: auto;
+}
+
+/* Espacements ultra-compacts pour mobiles */
+@media (max-width: 768px) {
+  .mobile-ultra-compact {
+    padding: 0.5rem;
+    margin: 0.25rem 0;
+  }
+
+  .mobile-spacing-minimal {
+    gap: 0.5rem;
+    margin: 0.25rem 0;
+  }
+
+  .mobile-text-compact {
+    line-height: 1.3;
+    font-size: clamp(0.8rem, 2.2vw, 0.9rem);
+  }
+
+  /* Réduction drastique des marges/paddings */
+  .space-y-4 > * + * {
+    margin-top: 0.75rem !important;
+  }
+
+  .space-y-6 > * + * {
+    margin-top: 1rem !important;
+  }
+
+  .space-y-8 > * + * {
+    margin-top: 1.25rem !important;
+  }
+}
+
+/* Headers compacts mobiles */
+.mobile-header-compact {
+  padding: clamp(0.5rem, 1.5vw, 0.75rem);
+  text-align: center;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(15px);
+  border-radius: clamp(0.75rem, 2vw, 1rem);
+  margin-bottom: clamp(0.75rem, 2vw, 1rem);
+}
+
+.mobile-title-compact {
+  font-size: clamp(1.25rem, 4vw, 1.75rem);
+  font-weight: 700;
+  margin-bottom: clamp(0.25rem, 0.8vw, 0.5rem);
+}
+
+/* Optimisation landscape mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+  .mobile-landscape-ultra-compact {
+    padding: 0.25rem;
+    margin: 0.125rem 0;
+  }
+
+  .mobile-form-compact {
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .mobile-scrollable-list {
+    max-height: calc(100vh - 200px);
+  }
+}
+
+/* Containers fluides sans débordement */
+.mobile-safe-container {
+  width: 100%;
+  max-width: 100vw;
+  padding-left: clamp(0.75rem, 2vw, 1rem);
+  padding-right: clamp(0.75rem, 2vw, 1rem);
+  box-sizing: border-box;
+}
+
+/* Fixes pour très petits écrans */
+@media (max-width: 375px) {
+  .mobile-tiny-screen {
+    font-size: 0.8rem;
+    padding: 0.5rem;
+  }
+
+  .mobile-button-compact {
+    height: 2.25rem;
+    font-size: 0.8rem;
+  }
+
+  .mobile-input-compact {
+    height: 2.25rem;
+    font-size: 0.8rem;
+  }
+}
