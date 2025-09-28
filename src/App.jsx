@@ -4258,7 +4258,7 @@ export default function App() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.5 }}
-                      className="title-main font-black bg-gradient-to-r from-green-400 via-green-500 to-green-600 bg-clip-text text-transparent"
+                      className="title-main font-black bg-gradient-to-r from-red-400 via-red-500 to-red-600 bg-clip-text text-transparent"
                     >
                       COURSES
                     </motion.h1>
