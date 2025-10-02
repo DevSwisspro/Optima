@@ -40,6 +40,17 @@
   font-size: 0.875em;
 }
 
+/* ====== SAFE AREA MOBILE ====== */
+
+/* Padding sécurisé pour éviter la barre de statut sur mobile */
+.pt-safe {
+  padding-top: max(1.5rem, env(safe-area-inset-top, 0px) + 1rem);
+}
+
+.pb-safe {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+}
+
 /* ====== ANIMATIONS MODERNES POUR PWA ====== */
 
 /* Animation gradient pour le titre OPTIMA */

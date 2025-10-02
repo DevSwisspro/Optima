@@ -1685,13 +1685,34 @@ export default function App() {
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="max-w-7xl mx-auto space-y-4 md:space-y-6 pt-4 md:pt-8 px-4 sm:px-6 lg:px-8 xl:px-12">
-        {/* Titre principal avec logo responsive */}
+        {/* Titre principal avec logo responsive - Desktop */}
         <div className="text-center mobile-header-compact hidden md:block">
           <div className="flex flex-col items-center spacing-responsive-md mobile-spacing">
             <div>
               <LogoDevSwiss className="logo-responsive text-white" showText={false} />
             </div>
             <h1 className="title-main font-black tracking-tight uppercase mobile-text-tight ultra-smooth landscape-compact" style={{
+              fontFamily: '"Bebas Neue", "Arial Black", "Helvetica Neue", sans-serif',
+              fontWeight: '900',
+              letterSpacing: '-0.02em',
+              background: 'linear-gradient(135deg, #ef4444, #dc2626)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              textShadow: '2px 2px 0px rgba(220, 38, 38, 0.3)'
+            }}>
+              OPTIMA
+            </h1>
+          </div>
+        </div>
+
+        {/* Titre principal avec logo - Mobile optimisé */}
+        <div className="md:hidden text-center pt-safe mb-6">
+          <div className="flex flex-col items-center gap-3">
+            <div>
+              <LogoDevSwiss className="w-16 h-16 text-white" showText={false} />
+            </div>
+            <h1 className="text-3xl font-black tracking-tight uppercase" style={{
               fontFamily: '"Bebas Neue", "Arial Black", "Helvetica Neue", sans-serif',
               fontWeight: '900',
               letterSpacing: '-0.02em',
@@ -1774,11 +1795,6 @@ export default function App() {
             <Play className={`icon-responsive-sm ${activeTab === "media" ? "text-red-400" : ""}`} />
             <span className="text-responsive-sm">Médias</span>
           </button>
-        </div>
-
-        {/* Header mobile compact */}
-        <div className="md:hidden text-center mb-4">
-          <h1 className="text-2xl font-black text-white">OPTIMA</h1>
         </div>
 
         {/* Contenu Principal avec Transitions Fluides */}
