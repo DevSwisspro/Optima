@@ -90,9 +90,16 @@
   }
 
   .recharts-tooltip-item {
-    color: #e5e7eb !important;
+    /* Garder la couleur d'origine de chaque catégorie pour le visuel */
     font-size: 14px !important;
     padding: 4px 0 !important;
+    font-weight: 500 !important;
+  }
+
+  /* Style des valeurs dans les tooltips */
+  .recharts-tooltip-item-value {
+    font-weight: 600 !important;
+    margin-left: 8px !important;
   }
 
   /* Désactiver le focus/active state sur les éléments SVG */
