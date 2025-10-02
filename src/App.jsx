@@ -1684,7 +1684,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <div className="max-w-7xl mx-auto space-y-4 md:space-y-6 pt-4 md:pt-8 px-4 sm:px-6 lg:px-8 xl:px-12">
+      <div className="max-w-7xl mx-auto space-y-4 md:space-y-6 pt-4 md:pt-8 pb-24 md:pb-8 px-4 sm:px-6 lg:px-8 xl:px-12">
         {/* Titre principal avec logo responsive - Desktop */}
         <div className="text-center mobile-header-compact hidden md:block">
           <div className="flex flex-col items-center spacing-responsive-md mobile-spacing">
@@ -6072,7 +6072,7 @@ export default function App() {
         </div>
 
         {/* Footer responsive */}
-        <footer className="text-center mobile-compact border-t border-gray-800 mb-16 md:mb-0 p-responsive-md">
+        <footer className="text-center mobile-compact border-t border-gray-800 md:mb-0 p-responsive-md pb-safe">
           <div className="flex flex-col items-center justify-center mobile-spacing">
             {/* Logo et nom responsive */}
             <div className="flex flex-col items-center mobile-spacing">
