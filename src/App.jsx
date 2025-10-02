@@ -1684,7 +1684,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <div className="max-w-4xl mx-auto space-y-4 md:space-y-6 pt-4 md:pt-8 px-4">
+      <div className="max-w-7xl mx-auto space-y-4 md:space-y-6 pt-4 md:pt-8 px-4 sm:px-6 lg:px-8 xl:px-12">
         {/* Titre principal avec logo responsive */}
         <div className="text-center mobile-header-compact hidden md:block">
           <div className="flex flex-col items-center spacing-responsive-md mobile-spacing">
@@ -1856,9 +1856,9 @@ export default function App() {
                       whileTap={{ scale: 0.98 }}
                       whileHover={{ scale: 1.02 }}
                       onClick={() => setActiveTab("budget-dashboard")}
-                      className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white py-4 px-6 rounded-2xl text-lg font-bold shadow-lg shadow-red-500/25 transition-all duration-300 flex items-center justify-center gap-3"
+                      className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white py-4 sm:py-3 px-6 sm:px-8 rounded-2xl text-base sm:text-lg font-bold shadow-lg shadow-red-500/25 transition-all duration-300 flex items-center justify-center gap-3 min-h-[48px]"
                     >
-                      <TrendingUp className="w-5 h-5" />
+                      <TrendingUp className="w-5 h-5 sm:w-5 sm:h-5" />
                       Budget Avancé
                     </motion.button>
                   </div>
@@ -1875,7 +1875,7 @@ export default function App() {
                         className="flex items-center gap-6"
                       >
                         <div className="p-4 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl shadow-xl">
-                          <BarChart3 className="w-10 h-10 text-white" />
+                          <BarChart3 className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
                         </div>
                         <div className="text-left">
                           <h2 className="text-4xl font-bold text-white mb-2">Dashboard Global</h2>
@@ -1916,7 +1916,7 @@ export default function App() {
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={() => setActiveTab("budget-dashboard")}
-                          className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-3"
+                          className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white px-6 sm:px-8 py-3 sm:py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-3 min-h-[48px]"
                         >
                           <TrendingUp className="w-5 h-5" />
                           Budget Avancé
@@ -2000,7 +2000,7 @@ export default function App() {
                       initial={{ opacity: 0, y: 30 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.4 }}
-                      className="grid grid-cols-5 gap-6"
+                      className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 lg:gap-6"
                     >
                       {Object.entries({
                         revenus: { label: 'Revenus', color: 'text-green-400', icon: TrendingUp },
@@ -2294,7 +2294,7 @@ export default function App() {
                   <p className="text-gray-500 text-sm mt-2">Commencez par ajouter des opérations dans l'onglet Budget</p>
                   <button
                     onClick={() => setActiveTab("budget")}
-                    className="mt-4 bg-red-600 hover:bg-red-500 text-white px-6 py-3 h-12 rounded-lg transition-colors duration-200 text-base font-medium"
+                    className="mt-4 bg-red-600 hover:bg-red-500 text-white px-6 py-3 min-h-[48px] sm:min-h-[44px] rounded-lg transition-colors duration-200 text-base font-medium"
                   >
                     Aller au Budget
                   </button>
@@ -3527,7 +3527,7 @@ export default function App() {
                   <p className="text-gray-500 text-sm mt-2">Commencez par ajouter des opérations dans l'onglet Budget</p>
                   <button
                     onClick={() => setActiveTab("budget")}
-                    className="mt-4 bg-red-600 hover:bg-red-500 text-white px-6 py-3 h-12 rounded-lg transition-colors duration-200 text-base font-medium"
+                    className="mt-4 bg-red-600 hover:bg-red-500 text-white px-6 py-3 min-h-[48px] sm:min-h-[44px] rounded-lg transition-colors duration-200 text-base font-medium"
                   >
                     Aller au Budget
                   </button>
@@ -3560,58 +3560,6 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Desktop Header original conservé */}
-                <div className="hidden md:block">
-                  <motion.div
-                    initial={{ scale: 0.9, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 0.2, type: "spring", bounce: 0.3 }}
-                    className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 mx-auto max-w-sm"
-                  >
-                    <div className="text-center space-y-4">
-                      <motion.div
-                        initial={{ scale: 0.8, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ delay: 0.4 }}
-                        className="inline-flex items-center justify-center p-4 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl shadow-xl mx-auto"
-                      >
-                        <List className="w-8 h-8 text-white" />
-                      </motion.div>
-
-                      <div className="space-y-2">
-                        <motion.h1
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.5 }}
-                          className="title-main font-black bg-gradient-to-r from-red-400 via-red-500 to-red-600 bg-clip-text text-transparent"
-                        >
-                          TASKS
-                        </motion.h1>
-                        <motion.p
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ delay: 0.6 }}
-                          className="text-responsive-base text-gray-300 font-medium"
-                        >
-                          Organisez et suivez vos objectifs
-                        </motion.p>
-                      </div>
-
-                      <motion.div
-                        initial={{ scale: 0.8, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ delay: 0.7, type: "spring" }}
-                        className="bg-white/10 rounded-2xl p-3 backdrop-blur-sm"
-                      >
-                        <div className="text-center">
-                          <div className="text-responsive-xs text-gray-400 font-medium mb-1">Total</div>
-                          <div className="text-responsive-2xl font-bold text-white">{tasks.length}</div>
-                        </div>
-                      </motion.div>
-                    </div>
-                  </motion.div>
-                </div>
-
                 {/* Desktop Header - Style Dashboard */}
                 <div className="hidden md:block">
                   <div className="glass-dark rounded-3xl p-8 border border-white/10">
@@ -3623,7 +3571,7 @@ export default function App() {
                         className="flex items-center gap-6"
                       >
                         <div className="p-4 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl shadow-xl">
-                          <List className="w-10 h-10 text-white" />
+                          <List className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
                         </div>
                         <div className="text-left">
                           <h2 className="text-4xl font-bold text-white mb-2">Gestionnaire de Tâches</h2>
@@ -3651,15 +3599,15 @@ export default function App() {
 
               {/* Mobile - Version ultra-compacte */}
               <div className="md:hidden">
-                <div className="bg-gray-800/50 rounded-lg p-4 border border-white/20">
-                  <div className="space-y-3">
+                <div className="bg-gray-800/50 rounded-lg p-4 sm:p-4 border border-white/20">
+                  <div className="space-y-3 sm:space-y-3">
                     {/* Input mobile compact */}
                     <Input
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       placeholder="Nouvelle tâche..."
                       onKeyDown={(e) => { if (e.key === "Enter") addTask(); }}
-                      className="w-full h-12 bg-white/10 text-white placeholder:text-gray-400 border-0 focus:bg-white/15 focus:ring-2 focus:ring-red-500 rounded-lg px-3"
+                      className="w-full h-14 sm:h-12 bg-white/10 text-white placeholder:text-gray-400 border-0 focus:bg-white/15 focus:ring-2 focus:ring-red-500 rounded-lg px-3 text-base sm:text-base"
                     />
 
                     {/* Priorité mobile compacte */}
@@ -3668,7 +3616,7 @@ export default function App() {
                         ref={priorityButtonMobileRef}
                         onClick={() => togglePriorityMenu(true)}
                         whileTap={{ scale: 0.98 }}
-                        className={`w-full h-12 text-white border-0 flex items-center justify-between focus:outline-none transition-all duration-300 rounded-lg px-3 ${
+                        className={`w-full min-h-[48px] sm:min-h-[44px] text-white border-0 flex items-center justify-between focus:outline-none transition-all duration-300 rounded-lg px-3 text-base sm:text-base ${
                           priorityChoice === "urgent" ? "bg-gradient-to-r from-red-600 to-red-700" :
                           "bg-gradient-to-r from-orange-500 to-orange-600"
                         }`}
@@ -3692,9 +3640,9 @@ export default function App() {
                     <motion.button
                       onClick={addTask}
                       whileTap={{ scale: 0.98 }}
-                      className="w-full h-12 bg-gradient-to-r from-red-600 to-red-700 text-white flex items-center justify-center gap-2 rounded-lg"
+                      className="w-full min-h-[48px] sm:min-h-[44px] bg-gradient-to-r from-red-600 to-red-700 text-white flex items-center justify-center gap-2 rounded-lg text-base sm:text-base font-semibold"
                     >
-                      <Plus className="w-4 h-4" />
+                      <Plus className="w-5 h-5 sm:w-4 sm:h-4" />
                       Ajouter
                     </motion.button>
                   </div>
@@ -3709,14 +3657,14 @@ export default function App() {
                   transition={{ delay: 0.4 }}
                   className="glass-dark rounded-3xl p-8 border border-white/10"
                 >
-                  <div className="flex items-center gap-6">
+                  <div className="flex items-center gap-4 sm:gap-6">
                     <div className="flex-1">
                       <Input
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         placeholder="Que voulez-vous accomplir ?"
                         onKeyDown={(e) => { if (e.key === "Enter") addTask(); }}
-                        className="w-full h-12 text-base rounded-xl border-0 bg-white/10 text-white placeholder:text-gray-300 font-medium focus:bg-white/15 focus:ring-2 focus:ring-red-500 transition-all duration-300 px-4"
+                        className="w-full h-14 sm:h-12 text-base sm:text-base rounded-xl border-0 bg-white/10 text-white placeholder:text-gray-300 font-medium focus:bg-white/15 focus:ring-2 focus:ring-red-500 transition-all duration-300 px-4"
                       />
                     </div>
 
@@ -3728,7 +3676,7 @@ export default function App() {
                           setShowPriorityMenu(!showPriorityMenu);
                         }}
                         whileTap={{ scale: 0.98 }}
-                        className={`h-12 px-6 rounded-xl text-white border-0 text-base flex items-center gap-3 focus:outline-none transition-all duration-300 font-semibold min-w-[180px] ${
+                        className={`min-h-[48px] sm:min-h-[44px] px-6 rounded-xl text-white border-0 text-base flex items-center gap-3 focus:outline-none transition-all duration-300 font-semibold min-w-[180px] ${
                           priorityChoice === "urgent" ? "bg-gradient-to-r from-red-600 to-red-700 shadow-lg" :
                           "bg-gradient-to-r from-orange-500 to-orange-600 shadow-lg"
                         }`}
@@ -3750,7 +3698,7 @@ export default function App() {
                       onClick={addTask}
                       whileTap={{ scale: 0.95 }}
                       whileHover={{ scale: 1.05 }}
-                      className="h-12 px-8 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-3"
+                      className="min-h-[48px] sm:min-h-[44px] px-6 sm:px-8 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-3"
                     >
                       <Plus className="w-5 h-5" />
                       Ajouter
@@ -3767,13 +3715,13 @@ export default function App() {
                 className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20"
               >
                 <div className="flex items-center gap-4">
-                  <div className="p-3 bg-gradient-to-br from-gray-600 to-gray-700 rounded-2xl shadow-lg">
-                    <Search className="w-6 h-6 text-white" />
+                  <div className="p-3 sm:p-3 bg-gradient-to-br from-gray-600 to-gray-700 rounded-2xl shadow-lg">
+                    <Search className="w-6 h-6 sm:w-6 sm:h-6 text-white" />
                   </div>
                   <div className="flex-1">
                     <Input
                       placeholder="Rechercher vos tâches..."
-                      className="w-full h-12 bg-white/10 border-0 rounded-2xl text-white placeholder:text-gray-300 text-lg font-medium focus:bg-white/15 focus:ring-2 focus:ring-red-500/60 transition-all duration-300 px-4"
+                      className="w-full h-14 sm:h-12 bg-white/10 border-0 rounded-2xl text-white placeholder:text-gray-300 text-base sm:text-lg font-medium focus:bg-white/15 focus:ring-2 focus:ring-red-500/60 transition-all duration-300 px-4"
                       value={filter.q}
                       onChange={(e) => setFilter({ ...filter, q: e.target.value })}
                     />
@@ -3903,58 +3851,6 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Desktop Header original conservé */}
-              <div className="hidden md:block">
-                <motion.div
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: 0.2, type: "spring", bounce: 0.3 }}
-                  className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 mx-auto max-w-sm"
-                >
-                  <div className="text-center space-y-4">
-                    <motion.div
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ delay: 0.4 }}
-                      className="inline-flex items-center justify-center p-4 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl shadow-xl mx-auto"
-                    >
-                      <FileText className="w-8 h-8 text-white" />
-                    </motion.div>
-
-                    <div className="space-y-2">
-                      <motion.h1
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.5 }}
-                        className="title-main font-black bg-gradient-to-r from-red-400 via-red-500 to-red-600 bg-clip-text text-transparent"
-                      >
-                        NOTES
-                      </motion.h1>
-                      <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.6 }}
-                        className="text-responsive-base text-gray-300 font-medium"
-                      >
-                        Organisez vos idées et pensées
-                      </motion.p>
-                    </div>
-
-                    <motion.div
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ delay: 0.7, type: "spring" }}
-                      className="bg-white/10 rounded-2xl p-3 backdrop-blur-sm"
-                    >
-                      <div className="text-center">
-                        <div className="text-responsive-xs text-gray-400 font-medium mb-1">Total</div>
-                        <div className="text-responsive-2xl font-bold text-white">{notes.length}</div>
-                      </div>
-                    </motion.div>
-                  </div>
-                </motion.div>
-              </div>
-
               {/* Desktop Header - Style horizontal harmonisé */}
               <div className="hidden md:block">
                 <motion.div
@@ -3971,7 +3867,7 @@ export default function App() {
                       className="flex items-center gap-6"
                     >
                       <div className="p-4 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl shadow-xl">
-                        <FileText className="w-10 h-10 text-white" />
+                        <FileText className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
                       </div>
                       <div className="text-left">
                         <h2 className="text-4xl font-bold text-white mb-2">Gestionnaire de Notes</h2>
@@ -4014,7 +3910,7 @@ export default function App() {
                       onChange={(e) => setNoteTitle(e.target.value)}
                       placeholder="Titre de la note (optionnel)"
                       onKeyDown={(e) => { if (e.key === "Enter" && e.ctrlKey) addNote(); }}
-                      className="w-full h-14 text-lg rounded-2xl border-0 bg-white/10 text-white placeholder:text-gray-300 font-medium focus:bg-white/15 focus:ring-2 focus:ring-red-500 transition-all duration-300 px-5"
+                      className="w-full h-14 sm:h-12 text-base sm:text-lg rounded-2xl border-0 bg-white/10 text-white placeholder:text-gray-300 font-medium focus:bg-white/15 focus:ring-2 focus:ring-red-500 transition-all duration-300 px-4 sm:px-5"
                     />
 
                     <textarea
@@ -4022,7 +3918,7 @@ export default function App() {
                       onChange={(e) => setNoteContent(e.target.value)}
                       placeholder="Contenu de votre note..."
                       onKeyDown={(e) => { if (e.key === "Enter" && e.ctrlKey) addNote(); }}
-                      className="w-full h-24 p-4 text-lg rounded-2xl border-0 bg-white/10 text-white placeholder:text-gray-300 font-medium focus:bg-white/15 focus:ring-2 focus:ring-red-500 transition-all duration-300 resize-none"
+                      className="w-full h-32 sm:h-24 p-4 text-base sm:text-lg rounded-2xl border-0 bg-white/10 text-white placeholder:text-gray-300 font-medium focus:bg-white/15 focus:ring-2 focus:ring-red-500 transition-all duration-300 resize-none"
                     />
 
                     <div className="flex gap-3">
@@ -4032,7 +3928,7 @@ export default function App() {
                             onClick={updateNote}
                             whileTap={{ scale: 0.95 }}
                             whileHover={{ scale: 1.05 }}
-                            className="flex-1 h-14 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                            className="flex-1 min-h-[48px] sm:min-h-[44px] bg-gradient-to-r from-green-600 to-green-700 text-white rounded-2xl font-bold text-base sm:text-lg shadow-lg hover:shadow-xl transition-all duration-300"
                           >
                             Sauvegarder
                           </motion.button>
@@ -4040,7 +3936,7 @@ export default function App() {
                             onClick={cancelEdit}
                             whileTap={{ scale: 0.95 }}
                             whileHover={{ scale: 1.05 }}
-                            className="h-14 px-6 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                            className="min-h-[48px] sm:min-h-[44px] px-6 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-2xl font-bold text-base sm:text-lg shadow-lg hover:shadow-xl transition-all duration-300"
                           >
                             Annuler
                           </motion.button>
@@ -4050,7 +3946,7 @@ export default function App() {
                           onClick={addNote}
                           whileTap={{ scale: 0.95 }}
                           whileHover={{ scale: 1.05 }}
-                          className="flex-1 h-14 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2"
+                          className="flex-1 min-h-[48px] sm:min-h-[44px] bg-gradient-to-r from-red-600 to-red-700 text-white rounded-2xl font-bold text-base sm:text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2"
                         >
                           <Plus className="w-5 h-5" />
                           Ajouter une note
@@ -4076,7 +3972,7 @@ export default function App() {
                         onChange={(e) => setNoteTitle(e.target.value)}
                         placeholder="Titre de la note (optionnel)"
                         onKeyDown={(e) => { if (e.key === "Enter" && e.ctrlKey) addNote(); }}
-                        className="h-14 text-lg rounded-2xl border-0 bg-white/10 text-white placeholder:text-gray-300 font-medium focus:bg-white/15 focus:ring-2 focus:ring-red-500 transition-all duration-300 px-5"
+                        className="h-14 sm:h-12 text-base sm:text-lg rounded-2xl border-0 bg-white/10 text-white placeholder:text-gray-300 font-medium focus:bg-white/15 focus:ring-2 focus:ring-red-500 transition-all duration-300 px-4 sm:px-5"
                       />
                       <div className="flex gap-3">
                         {editingNote ? (
@@ -4085,7 +3981,7 @@ export default function App() {
                               onClick={updateNote}
                               whileTap={{ scale: 0.98 }}
                               whileHover={{ scale: 1.02 }}
-                              className="flex-1 h-14 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                              className="flex-1 min-h-[48px] sm:min-h-[44px] bg-gradient-to-r from-green-600 to-green-700 text-white rounded-2xl font-bold text-base sm:text-lg shadow-lg hover:shadow-xl transition-all duration-300"
                             >
                               Sauvegarder
                             </motion.button>
@@ -4093,7 +3989,7 @@ export default function App() {
                               onClick={cancelEdit}
                               whileTap={{ scale: 0.98 }}
                               whileHover={{ scale: 1.02 }}
-                              className="h-14 px-6 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                              className="min-h-[48px] sm:min-h-[44px] px-6 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-2xl font-bold text-base sm:text-lg shadow-lg hover:shadow-xl transition-all duration-300"
                             >
                               Annuler
                             </motion.button>
@@ -4103,7 +3999,7 @@ export default function App() {
                             onClick={addNote}
                             whileTap={{ scale: 0.98 }}
                             whileHover={{ scale: 1.02 }}
-                            className="flex-1 h-14 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2"
+                            className="flex-1 min-h-[48px] sm:min-h-[44px] bg-gradient-to-r from-red-600 to-red-700 text-white rounded-2xl font-bold text-base sm:text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2"
                           >
                             <Plus className="w-5 h-5" />
                             Ajouter
@@ -4117,7 +4013,7 @@ export default function App() {
                       onChange={(e) => setNoteContent(e.target.value)}
                       placeholder="Contenu de votre note..."
                       onKeyDown={(e) => { if (e.key === "Enter" && e.ctrlKey) addNote(); }}
-                      className="w-full h-24 p-4 text-lg rounded-2xl border-0 bg-white/10 text-white placeholder:text-gray-300 font-medium focus:bg-white/15 focus:ring-2 focus:ring-red-500 transition-all duration-300 resize-none"
+                      className="w-full h-32 sm:h-24 p-4 text-base sm:text-lg rounded-2xl border-0 bg-white/10 text-white placeholder:text-gray-300 font-medium focus:bg-white/15 focus:ring-2 focus:ring-red-500 transition-all duration-300 resize-none"
                     />
                   </div>
                 </motion.div>
@@ -4131,13 +4027,13 @@ export default function App() {
                 className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20"
               >
                 <div className="flex items-center gap-4">
-                  <div className="p-3 bg-gradient-to-br from-gray-600 to-gray-700 rounded-2xl shadow-lg">
-                    <Search className="w-6 h-6 text-white" />
+                  <div className="p-3 sm:p-3 bg-gradient-to-br from-gray-600 to-gray-700 rounded-2xl shadow-lg">
+                    <Search className="w-6 h-6 sm:w-6 sm:h-6 text-white" />
                   </div>
                   <div className="flex-1">
                     <Input
                       placeholder="Rechercher dans les notes..."
-                      className="w-full h-12 bg-white/10 border-0 rounded-2xl text-white placeholder:text-gray-300 text-lg font-medium focus:bg-white/15 focus:ring-2 focus:ring-red-500/60 transition-all duration-300 px-4"
+                      className="w-full h-14 sm:h-12 bg-white/10 border-0 rounded-2xl text-white placeholder:text-gray-300 text-base sm:text-lg font-medium focus:bg-white/15 focus:ring-2 focus:ring-red-500/60 transition-all duration-300 px-4"
                       value={noteFilter.q}
                       onChange={(e) => setNoteFilter({ ...noteFilter, q: e.target.value })}
                     />
@@ -4169,7 +4065,7 @@ export default function App() {
                     <div className="text-responsive-lg text-gray-400">Commencez par créer votre première note</div>
                   </motion.div>
                 ) : (
-                <div className="flex flex-col gap-4">
+                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
                   <AnimatePresence initial={false}>
                     {filteredNotes.map(note => (
                       <motion.div 
@@ -4415,7 +4311,7 @@ export default function App() {
                         <span className="w-2 h-2 bg-green-500 rounded-full"></span>
                         Courses courantes
                       </h3>
-                      <div className="flex flex-col gap-4">
+                      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
                         <AnimatePresence initial={false}>
                           {filteredShoppingItems.filter(item => item.category === 'courant').map(item => (
                             <motion.div 
@@ -4467,7 +4363,7 @@ export default function App() {
                         <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
                         Achats futurs
                       </h3>
-                      <div className="flex flex-col gap-4">
+                      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
                         <AnimatePresence initial={false}>
                           {filteredShoppingItems.filter(item => item.category === 'futur').map(item => (
                             <motion.div 
@@ -5939,7 +5835,7 @@ export default function App() {
                   <div className="text-lg">Commencez par ajouter votre premier film, série ou animé</div>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
                   <AnimatePresence initial={false}>
                     {filteredMedia.map(media => (
                       <motion.div
@@ -5954,7 +5850,7 @@ export default function App() {
                         <div className="bg-gray-800/60 backdrop-blur-sm rounded-2xl border border-gray-700/50 overflow-hidden hover:border-red-500/40 transition-all duration-300 shadow-lg hover:shadow-xl">
 
                           {/* Layout responsive : mobile-first */}
-                          <div className="flex flex-col sm:flex-row">
+                          <div className="flex flex-col">
 
                             {/* Poster - propre sans overlay */}
                             <div className="flex-shrink-0">
@@ -5962,12 +5858,12 @@ export default function App() {
                                 <img
                                   src={media.posterPath}
                                   alt={media.title}
-                                  className="w-full h-64 sm:w-28 sm:h-40 object-cover rounded-lg shadow-md"
+                                  className="w-full h-64 object-cover rounded-t-lg shadow-md"
                                   loading="lazy"
                                   decoding="async"
                                 />
                               ) : (
-                                <div className="w-full h-64 sm:w-28 sm:h-40 bg-gray-700/50 flex items-center justify-center rounded-lg">
+                                <div className="w-full h-64 bg-gray-700/50 flex items-center justify-center rounded-t-lg">
                                   <Play className="w-8 h-8 text-gray-500" />
                                 </div>
                               )}
