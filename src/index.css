@@ -81,6 +81,12 @@
     font-size: 12px !important;
     max-width: 200px !important;
     white-space: nowrap !important;
+    color: #ffffff !important;
+  }
+
+  /* Forcer tous les textes du tooltip en blanc */
+  .recharts-default-tooltip * {
+    color: #ffffff !important;
   }
 
   /* Labels tooltip compacts sur mobile */
@@ -100,10 +106,21 @@
     line-height: 1.3 !important;
   }
 
+  /* Assurer que le nom de la catégorie est blanc */
+  .recharts-tooltip-item-name {
+    color: #ffffff !important;
+  }
+
   /* Style des valeurs dans les tooltips - compact */
   .recharts-tooltip-item-value {
     font-weight: 600 !important;
     margin-left: 6px !important;
+    color: #ffffff !important;
+  }
+
+  /* Liste des items dans le tooltip - texte blanc par défaut */
+  .recharts-tooltip-item-list li {
+    color: #ffffff !important;
   }
 
   /* Positionner le tooltip pour ne pas cacher le graphique */
