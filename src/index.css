@@ -51,7 +51,7 @@
   padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
 }
 
-/* ====== OPTIMISATIONS GRAPHIQUES RECHARTS MOBILE ====== */
+/* ====== OPTIMISATIONS GRAPHIQUES RECHARTS ====== */
 
 /* Supprimer l'outline bleu sur mobile lors du tap sur les graphiques */
 @media (max-width: 768px) {
@@ -64,68 +64,6 @@
   .recharts-sector {
     -webkit-tap-highlight-color: transparent !important;
     outline: none !important;
-  }
-
-  /* Optimiser les tooltips pour mobile */
-  .recharts-tooltip-wrapper {
-    pointer-events: none !important;
-  }
-
-  .recharts-default-tooltip {
-    background: rgba(0, 0, 0, 0.92) !important;
-    border: 1px solid rgba(255, 255, 255, 0.15) !important;
-    border-radius: 8px !important;
-    padding: 6px 10px !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
-    backdrop-filter: blur(8px) !important;
-    font-size: 12px !important;
-    max-width: 200px !important;
-    white-space: nowrap !important;
-    color: #ffffff !important;
-  }
-
-  /* Forcer tous les textes du tooltip en blanc */
-  .recharts-default-tooltip * {
-    color: #ffffff !important;
-  }
-
-  /* Labels tooltip compacts sur mobile */
-  .recharts-tooltip-label {
-    color: #ffffff !important;
-    font-weight: 600 !important;
-    margin-bottom: 4px !important;
-    font-size: 12px !important;
-    line-height: 1.2 !important;
-  }
-
-  .recharts-tooltip-item {
-    /* Garder la couleur d'origine de chaque catégorie pour le visuel */
-    font-size: 11px !important;
-    padding: 2px 0 !important;
-    font-weight: 500 !important;
-    line-height: 1.3 !important;
-  }
-
-  /* Assurer que le nom de la catégorie est blanc */
-  .recharts-tooltip-item-name {
-    color: #ffffff !important;
-  }
-
-  /* Style des valeurs dans les tooltips - compact */
-  .recharts-tooltip-item-value {
-    font-weight: 600 !important;
-    margin-left: 6px !important;
-    color: #ffffff !important;
-  }
-
-  /* Liste des items dans le tooltip - texte blanc par défaut */
-  .recharts-tooltip-item-list li {
-    color: #ffffff !important;
-  }
-
-  /* Positionner le tooltip pour ne pas cacher le graphique */
-  .recharts-tooltip-wrapper {
-    transform: translateY(-8px) !important;
   }
 
   /* Désactiver le focus/active state sur les éléments SVG */

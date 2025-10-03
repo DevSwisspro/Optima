@@ -113,6 +113,87 @@ const getCategoryColor = (category, index) => {
   return categoryColors[index % categoryColors.length];
 };
 
+// CustomTooltip responsive avec couleurs des catégories
+const CustomTooltip = ({ active, payload, label }) => {
+  if (!active || !payload || !payload.length) return null;
+
+  const isMobile = window.innerWidth < 768;
+
+  return (
+    <div
+      className="recharts-custom-tooltip"
+      style={{
+        backgroundColor: 'rgba(0, 0, 0, 0.95)',
+        padding: isMobile ? '8px 12px' : '12px 16px',
+        borderRadius: '12px',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+        backdropFilter: 'blur(10px)',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+        maxWidth: isMobile ? '220px' : '280px',
+        fontSize: isMobile ? '13px' : '14px'
+      }}
+    >
+      {label && (
+        <p
+          className="recharts-tooltip-label"
+          style={{
+            color: '#fff',
+            fontWeight: '600',
+            marginBottom: '6px',
+            fontSize: isMobile ? '13px' : '15px'
+          }}
+        >
+          {label}
+        </p>
+      )}
+      {payload.map((entry, index) => {
+        const dataKey = entry.dataKey || entry.name;
+        const color = entry.color || entry.fill || colors[dataKey] || '#8884d8';
+
+        return (
+          <div
+            key={`item-${index}`}
+            className="recharts-tooltip-item"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '4px 0',
+              color: '#fff'
+            }}
+          >
+            <div
+              style={{
+                width: isMobile ? '10px' : '12px',
+                height: isMobile ? '10px' : '12px',
+                borderRadius: '50%',
+                backgroundColor: color,
+                flexShrink: 0,
+                boxShadow: `0 0 8px ${color}40`
+              }}
+            />
+            <span style={{
+              color: '#fff',
+              fontWeight: '500',
+              fontSize: isMobile ? '12px' : '13px',
+              flex: 1
+            }}>
+              {entry.name}:
+            </span>
+            <span style={{
+              color: color,
+              fontWeight: '700',
+              fontSize: isMobile ? '13px' : '14px'
+            }}>
+              {typeof entry.value === 'number' ? formatCurrency(entry.value) : entry.value}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
 // Fonctions utilitaires pour les vues détaillées
 const processCategoriesData = (budgetItems, year) => {
   const categories = {};
@@ -2177,123 +2258,120 @@ export default function App() {
                   {/* Graphiques mensuels */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Graphique en barres mensuelles */}
-                    <motion.div 
+                    <motion.div
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm card-responsive border border-gray-700/30 hover-lift ultra-smooth"
                     >
                       <h3 className="text-xl font-bold text-white mb-4">Évolution mensuelle {dashboardFilter.year}</h3>
-                      <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={processMonthlyData(budgetItems, dashboardFilter.year)}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                          <XAxis dataKey="name" stroke="#9ca3af" />
-                          <YAxis stroke="#9ca3af" />
-                          <Tooltip 
-                            contentStyle={{ 
-                              backgroundColor: '#1f2937', 
-                              border: '1px solid #374151',
-                              borderRadius: '8px',
-                              color: '#fff'
-                            }}
-                            formatter={(value) => [`${formatCurrency(value)}`, '']}
-                          />
-                          <Legend />
-                          <Bar dataKey="revenus" fill={colors.revenus} name="Revenus" />
-                          <Bar dataKey="depenses_fixes" fill={colors.depenses_fixes} name="Dépenses fixes" />
-                          <Bar dataKey="depenses_variables" fill={colors.depenses_variables} name="Dépenses variables" />
-                          <Bar dataKey="epargne" fill={colors.epargne} name="Épargne" />
-                          <Bar dataKey="investissements" fill={colors.investissements} name="Investissements" />
-                        </BarChart>
-                      </ResponsiveContainer>
+                      <div className="w-full" style={{ height: window.innerWidth < 768 ? '280px' : '320px' }}>
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart data={processMonthlyData(budgetItems, dashboardFilter.year)}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                            <XAxis
+                              dataKey="name"
+                              stroke="#9ca3af"
+                              style={{ fontSize: window.innerWidth < 768 ? '11px' : '12px' }}
+                            />
+                            <YAxis
+                              stroke="#9ca3af"
+                              style={{ fontSize: window.innerWidth < 768 ? '11px' : '12px' }}
+                            />
+                            <Tooltip content={<CustomTooltip />} />
+                            <Legend
+                              wrapperStyle={{ fontSize: window.innerWidth < 768 ? '11px' : '12px' }}
+                            />
+                            <Bar dataKey="revenus" fill={colors.revenus} name="Revenus" />
+                            <Bar dataKey="depenses_fixes" fill={colors.depenses_fixes} name="Dépenses fixes" />
+                            <Bar dataKey="depenses_variables" fill={colors.depenses_variables} name="Dépenses variables" />
+                            <Bar dataKey="epargne" fill={colors.epargne} name="Épargne" />
+                            <Bar dataKey="investissements" fill={colors.investissements} name="Investissements" />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
                     </motion.div>
 
                     {/* Graphique camembert répartition annuelle */}
-                    <motion.div 
+                    <motion.div
                       initial={{ opacity: 0, x: 20 }}
                       animate={{ opacity: 1, x: 0 }}
                       className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm card-responsive border border-gray-700/30 hover-lift ultra-smooth"
                     >
                       <h3 className="text-xl font-bold text-white mb-4">Répartition {dashboardFilter.month === 'all' ? dashboardFilter.year : `${new Date(dashboardFilter.year, dashboardFilter.month - 1).toLocaleDateString('fr-FR', { month: 'long' })} ${dashboardFilter.year}`}</h3>
-                      <ResponsiveContainer width="100%" height={300}>
-                        <PieChart>
-                          <Pie
-                            data={[
-                              { 
-                                name: 'Revenus', 
-                                value: budgetItems.filter(item => {
-                                  const itemDate = new Date(item.date);
-                                  const yearMatch = itemDate.getFullYear() === dashboardFilter.year;
-                                  const monthMatch = dashboardFilter.month === 'all' || itemDate.getMonth() + 1 === parseInt(dashboardFilter.month);
-                                  return item.type === 'revenus' && yearMatch && monthMatch;
-                                }).reduce((sum, item) => sum + parseFloat(item.amount), 0),
-                                fill: colors.revenus
-                              },
-                              { 
-                                name: 'Dépenses fixes', 
-                                value: budgetItems.filter(item => {
-                                  const itemDate = new Date(item.date);
-                                  const yearMatch = itemDate.getFullYear() === dashboardFilter.year;
-                                  const monthMatch = dashboardFilter.month === 'all' || itemDate.getMonth() + 1 === parseInt(dashboardFilter.month);
-                                  return item.type === 'depenses_fixes' && yearMatch && monthMatch;
-                                }).reduce((sum, item) => sum + parseFloat(item.amount), 0),
-                                fill: colors.depenses_fixes
-                              },
-                              { 
-                                name: 'Dépenses variables', 
-                                value: budgetItems.filter(item => {
-                                  const itemDate = new Date(item.date);
-                                  const yearMatch = itemDate.getFullYear() === dashboardFilter.year;
-                                  const monthMatch = dashboardFilter.month === 'all' || itemDate.getMonth() + 1 === parseInt(dashboardFilter.month);
-                                  return item.type === 'depenses_variables' && yearMatch && monthMatch;
-                                }).reduce((sum, item) => sum + parseFloat(item.amount), 0),
-                                fill: colors.depenses_variables
-                              },
-                              { 
-                                name: 'Épargne', 
-                                value: budgetItems.filter(item => {
-                                  const itemDate = new Date(item.date);
-                                  const yearMatch = itemDate.getFullYear() === dashboardFilter.year;
-                                  const monthMatch = dashboardFilter.month === 'all' || itemDate.getMonth() + 1 === parseInt(dashboardFilter.month);
-                                  return item.type === 'epargne' && yearMatch && monthMatch;
-                                }).reduce((sum, item) => sum + parseFloat(item.amount), 0),
-                                fill: colors.epargne
-                              },
-                              { 
-                                name: 'Investissements', 
-                                value: budgetItems.filter(item => {
-                                  const itemDate = new Date(item.date);
-                                  const yearMatch = itemDate.getFullYear() === dashboardFilter.year;
-                                  const monthMatch = dashboardFilter.month === 'all' || itemDate.getMonth() + 1 === parseInt(dashboardFilter.month);
-                                  return item.type === 'investissements' && yearMatch && monthMatch;
-                                }).reduce((sum, item) => sum + parseFloat(item.amount), 0),
-                                fill: colors.investissements
-                              }
-                            ].filter(item => item.value > 0)}
-                            cx="50%"
-                            cy="50%"
-                            labelLine={true}
-                            label={({ percent }) => `${(percent * 100).toFixed(1)}%`}
-                            outerRadius={100}
-                            fill="#8884d8"
-                            dataKey="value"
-                          >
-                          </Pie>
-                          <Tooltip 
-                            contentStyle={{ 
-                              backgroundColor: '#1f2937', 
-                              border: '1px solid #374151',
-                              borderRadius: '8px',
-                              color: '#fff'
-                            }}
-                            formatter={(value, name) => [`${formatCurrency(value)}`, name]}
-                          />
-                          <Legend 
-                            verticalAlign="bottom" 
-                            height={36}
-                            wrapperStyle={{ color: '#fff', fontSize: '14px' }}
-                          />
-                        </PieChart>
-                      </ResponsiveContainer>
+                      <div className="w-full" style={{ height: window.innerWidth < 768 ? '280px' : '320px' }}>
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie
+                              data={[
+                                {
+                                  name: 'Revenus',
+                                  value: budgetItems.filter(item => {
+                                    const itemDate = new Date(item.date);
+                                    const yearMatch = itemDate.getFullYear() === dashboardFilter.year;
+                                    const monthMatch = dashboardFilter.month === 'all' || itemDate.getMonth() + 1 === parseInt(dashboardFilter.month);
+                                    return item.type === 'revenus' && yearMatch && monthMatch;
+                                  }).reduce((sum, item) => sum + parseFloat(item.amount), 0),
+                                  fill: colors.revenus
+                                },
+                                {
+                                  name: 'Dépenses fixes',
+                                  value: budgetItems.filter(item => {
+                                    const itemDate = new Date(item.date);
+                                    const yearMatch = itemDate.getFullYear() === dashboardFilter.year;
+                                    const monthMatch = dashboardFilter.month === 'all' || itemDate.getMonth() + 1 === parseInt(dashboardFilter.month);
+                                    return item.type === 'depenses_fixes' && yearMatch && monthMatch;
+                                  }).reduce((sum, item) => sum + parseFloat(item.amount), 0),
+                                  fill: colors.depenses_fixes
+                                },
+                                {
+                                  name: 'Dépenses variables',
+                                  value: budgetItems.filter(item => {
+                                    const itemDate = new Date(item.date);
+                                    const yearMatch = itemDate.getFullYear() === dashboardFilter.year;
+                                    const monthMatch = dashboardFilter.month === 'all' || itemDate.getMonth() + 1 === parseInt(dashboardFilter.month);
+                                    return item.type === 'depenses_variables' && yearMatch && monthMatch;
+                                  }).reduce((sum, item) => sum + parseFloat(item.amount), 0),
+                                  fill: colors.depenses_variables
+                                },
+                                {
+                                  name: 'Épargne',
+                                  value: budgetItems.filter(item => {
+                                    const itemDate = new Date(item.date);
+                                    const yearMatch = itemDate.getFullYear() === dashboardFilter.year;
+                                    const monthMatch = dashboardFilter.month === 'all' || itemDate.getMonth() + 1 === parseInt(dashboardFilter.month);
+                                    return item.type === 'epargne' && yearMatch && monthMatch;
+                                  }).reduce((sum, item) => sum + parseFloat(item.amount), 0),
+                                  fill: colors.epargne
+                                },
+                                {
+                                  name: 'Investissements',
+                                  value: budgetItems.filter(item => {
+                                    const itemDate = new Date(item.date);
+                                    const yearMatch = itemDate.getFullYear() === dashboardFilter.year;
+                                    const monthMatch = dashboardFilter.month === 'all' || itemDate.getMonth() + 1 === parseInt(dashboardFilter.month);
+                                    return item.type === 'investissements' && yearMatch && monthMatch;
+                                  }).reduce((sum, item) => sum + parseFloat(item.amount), 0),
+                                  fill: colors.investissements
+                                }
+                              ].filter(item => item.value > 0)}
+                              cx="50%"
+                              cy="50%"
+                              labelLine={window.innerWidth >= 768}
+                              label={window.innerWidth >= 768 ? ({ percent }) => `${(percent * 100).toFixed(1)}%` : false}
+                              outerRadius={window.innerWidth < 768 ? 80 : 100}
+                              fill="#8884d8"
+                              dataKey="value"
+                            >
+                            </Pie>
+                            <Tooltip content={<CustomTooltip />} />
+                            <Legend
+                              verticalAlign="bottom"
+                              height={36}
+                              wrapperStyle={{ color: '#fff', fontSize: window.innerWidth < 768 ? '11px' : '14px' }}
+                            />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </div>
                     </motion.div>
                   </div>
 
@@ -2424,57 +2502,62 @@ export default function App() {
                         {/* Graphique barres empilées mensuelles */}
                         <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/30">
                           <h3 className="text-xl font-bold text-white mb-4">Revenus vs Dépenses par mois</h3>
-                          <ResponsiveContainer width="100%" height={500}>
-                            <BarChart data={processMonthlyData(budgetItems, monthlyViewYear)}>
-                              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                              <XAxis dataKey="name" stroke="#9ca3af" />
-                              <YAxis stroke="#9ca3af" />
-                              <Tooltip 
-                                contentStyle={{ 
-                                  backgroundColor: '#1f2937', 
-                                  border: '1px solid #374151',
-                                  borderRadius: '8px',
-                                  color: '#fff'
-                                }}
-                                formatter={(value) => [`${formatCurrency(value)}`, '']}
-                              />
-                              <Legend />
-                              <Bar dataKey="revenus" stackId="a" fill={colors.revenus} name="Revenus" />
-                              <Bar dataKey="depenses_fixes" stackId="b" fill={colors.depenses_fixes} name="Dépenses fixes" />
-                              <Bar dataKey="depenses_variables" stackId="b" fill={colors.depenses_variables} name="Dépenses variables" />
-                              <Bar dataKey="epargne" stackId="b" fill={colors.epargne} name="Épargne" />
-                              <Bar dataKey="investissements" stackId="b" fill={colors.investissements} name="Investissements" />
-                            </BarChart>
-                          </ResponsiveContainer>
+                          <div className="w-full" style={{ height: window.innerWidth < 768 ? '350px' : '500px' }}>
+                            <ResponsiveContainer width="100%" height="100%">
+                              <BarChart data={processMonthlyData(budgetItems, monthlyViewYear)}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                                <XAxis
+                                  dataKey="name"
+                                  stroke="#9ca3af"
+                                  style={{ fontSize: window.innerWidth < 768 ? '10px' : '12px' }}
+                                />
+                                <YAxis
+                                  stroke="#9ca3af"
+                                  style={{ fontSize: window.innerWidth < 768 ? '10px' : '12px' }}
+                                />
+                                <Tooltip content={<CustomTooltip />} />
+                                <Legend
+                                  wrapperStyle={{ fontSize: window.innerWidth < 768 ? '11px' : '12px' }}
+                                />
+                                <Bar dataKey="revenus" stackId="a" fill={colors.revenus} name="Revenus" />
+                                <Bar dataKey="depenses_fixes" stackId="b" fill={colors.depenses_fixes} name="Dépenses fixes" />
+                                <Bar dataKey="depenses_variables" stackId="b" fill={colors.depenses_variables} name="Dépenses variables" />
+                                <Bar dataKey="epargne" stackId="b" fill={colors.epargne} name="Épargne" />
+                                <Bar dataKey="investissements" stackId="b" fill={colors.investissements} name="Investissements" />
+                              </BarChart>
+                            </ResponsiveContainer>
+                          </div>
                         </div>
 
                         {/* Courbe du solde mensuel */}
                         <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/30">
                           <h3 className="text-xl font-bold text-white mb-4">Évolution du solde mensuel</h3>
-                          <ResponsiveContainer width="100%" height={500}>
-                            <LineChart data={processMonthlyData(budgetItems, monthlyViewYear)}>
-                              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                              <XAxis dataKey="name" stroke="#9ca3af" />
-                              <YAxis stroke="#9ca3af" />
-                              <Tooltip 
-                                contentStyle={{ 
-                                  backgroundColor: '#1f2937', 
-                                  border: '1px solid #374151',
-                                  borderRadius: '8px',
-                                  color: '#fff'
-                                }}
-                                formatter={(value) => [formatCurrency(value), 'Solde']}
-                              />
-                              <Line 
-                                type="monotone" 
-                                dataKey="solde" 
-                                stroke="#ef4444" 
-                                strokeWidth={3}
-                                dot={{ fill: '#ef4444', strokeWidth: 2, r: 5 }}
-                                activeDot={{ r: 7, stroke: '#ef4444', strokeWidth: 2 }}
-                              />
-                            </LineChart>
-                          </ResponsiveContainer>
+                          <div className="w-full" style={{ height: window.innerWidth < 768 ? '300px' : '500px' }}>
+                            <ResponsiveContainer width="100%" height="100%">
+                              <LineChart data={processMonthlyData(budgetItems, monthlyViewYear)}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                                <XAxis
+                                  dataKey="name"
+                                  stroke="#9ca3af"
+                                  style={{ fontSize: window.innerWidth < 768 ? '10px' : '12px' }}
+                                />
+                                <YAxis
+                                  stroke="#9ca3af"
+                                  style={{ fontSize: window.innerWidth < 768 ? '10px' : '12px' }}
+                                />
+                                <Tooltip content={<CustomTooltip />} />
+                                <Line
+                                  type="monotone"
+                                  dataKey="solde"
+                                  stroke="#ef4444"
+                                  strokeWidth={window.innerWidth < 768 ? 2 : 3}
+                                  dot={{ fill: '#ef4444', strokeWidth: 2, r: window.innerWidth < 768 ? 4 : 5 }}
+                                  activeDot={{ r: window.innerWidth < 768 ? 6 : 7, stroke: '#ef4444', strokeWidth: 2 }}
+                                  name="Solde"
+                                />
+                              </LineChart>
+                            </ResponsiveContainer>
+                          </div>
                         </div>
                       </div>
                     </motion.div>
@@ -2561,114 +2644,106 @@ export default function App() {
                       <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/30">
                         <h3 className="text-xl font-bold text-white mb-4">Vue d'ensemble - Toutes catégories</h3>
                         <div className="w-full flex justify-center">
-                          <ResponsiveContainer width="100%" height={500} minWidth={300}>
-                            <PieChart>
-                              <Pie
-                                data={processCategoriesData(budgetItems, categoriesViewYear)
-                                  .filter(entry => entry.value < 0) // Seulement les dépenses
-                                  .map(entry => ({...entry, value: Math.abs(entry.value)}))} // Convertir en positif pour l'affichage
-                                dataKey="value"
-                                nameKey="name"
-                                cx="50%"
-                                cy="50%"
-                                outerRadius={200}
-                                innerRadius={80}
-                                paddingAngle={2}
-                                label={({ name, percent }) => 
-                                  `${name} ${(percent * 100).toFixed(1)}%`
-                                }
-                                labelLine={true}
-                                style={{
-                                  fontSize: '12px',
-                                  fontWeight: '500'
-                                }}
-                              >
-                                {processCategoriesData(budgetItems, categoriesViewYear)
-                                  .filter(entry => entry.value < 0)
-                                  .map((entry, index) => (
-                                  <Cell 
-                                    key={`global-expense-cell-${index}`} 
-                                    fill={entry.fill}
-                                    stroke="#1f2937"
-                                    strokeWidth={2}
-                                  />
-                                ))}
-                              </Pie>
-                              <Tooltip 
-                                contentStyle={{ 
-                                  backgroundColor: '#1f2937', 
-                                  border: '1px solid #374151',
-                                  borderRadius: '8px',
-                                  color: '#fff',
-                                  fontSize: '14px'
-                                }}
-                                formatter={(value, name) => [
-                                  formatCurrency(value),
-                                  name
-                                ]}
-                              />
-                            </PieChart>
-                          </ResponsiveContainer>
+                          <div className="w-full" style={{ height: window.innerWidth < 768 ? '350px' : '500px' }}>
+                            <ResponsiveContainer width="100%" height="100%" minWidth={300}>
+                              <PieChart>
+                                <Pie
+                                  data={processCategoriesData(budgetItems, categoriesViewYear)
+                                    .filter(entry => entry.value < 0) // Seulement les dépenses
+                                    .map(entry => ({...entry, value: Math.abs(entry.value)}))} // Convertir en positif pour l'affichage
+                                  dataKey="value"
+                                  nameKey="name"
+                                  cx="50%"
+                                  cy="50%"
+                                  outerRadius={window.innerWidth < 768 ? 100 : 200}
+                                  innerRadius={window.innerWidth < 768 ? 40 : 80}
+                                  paddingAngle={2}
+                                  label={window.innerWidth >= 768 ? ({ name, percent }) =>
+                                    `${name} ${(percent * 100).toFixed(1)}%`
+                                  : false}
+                                  labelLine={window.innerWidth >= 768}
+                                  style={{
+                                    fontSize: '12px',
+                                    fontWeight: '500'
+                                  }}
+                                >
+                                  {processCategoriesData(budgetItems, categoriesViewYear)
+                                    .filter(entry => entry.value < 0)
+                                    .map((entry, index) => (
+                                    <Cell
+                                      key={`global-expense-cell-${index}`}
+                                      fill={entry.fill}
+                                      stroke="#1f2937"
+                                      strokeWidth={2}
+                                    />
+                                  ))}
+                                </Pie>
+                                <Tooltip content={<CustomTooltip />} />
+                                <Legend
+                                  verticalAlign="bottom"
+                                  wrapperStyle={{ fontSize: window.innerWidth < 768 ? '10px' : '12px' }}
+                                />
+                              </PieChart>
+                            </ResponsiveContainer>
+                          </div>
                         </div>
                       </div>
 
                       {/* BLOC 3: Graphique barres par catégorie */}
                       <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/30">
                         <h3 className="text-xl font-bold text-white mb-4">Barres par catégorie</h3>
-                        <ResponsiveContainer width="100%" height={600}>
-                          <BarChart
-                            data={processCategoriesData(budgetItems, categoriesViewYear)
-                              .filter(entry => entry.value < 0) // Seulement les dépenses
-                              .map(entry => ({...entry, value: Math.abs(entry.value)})) // Convertir en positif
-                              .sort((a, b) => b.value - a.value)} // Trier par montant décroissant
-                            layout="horizontal"
-                            margin={{ top: 20, right: 30, left: 20, bottom: 120 }}
-                          >
-                            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                            <XAxis 
-                              type="category" 
-                              dataKey="name"
-                              stroke="#9ca3af" 
-                              tick={{ 
-                                fontSize: 11,
-                                angle: -45,
-                                textAnchor: 'end',
-                                height: 100
+                        <div className="w-full" style={{ height: window.innerWidth < 768 ? '450px' : '600px' }}>
+                          <ResponsiveContainer width="100%" height="100%">
+                            <BarChart
+                              data={processCategoriesData(budgetItems, categoriesViewYear)
+                                .filter(entry => entry.value < 0) // Seulement les dépenses
+                                .map(entry => ({...entry, value: Math.abs(entry.value)})) // Convertir en positif
+                                .sort((a, b) => b.value - a.value)} // Trier par montant décroissant
+                              layout="horizontal"
+                              margin={{
+                                top: 20,
+                                right: window.innerWidth < 768 ? 10 : 30,
+                                left: window.innerWidth < 768 ? 10 : 20,
+                                bottom: window.innerWidth < 768 ? 80 : 120
                               }}
-                              height={100}
-                              interval={0}
-                            />
-                            <YAxis 
-                              type="number"
-                              stroke="#9ca3af" 
-                              tickFormatter={(value) => formatCurrency(value)}
-                            />
-                            <Tooltip 
-                              contentStyle={{ 
-                                backgroundColor: '#1f2937', 
-                                border: '1px solid #374151',
-                                borderRadius: '8px',
-                                color: '#fff'
-                              }}
-                              formatter={(value, name, props) => [
-                                formatCurrency(value),
-                                props.payload.name
-                              ]}
-                            />
-                            <Bar 
-                              dataKey="value" 
-                              radius={[0, 4, 4, 0]}
                             >
-                              {processCategoriesData(budgetItems, categoriesViewYear)
-                                .filter(entry => entry.value < 0)
-                                .map(entry => ({...entry, value: Math.abs(entry.value)}))
-                                .sort((a, b) => b.value - a.value)
-                                .map((entry, index) => (
-                                <Cell key={`bar-cell-${index}`} fill={entry.fill} />
-                              ))}
-                            </Bar>
-                          </BarChart>
-                        </ResponsiveContainer>
+                              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                              <XAxis
+                                type="category"
+                                dataKey="name"
+                                stroke="#9ca3af"
+                                tick={{
+                                  fontSize: window.innerWidth < 768 ? 9 : 11,
+                                  angle: -45,
+                                  textAnchor: 'end',
+                                  height: window.innerWidth < 768 ? 60 : 100
+                                }}
+                                height={window.innerWidth < 768 ? 60 : 100}
+                                interval={0}
+                              />
+                              <YAxis
+                                type="number"
+                                stroke="#9ca3af"
+                                tickFormatter={(value) => formatCurrency(value)}
+                                style={{ fontSize: window.innerWidth < 768 ? '10px' : '12px' }}
+                              />
+                              <Tooltip content={<CustomTooltip />} />
+                              <Bar
+                                dataKey="value"
+                                radius={[0, 4, 4, 0]}
+                                name="Montant"
+                              >
+                                {processCategoriesData(budgetItems, categoriesViewYear)
+                                  .filter(entry => entry.value < 0)
+                                  .map(entry => ({...entry, value: Math.abs(entry.value)}))
+                                  .sort((a, b) => b.value - a.value)
+                                  .map((entry, index) => (
+                                  <Cell key={`bar-cell-${index}`} fill={entry.fill} />
+                                ))}
+                              </Bar>
+                            </BarChart>
+                          </ResponsiveContainer>
+                        </div>
                       </div>
 
                       {/* BLOC 4: Liste des investissements */}
@@ -2732,50 +2807,47 @@ export default function App() {
                       <div className="bg-gradient-to-br from-blue-900/30 to-green-900/30 backdrop-blur-sm rounded-xl p-6 border border-blue-700/30">
                         <h3 className="text-xl font-bold text-white mb-4">Investissements & Épargne</h3>
                         <div className="w-full flex justify-center">
-                          <ResponsiveContainer width="100%" height={450} minWidth={300}>
-                            <PieChart>
-                              <Pie
-                                data={processCategoriesData(budgetItems, categoriesViewYear)
-                                  .filter(item => item.type === 'epargne' || item.type === 'investissements')}
-                                dataKey="value"
-                                nameKey="name"
-                                cx="50%"
-                                cy="50%"
-                                outerRadius={160}
-                                innerRadius={60}
-                                paddingAngle={3}
-                                label={({ name, percent }) => 
-                                  `${name} ${(percent * 100).toFixed(1)}%`
-                                }
-                                labelLine={true}
-                                style={{
-                                  fontSize: '12px',
-                                  fontWeight: '500'
-                                }}
-                              >
-                                {processCategoriesData(budgetItems, categoriesViewYear)
-                                  .filter(item => item.type === 'epargne' || item.type === 'investissements')
-                                  .map((entry, index) => (
-                                  <Cell 
-                                    key={`investment-cell-${index}`} 
-                                    fill={entry.fill}
-                                    stroke="#1e3a8a"
-                                    strokeWidth={2}
-                                  />
-                                ))}
-                              </Pie>
-                              <Tooltip 
-                                contentStyle={{ 
-                                  backgroundColor: '#1e3a8a', 
-                                  border: '1px solid #3b82f6',
-                                  borderRadius: '8px',
-                                  color: '#fff',
-                                  fontSize: '14px'
-                                }}
-                                formatter={(value, name) => [`${formatCurrency(value)}`, name]}
-                              />
-                            </PieChart>
-                          </ResponsiveContainer>
+                          <div className="w-full" style={{ height: window.innerWidth < 768 ? '320px' : '450px' }}>
+                            <ResponsiveContainer width="100%" height="100%" minWidth={300}>
+                              <PieChart>
+                                <Pie
+                                  data={processCategoriesData(budgetItems, categoriesViewYear)
+                                    .filter(item => item.type === 'epargne' || item.type === 'investissements')}
+                                  dataKey="value"
+                                  nameKey="name"
+                                  cx="50%"
+                                  cy="50%"
+                                  outerRadius={window.innerWidth < 768 ? 85 : 160}
+                                  innerRadius={window.innerWidth < 768 ? 40 : 60}
+                                  paddingAngle={3}
+                                  label={window.innerWidth >= 768 ? ({ name, percent }) =>
+                                    `${name} ${(percent * 100).toFixed(1)}%`
+                                  : false}
+                                  labelLine={window.innerWidth >= 768}
+                                  style={{
+                                    fontSize: '12px',
+                                    fontWeight: '500'
+                                  }}
+                                >
+                                  {processCategoriesData(budgetItems, categoriesViewYear)
+                                    .filter(item => item.type === 'epargne' || item.type === 'investissements')
+                                    .map((entry, index) => (
+                                    <Cell
+                                      key={`investment-cell-${index}`}
+                                      fill={entry.fill}
+                                      stroke="#1e3a8a"
+                                      strokeWidth={2}
+                                    />
+                                  ))}
+                                </Pie>
+                                <Tooltip content={<CustomTooltip />} />
+                                <Legend
+                                  verticalAlign="bottom"
+                                  wrapperStyle={{ fontSize: window.innerWidth < 768 ? '10px' : '12px' }}
+                                />
+                              </PieChart>
+                            </ResponsiveContainer>
+                          </div>
                         </div>
                       </div>
                     </motion.div>
@@ -2951,100 +3023,98 @@ export default function App() {
                           </div>
                         </div>
                         
-                        <ResponsiveContainer width="100%" height={500}>
-                          <BarChart 
-                            data={(() => {
-                              const compData = getComparativeData(
-                                budgetItems, 
-                                compareConfig.period1, 
-                                compareConfig.period2, 
-                                compareGranularity
-                              );
-                              
-                              const result = [];
-                              
-                              if (compData.isDetailed) {
-                                // Mode catégories détaillées
-                                Object.keys(compData.period1).forEach(category => {
-                                  result.push({
-                                    category,
-                                    periode1: compData.period1[category], 
-                                    periode2: compData.period2[category]
-                                  });
-                                });
-                              } else {
-                                // Mode types
-                                result.push(
-                                  {
-                                    category: 'Revenus',
-                                    periode1: compData.period1.revenus,
-                                    periode2: compData.period2.revenus
-                                  },
-                                  {
-                                    category: 'Dépenses fixes',
-                                    periode1: compData.period1.depenses_fixes,
-                                    periode2: compData.period2.depenses_fixes
-                                  },
-                                  {
-                                    category: 'Dépenses variables',
-                                    periode1: compData.period1.depenses_variables,
-                                    periode2: compData.period2.depenses_variables
-                                  },
-                                  {
-                                    category: 'Épargne',
-                                    periode1: compData.period1.epargne,
-                                    periode2: compData.period2.epargne
-                                  },
-                                  {
-                                    category: 'Investissements',
-                                    periode1: compData.period1.investissements,
-                                    periode2: compData.period2.investissements
-                                  }
+                        <div className="w-full" style={{ height: window.innerWidth < 768 ? '400px' : '500px' }}>
+                          <ResponsiveContainer width="100%" height="100%">
+                            <BarChart
+                              data={(() => {
+                                const compData = getComparativeData(
+                                  budgetItems,
+                                  compareConfig.period1,
+                                  compareConfig.period2,
+                                  compareGranularity
                                 );
-                              }
-                              
-                              return result;
-                            })()}
-                            margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
-                          >
-                            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                            <XAxis 
-                              dataKey="category"
-                              stroke="#9ca3af"
-                              tick={{ fontSize: 12 }}
-                              angle={-45}
-                              textAnchor="end"
-                              height={80}
-                            />
-                            <YAxis 
-                              stroke="#9ca3af"
-                              tickFormatter={(value) => formatCurrency(value)}
-                            />
-                            <Tooltip 
-                              contentStyle={{ 
-                                backgroundColor: '#1f2937', 
-                                border: '1px solid #374151',
-                                borderRadius: '8px',
-                                color: '#fff',
-                                fontSize: '14px'
+
+                                const result = [];
+
+                                if (compData.isDetailed) {
+                                  // Mode catégories détaillées
+                                  Object.keys(compData.period1).forEach(category => {
+                                    result.push({
+                                      category,
+                                      periode1: compData.period1[category],
+                                      periode2: compData.period2[category]
+                                    });
+                                  });
+                                } else {
+                                  // Mode types
+                                  result.push(
+                                    {
+                                      category: 'Revenus',
+                                      periode1: compData.period1.revenus,
+                                      periode2: compData.period2.revenus
+                                    },
+                                    {
+                                      category: 'Dépenses fixes',
+                                      periode1: compData.period1.depenses_fixes,
+                                      periode2: compData.period2.depenses_fixes
+                                    },
+                                    {
+                                      category: 'Dépenses variables',
+                                      periode1: compData.period1.depenses_variables,
+                                      periode2: compData.period2.depenses_variables
+                                    },
+                                    {
+                                      category: 'Épargne',
+                                      periode1: compData.period1.epargne,
+                                      periode2: compData.period2.epargne
+                                    },
+                                    {
+                                      category: 'Investissements',
+                                      periode1: compData.period1.investissements,
+                                      periode2: compData.period2.investissements
+                                    }
+                                  );
+                                }
+
+                                return result;
+                              })()}
+                              margin={{
+                                top: 20,
+                                right: window.innerWidth < 768 ? 10 : 30,
+                                left: window.innerWidth < 768 ? 10 : 20,
+                                bottom: window.innerWidth < 768 ? 60 : 80
                               }}
-                              formatter={(value, name) => [
-                                formatCurrency(value),
-                                name.includes('periode1') ? 'Période 1' : 'Période 2'
-                              ]}
-                            />
-                            <Legend 
-                              wrapperStyle={{ paddingTop: '20px', fontSize: '14px' }}
-                            />
-                            <Bar 
-                              dataKey="periode1" 
-                              fill="#3b82f6"
-                              name="Période 1 (Bleue)"
-                              radius={[4, 4, 0, 0]}
-                            />
-                            <Bar 
-                              dataKey="periode2" 
-                              fill="#f97316"
+                            >
+                              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                              <XAxis
+                                dataKey="category"
+                                stroke="#9ca3af"
+                                tick={{ fontSize: window.innerWidth < 768 ? 9 : 12 }}
+                                angle={-45}
+                                textAnchor="end"
+                                height={window.innerWidth < 768 ? 60 : 80}
+                              />
+                              <YAxis
+                                stroke="#9ca3af"
+                                tickFormatter={(value) => formatCurrency(value)}
+                                style={{ fontSize: window.innerWidth < 768 ? '10px' : '12px' }}
+                              />
+                              <Tooltip content={<CustomTooltip />} />
+                              <Legend
+                                wrapperStyle={{
+                                  paddingTop: '20px',
+                                  fontSize: window.innerWidth < 768 ? '11px' : '14px'
+                                }}
+                              />
+                              <Bar
+                                dataKey="periode1"
+                                fill="#3b82f6"
+                                name="Période 1 (Bleue)"
+                                radius={[4, 4, 0, 0]}
+                              />
+                              <Bar
+                                dataKey="periode2"
+                                fill="#f97316"
                               name="Période 2 (Orange)"
                               radius={[4, 4, 0, 0]}
                             />
