@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { Check, Plus, Trash2, Sparkles, Search, List, FileText, ShoppingCart, Wallet, BarChart3, ArrowLeft, TrendingUp, PieChart as PieChartIcon, Calendar, Table, Download, Filter, ChevronLeft, ChevronRight, Settings, X, Play, Star, Edit } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, LabelList } from 'recharts';
 import { Button } from "@/components/ui/button";
@@ -148,7 +147,9 @@ const CustomTooltip = ({ active, payload, label }) => {
       )}
       {payload.map((entry, index) => {
         const dataKey = entry.dataKey || entry.name;
-        const color = entry.color || entry.fill || colors[dataKey] || '#8884d8';
+        // Pour les PieChart, la couleur est dans entry.payload.fill
+        // Pour les autres graphiques (Bar, Line), elle est dans entry.color ou entry.fill
+        const color = entry.payload?.fill || entry.color || entry.fill || colors[dataKey] || '#8884d8';
 
         return (
           <div
@@ -173,7 +174,7 @@ const CustomTooltip = ({ active, payload, label }) => {
               }}
             />
             <span style={{
-              color: '#fff',
+              color: color,
               fontWeight: '500',
               fontSize: isMobile ? '12px' : '13px',
               flex: 1
@@ -1670,7 +1671,7 @@ export default function App() {
   }, [mediaItems]);
 
   const PriorityBadge = ({ p }) => (
-    <motion.div
+    <div
       initial={{ scale: 0.8, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       whileHover={{ scale: 1.05 }}
@@ -1688,11 +1689,11 @@ export default function App() {
       <span className="text-xs font-semibold">
         {PRIORITY_LABELS[p]}
       </span>
-    </motion.div>
+    </div>
   );
 
   const TaskRow = ({ t }) => (
-    <motion.div
+    <div
       layout
       initial={{ opacity: 0, y: 20, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -1705,7 +1706,7 @@ export default function App() {
     >
       <div className="relative flex items-center mobile-spacing p-responsive-sm touch-target">
         {/* Touch target responsive pour mobile */}
-        <motion.button
+        <button
           onClick={() => completeTask(t.id)}
           whileTap={{ scale: 0.92 }}
           whileHover={{ scale: 1.08 }}
@@ -1714,13 +1715,13 @@ export default function App() {
           <Check className="icon-responsive-md text-white drop-shadow-sm" />
 
           {/* Effet de brillance au survol */}
-          <motion.div
+          <div
             className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent rounded-2xl"
             initial={{ x: '-100%', opacity: 0 }}
             whileHover={{ x: '100%', opacity: 1 }}
             transition={{ duration: 0.6 }}
           />
-        </motion.button>
+        </button>
 
         <div className="flex-1 min-w-0 mobile-compact">
           <div className="flex items-start mobile-spacing">
@@ -1729,17 +1730,17 @@ export default function App() {
             </span>
 
             {/* Badge de priorité redesigné pour mobile */}
-            <motion.div
+            <div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.1 }}
             >
               <PriorityBadge p={t.priority} />
-            </motion.div>
+            </div>
           </div>
 
           {/* Indicateur visuel subtil pour le swipe (optionnel) */}
-          <motion.div
+          <div
             className="absolute right-2 top-1/2 transform -translate-y-1/2 opacity-20 group-hover:opacity-40 transition-opacity duration-300"
             initial={{ x: 10, opacity: 0 }}
             animate={{ x: 0, opacity: 0.2 }}
@@ -1749,18 +1750,18 @@ export default function App() {
               <div className="w-1 h-1 bg-white rounded-full"></div>
               <div className="w-1 h-1 bg-white rounded-full"></div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
 
       {/* Effet de gradient sur les bords pour design moderne */}
-      <motion.div
+      <div
         className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
         style={{
           background: 'linear-gradient(90deg, transparent 0%, rgba(220, 38, 38, 0.1) 50%, transparent 100%)'
         }}
       />
-    </motion.div>
+    </div>
   );
 
   return (
@@ -1879,9 +1880,9 @@ export default function App() {
         </div>
 
         {/* Contenu Principal avec Transitions Fluides */}
-        <AnimatePresence mode="wait">
+        
           {activeTab === "dashboard" && (
-            <motion.div
+            <div
               key="dashboard"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -1890,7 +1891,7 @@ export default function App() {
               className="space-y-4 md:space-y-8"
             >
               {/* Header Dashboard - Mobile vs Desktop */}
-              <motion.div
+              <div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
@@ -1898,7 +1899,7 @@ export default function App() {
               >
                 {/* Mobile Header - Centré et épuré */}
                 <div className="md:hidden">
-                  <motion.div
+                  <div
                     initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: 0.2, type: "spring", bounce: 0.3 }}
@@ -1913,11 +1914,11 @@ export default function App() {
                         <p className="text-sm text-gray-300">Vue d'ensemble</p>
                       </div>
                     </div>
-                  </motion.div>
+                  </div>
 
                   {/* Filtres Mobile - Style Cards */}
                   <div className="mt-6 space-y-3">
-                    <motion.select
+                    <select
                       initial={{ x: -50, opacity: 0 }}
                       animate={{ x: 0, opacity: 1 }}
                       transition={{ delay: 0.3 }}
@@ -1928,9 +1929,9 @@ export default function App() {
                       {getAvailableYears(budgetItems).length > 0 ? getAvailableYears(budgetItems).map(year => (
                         <option key={year} value={year} className="bg-gray-800">{year}</option>
                       )) : <option value={new Date().getFullYear()} className="bg-gray-800">{new Date().getFullYear()}</option>}
-                    </motion.select>
+                    </select>
 
-                    <motion.select
+                    <select
                       initial={{ x: 50, opacity: 0 }}
                       animate={{ x: 0, opacity: 1 }}
                       transition={{ delay: 0.4 }}
@@ -1944,9 +1945,9 @@ export default function App() {
                           {new Date(2024, i).toLocaleDateString('fr-FR', { month: 'long' })}
                         </option>
                       ))}
-                    </motion.select>
+                    </select>
 
-                    <motion.button
+                    <button
                       initial={{ y: 50, opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
                       transition={{ delay: 0.5 }}
@@ -1957,7 +1958,7 @@ export default function App() {
                     >
                       <TrendingUp className="w-5 h-5 sm:w-5 sm:h-5" />
                       Budget Avancé
-                    </motion.button>
+                    </button>
                   </div>
                 </div>
 
@@ -1965,7 +1966,7 @@ export default function App() {
                 <div className="hidden md:block">
                   <div className="glass-dark rounded-3xl p-8 border border-white/10">
                     <div className="flex flex-row justify-between items-center">
-                      <motion.div
+                      <div
                         initial={{ x: -30, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ delay: 0.2 }}
@@ -1978,9 +1979,9 @@ export default function App() {
                           <h2 className="text-4xl font-bold text-white mb-2">Dashboard Global</h2>
                           <p className="text-xl text-gray-300">Analyse complète de vos finances</p>
                         </div>
-                      </motion.div>
+                      </div>
 
-                      <motion.div
+                      <div
                         initial={{ x: 30, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ delay: 0.3 }}
@@ -2009,7 +2010,7 @@ export default function App() {
                           ))}
                         </select>
 
-                        <motion.button
+                        <button
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={() => setActiveTab("budget-dashboard")}
@@ -2017,12 +2018,12 @@ export default function App() {
                         >
                           <TrendingUp className="w-5 h-5" />
                           Budget Avancé
-                        </motion.button>
-                      </motion.div>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </motion.div>
+              </div>
 
               {budgetItems.length > 0 ? (
                 <>
@@ -2030,7 +2031,7 @@ export default function App() {
 
                   {/* Version Mobile - Cards verticales centrées */}
                   <div className="md:hidden">
-                    <motion.div
+                    <div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.6 }}
@@ -2055,7 +2056,7 @@ export default function App() {
                         const Icon = config.icon;
 
                         return (
-                          <motion.div
+                          <div
                             key={type}
                             initial={{ x: index % 2 === 0 ? -100 : 100, opacity: 0 }}
                             animate={{ x: 0, opacity: 1 }}
@@ -2077,23 +2078,23 @@ export default function App() {
                                   </div>
                                 </div>
                               </div>
-                              <motion.div
+                              <div
                                 animate={{ rotate: [0, 5, -5, 0] }}
                                 transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                                 className="text-2xl opacity-20"
                               >
                                 {type === 'revenus' ? '📈' : type === 'epargne' ? '💰' : type === 'investissements' ? '📊' : '💸'}
-                              </motion.div>
+                              </div>
                             </div>
-                          </motion.div>
+                          </div>
                         );
                       })}
-                    </motion.div>
+                    </div>
                   </div>
 
                   {/* Version Desktop - Grid horizontal classique amélioré */}
                   <div className="hidden md:block">
-                    <motion.div
+                    <div
                       initial={{ opacity: 0, y: 30 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.4 }}
@@ -2118,7 +2119,7 @@ export default function App() {
                         const Icon = config.icon;
 
                         return (
-                          <motion.div
+                          <div
                             key={type}
                             initial={{ y: 50, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
@@ -2137,15 +2138,15 @@ export default function App() {
                                 {type === 'revenus' || type === 'epargne' || type === 'investissements' ? '+' : '-'}{formatCurrency(total).replace(' CHF', '')} CHF
                               </div>
                             </div>
-                          </motion.div>
+                          </div>
                         );
                       })}
-                    </motion.div>
+                    </div>
                   </div>
 
                   {/* Jauges de progression des objectifs */}
                   {(budgetLimits.longTerm.epargne > 0 || budgetLimits.longTerm.investissements > 0) && (
-                    <motion.div 
+                    <div 
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm card-responsive border border-gray-700/30 hover-lift ultra-smooth"
@@ -2252,13 +2253,13 @@ export default function App() {
                           </div>
                         )}
                       </div>
-                    </motion.div>
+                    </div>
                   )}
 
                   {/* Graphiques mensuels */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Graphique en barres mensuelles */}
-                    <motion.div
+                    <div
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm card-responsive border border-gray-700/30 hover-lift ultra-smooth"
@@ -2289,10 +2290,10 @@ export default function App() {
                           </BarChart>
                         </ResponsiveContainer>
                       </div>
-                    </motion.div>
+                    </div>
 
                     {/* Graphique camembert répartition annuelle */}
-                    <motion.div
+                    <div
                       initial={{ opacity: 0, x: 20 }}
                       animate={{ opacity: 1, x: 0 }}
                       className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm card-responsive border border-gray-700/30 hover-lift ultra-smooth"
@@ -2372,7 +2373,7 @@ export default function App() {
                           </PieChart>
                         </ResponsiveContainer>
                       </div>
-                    </motion.div>
+                    </div>
                   </div>
 
                   {/* Graphiques annuels */}
@@ -2394,11 +2395,11 @@ export default function App() {
                   </button>
                 </div>
               )}
-            </motion.div>
+            </div>
           )}
 
           {activeTab === "budget-dashboard" && (
-            <motion.div
+            <div
               key="budget-dashboard"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -2480,7 +2481,7 @@ export default function App() {
                 <>
                   {/* Vue Mensuelle */}
                   {budgetDashboardView === "monthly" && (
-                    <motion.div 
+                    <div 
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       className="space-y-6"
@@ -2560,12 +2561,12 @@ export default function App() {
                           </div>
                         </div>
                       </div>
-                    </motion.div>
+                    </div>
                   )}
 
                   {/* Vue Catégories - 5 Blocs séparés */}
                   {budgetDashboardView === "categories" && (
-                    <motion.div 
+                    <div 
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       className="space-y-6"
@@ -2850,12 +2851,12 @@ export default function App() {
                           </div>
                         </div>
                       </div>
-                    </motion.div>
+                    </div>
                   )}
 
                   {/* Vue Comparative */}
                   {budgetDashboardView === "comparative" && (
-                    <motion.div 
+                    <div 
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       className="space-y-6"
@@ -3120,7 +3121,8 @@ export default function App() {
                             />
                           </BarChart>
                         </ResponsiveContainer>
-                        
+                      </div>
+
                         {/* Résumé simple des évolutions */}
                         <div className="mt-6 p-4 bg-gray-700/30 rounded-lg">
                           <h4 className="text-lg font-bold text-white mb-4 text-center">Qu'est-ce qui a changé ?</h4>
@@ -3454,12 +3456,12 @@ export default function App() {
                           })()}
                         </div>
                       </div>
-                    </motion.div>
+                    </div>
                   )}
 
                   {/* Vue Tableau */}
                   {budgetDashboardView === "table" && (
-                    <motion.div 
+                    <div 
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       className="space-y-6"
@@ -3603,7 +3605,7 @@ export default function App() {
                           );
                         })()}
                       </div>
-                    </motion.div>
+                    </div>
                   )}
                 </>
               ) : (
@@ -3619,11 +3621,11 @@ export default function App() {
                   </button>
                 </div>
               )}
-            </motion.div>
+            </div>
           )}
 
           {activeTab === "tasks" && (
-            <motion.div
+            <div
               key="tasks"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -3632,7 +3634,7 @@ export default function App() {
               className="space-y-4 md:space-y-8"
             >
               {/* Header Tâches - Mobile vs Desktop harmonisé */}
-              <motion.div
+              <div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
@@ -3650,7 +3652,7 @@ export default function App() {
                 <div className="hidden md:block">
                   <div className="glass-dark rounded-3xl p-8 border border-white/10">
                     <div className="flex flex-row justify-between items-center">
-                      <motion.div
+                      <div
                         initial={{ x: -30, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ delay: 0.2 }}
@@ -3663,9 +3665,9 @@ export default function App() {
                           <h2 className="text-4xl font-bold text-white mb-2">Gestionnaire de Tâches</h2>
                           <p className="text-xl text-gray-300">Organisez et suivez vos objectifs</p>
                         </div>
-                      </motion.div>
+                      </div>
 
-                      <motion.div
+                      <div
                         initial={{ x: 30, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ delay: 0.3 }}
@@ -3675,11 +3677,11 @@ export default function App() {
                           <div className="text-sm text-gray-400">Tâches totales</div>
                           <div className="text-3xl font-bold text-white">{tasks.length}</div>
                         </div>
-                      </motion.div>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </motion.div>
+              </div>
 
               {/* Zone d'ajout de tâche - Mobile vs Desktop */}
 
@@ -3698,7 +3700,7 @@ export default function App() {
 
                     {/* Priorité mobile compacte */}
                     <div className="relative" style={{zIndex: 100}} ref={priorityMenuRef}>
-                      <motion.button
+                      <button
                         ref={priorityButtonMobileRef}
                         onClick={() => togglePriorityMenu(true)}
                         whileTap={{ scale: 0.98 }}
@@ -3711,33 +3713,33 @@ export default function App() {
                           <div className="w-4 h-4 rounded-full bg-white/80"></div>
                           <span>{PRIORITY_LABELS[priorityChoice] || PRIORITY_LABELS['normal']}</span>
                         </div>
-                        <motion.span
+                        <span
                           className="text-white text-xl"
                           animate={{ rotate: showPriorityMenu ? 180 : 0 }}
                           transition={{ duration: 0.2 }}
                         >
                           ▼
-                        </motion.span>
-                      </motion.button>
+                        </span>
+                      </button>
 
                     </div>
 
                     {/* Bouton mobile compact */}
-                    <motion.button
+                    <button
                       onClick={addTask}
                       whileTap={{ scale: 0.98 }}
                       className="w-full min-h-[48px] sm:min-h-[44px] bg-gradient-to-r from-red-600 to-red-700 text-white flex items-center justify-center gap-2 rounded-lg text-base sm:text-base font-semibold"
                     >
                       <Plus className="w-5 h-5 sm:w-4 sm:h-4" />
                       Ajouter
-                    </motion.button>
+                    </button>
                   </div>
                 </div>
               </div>
 
               {/* Desktop - Version horizontale compacte */}
               <div className="hidden md:block">
-                <motion.div
+                <div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
@@ -3755,7 +3757,7 @@ export default function App() {
                     </div>
 
                     <div className="relative" style={{zIndex: 100}} ref={priorityMenuRef}>
-                      <motion.button
+                      <button
                         ref={priorityButtonDesktopRef}
                         onClick={() => {
                           calculateMenuPosition(priorityButtonDesktopRef);
@@ -3769,18 +3771,18 @@ export default function App() {
                       >
                         <div className="w-3 h-3 rounded-full bg-white/80"></div>
                         <span>{PRIORITY_LABELS[priorityChoice] || PRIORITY_LABELS['normal']}</span>
-                        <motion.span
+                        <span
                           className="text-white ml-auto"
                           animate={{ rotate: showPriorityMenu ? 180 : 0 }}
                           transition={{ duration: 0.2 }}
                         >
                           ▼
-                        </motion.span>
-                      </motion.button>
+                        </span>
+                      </button>
 
                     </div>
 
-                    <motion.button
+                    <button
                       onClick={addTask}
                       whileTap={{ scale: 0.95 }}
                       whileHover={{ scale: 1.05 }}
@@ -3788,13 +3790,13 @@ export default function App() {
                     >
                       <Plus className="w-5 h-5" />
                       Ajouter
-                    </motion.button>
+                    </button>
                   </div>
-                </motion.div>
+                </div>
               </div>
 
               {/* Barre de recherche harmonisée */}
-              <motion.div
+              <div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
@@ -3813,41 +3815,41 @@ export default function App() {
                     />
                   </div>
                 </div>
-              </motion.div>
+              </div>
 
               {/* Zone d'affichage des tâches harmonisée */}
-              <motion.div
+              <div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.8 }}
                 className="glass-dark rounded-3xl p-6 min-h-96 neo-shadow border border-white/20"
               >
                 {(tasksByPriority.urgent.length === 0 && tasksByPriority.normal.length === 0) ? (
-                  <motion.div
+                  <div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     className="text-center text-gray-300 py-16"
                   >
-                    <motion.div
+                    <div
                       animate={{ rotate: [0, 5, -5, 0] }}
                       transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                       className="text-responsive-4xl spacing-responsive-md"
                     >
                       📝
-                    </motion.div>
+                    </div>
                     <div className="text-responsive-2xl font-bold spacing-responsive-sm text-white">Aucune tâche</div>
                     <div className="text-responsive-lg text-gray-400">Créez votre première tâche pour commencer</div>
-                  </motion.div>
+                  </div>
                 ) : (
                   <div className="space-y-4 md:space-y-8">
                     {/* Section À faire rapidement */}
                     {tasksByPriority.urgent.length > 0 && (
-                      <motion.div
+                      <div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         className="space-y-5"
                       >
-                        <motion.div
+                        <div
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
                           className="flex items-center mobile-spacing p-responsive-sm border-b border-red-500/40"
@@ -3857,33 +3859,33 @@ export default function App() {
                           </div>
                           <div className="flex items-center mobile-spacing text-red-400 font-bold text-responsive-xl">
                             À faire rapidement
-                            <motion.span
+                            <span
                               initial={{ scale: 0 }}
                               animate={{ scale: 1 }}
                               transition={{ type: "spring", bounce: 0.5 }}
                               className="text-responsive-xs bg-gradient-to-r from-red-500 to-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg"
                             >
                               {tasksByPriority.urgent.length}
-                            </motion.span>
+                            </span>
                           </div>
-                        </motion.div>
-                        <div className="flex flex-col mobile-spacing">
-                          <AnimatePresence initial={false}>
-                            {tasksByPriority.urgent.map(t => <TaskRow key={t.id} t={t} />)}
-                          </AnimatePresence>
                         </div>
-                      </motion.div>
+                        <div className="flex flex-col mobile-spacing">
+                          
+                            {tasksByPriority.urgent.map(t => <TaskRow key={t.id} t={t} />)}
+                          
+                        </div>
+                      </div>
                     )}
 
                     {/* Section À faire prochainement */}
                     {tasksByPriority.normal.length > 0 && (
-                      <motion.div
+                      <div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 }}
                         className="space-y-5"
                       >
-                        <motion.div
+                        <div
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: 0.1 }}
@@ -3894,32 +3896,32 @@ export default function App() {
                           </div>
                           <div className="flex items-center mobile-spacing text-orange-400 font-bold text-responsive-xl">
                             À faire prochainement
-                            <motion.span
+                            <span
                               initial={{ scale: 0 }}
                               animate={{ scale: 1 }}
                               transition={{ type: "spring", bounce: 0.5, delay: 0.1 }}
                               className="text-responsive-xs bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg"
                             >
                               {tasksByPriority.normal.length}
-                            </motion.span>
+                            </span>
                           </div>
-                        </motion.div>
-                        <div className="flex flex-col mobile-spacing">
-                          <AnimatePresence initial={false}>
-                            {tasksByPriority.normal.map(t => <TaskRow key={t.id} t={t} />)}
-                          </AnimatePresence>
                         </div>
-                      </motion.div>
+                        <div className="flex flex-col mobile-spacing">
+                          
+                            {tasksByPriority.normal.map(t => <TaskRow key={t.id} t={t} />)}
+                          
+                        </div>
+                      </div>
                     )}
 
                   </div>
                 )}
-              </motion.div>
-            </motion.div>
+              </div>
+            </div>
           )}
 
           {activeTab === "notes" && (
-            <motion.div
+            <div
               key="notes"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -3939,14 +3941,14 @@ export default function App() {
 
               {/* Desktop Header - Style horizontal harmonisé */}
               <div className="hidden md:block">
-                <motion.div
+                <div
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, ease: "easeOut" }}
                   className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20"
                 >
                   <div className="flex items-center justify-between">
-                    <motion.div
+                    <div
                       initial={{ x: -30, opacity: 0 }}
                       animate={{ x: 0, opacity: 1 }}
                       transition={{ delay: 0.2 }}
@@ -3959,9 +3961,9 @@ export default function App() {
                         <h2 className="text-4xl font-bold text-white mb-2">Gestionnaire de Notes</h2>
                         <p className="text-xl text-gray-300">Organisez vos idées et pensées</p>
                       </div>
-                    </motion.div>
+                    </div>
 
-                    <motion.div
+                    <div
                       initial={{ x: 30, opacity: 0 }}
                       animate={{ x: 0, opacity: 1 }}
                       transition={{ delay: 0.3 }}
@@ -3971,16 +3973,16 @@ export default function App() {
                         <div className="text-sm text-gray-400">Notes totales</div>
                         <div className="text-3xl font-bold text-white">{notes.length}</div>
                       </div>
-                    </motion.div>
+                    </div>
                   </div>
-                </motion.div>
+                </div>
               </div>
 
               {/* Zone d'ajout de note - Mobile vs Desktop */}
 
               {/* Mobile - Version centrée et verticale */}
               <div className="md:hidden">
-                <motion.div
+                <div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
@@ -4010,25 +4012,25 @@ export default function App() {
                     <div className="flex gap-3">
                       {editingNote ? (
                         <>
-                          <motion.button
+                          <button
                             onClick={updateNote}
                             whileTap={{ scale: 0.95 }}
                             whileHover={{ scale: 1.05 }}
                             className="flex-1 min-h-[48px] sm:min-h-[44px] bg-gradient-to-r from-green-600 to-green-700 text-white rounded-2xl font-bold text-base sm:text-lg shadow-lg hover:shadow-xl transition-all duration-300"
                           >
                             Sauvegarder
-                          </motion.button>
-                          <motion.button
+                          </button>
+                          <button
                             onClick={cancelEdit}
                             whileTap={{ scale: 0.95 }}
                             whileHover={{ scale: 1.05 }}
                             className="min-h-[48px] sm:min-h-[44px] px-6 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-2xl font-bold text-base sm:text-lg shadow-lg hover:shadow-xl transition-all duration-300"
                           >
                             Annuler
-                          </motion.button>
+                          </button>
                         </>
                       ) : (
-                        <motion.button
+                        <button
                           onClick={addNote}
                           whileTap={{ scale: 0.95 }}
                           whileHover={{ scale: 1.05 }}
@@ -4036,16 +4038,16 @@ export default function App() {
                         >
                           <Plus className="w-5 h-5" />
                           Ajouter une note
-                        </motion.button>
+                        </button>
                       )}
                     </div>
                   </div>
-                </motion.div>
+                </div>
               </div>
 
               {/* Desktop - Version horizontale intégrée */}
               <div className="hidden md:block">
-                <motion.div
+                <div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
@@ -4063,25 +4065,25 @@ export default function App() {
                       <div className="flex gap-3">
                         {editingNote ? (
                           <>
-                            <motion.button
+                            <button
                               onClick={updateNote}
                               whileTap={{ scale: 0.98 }}
                               whileHover={{ scale: 1.02 }}
                               className="flex-1 min-h-[48px] sm:min-h-[44px] bg-gradient-to-r from-green-600 to-green-700 text-white rounded-2xl font-bold text-base sm:text-lg shadow-lg hover:shadow-xl transition-all duration-300"
                             >
                               Sauvegarder
-                            </motion.button>
-                            <motion.button
+                            </button>
+                            <button
                               onClick={cancelEdit}
                               whileTap={{ scale: 0.98 }}
                               whileHover={{ scale: 1.02 }}
                               className="min-h-[48px] sm:min-h-[44px] px-6 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-2xl font-bold text-base sm:text-lg shadow-lg hover:shadow-xl transition-all duration-300"
                             >
                               Annuler
-                            </motion.button>
+                            </button>
                           </>
                         ) : (
-                          <motion.button
+                          <button
                             onClick={addNote}
                             whileTap={{ scale: 0.98 }}
                             whileHover={{ scale: 1.02 }}
@@ -4089,7 +4091,7 @@ export default function App() {
                           >
                             <Plus className="w-5 h-5" />
                             Ajouter
-                          </motion.button>
+                          </button>
                         )}
                       </div>
                     </div>
@@ -4102,11 +4104,11 @@ export default function App() {
                       className="w-full h-32 sm:h-24 p-4 text-base sm:text-lg rounded-2xl border-0 bg-white/10 text-white placeholder:text-gray-300 font-medium focus:bg-white/15 focus:ring-2 focus:ring-red-500 transition-all duration-300 resize-none"
                     />
                   </div>
-                </motion.div>
+                </div>
               </div>
 
               {/* Barre de recherche harmonisée */}
-              <motion.div
+              <div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
@@ -4125,36 +4127,36 @@ export default function App() {
                     />
                   </div>
                 </div>
-              </motion.div>
+              </div>
 
               {/* Zone d'affichage des notes harmonisée */}
-              <motion.div
+              <div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.8 }}
                 className="glass-dark rounded-3xl p-6 min-h-96 neo-shadow border border-white/20"
               >
                 {filteredNotes.length === 0 ? (
-                  <motion.div
+                  <div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     className="text-center text-gray-300 py-16"
                   >
-                    <motion.div
+                    <div
                       animate={{ rotate: [0, 5, -5, 0] }}
                       transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                       className="text-responsive-4xl spacing-responsive-md"
                     >
                       📄
-                    </motion.div>
+                    </div>
                     <div className="text-responsive-2xl font-bold spacing-responsive-sm text-white">Aucune note</div>
                     <div className="text-responsive-lg text-gray-400">Commencez par créer votre première note</div>
-                  </motion.div>
+                  </div>
                 ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
-                  <AnimatePresence initial={false}>
+                  
                     {filteredNotes.map(note => (
-                      <motion.div 
+                      <div 
                         key={note.id}
                         layout 
                         initial={{ opacity: 0, y: 20, scale: 0.95 }} 
@@ -4196,18 +4198,18 @@ export default function App() {
                             )}
                           </div>
                         </div>
-                      </motion.div>
+                      </div>
                     ))}
-                  </AnimatePresence>
+                  
                   </div>
                 )}
-              </motion.div>
-            </motion.div>
+              </div>
+            </div>
           )}
 
         {/* Section des courses */}
         {activeTab === "shopping" && (
-          <motion.div
+          <div
             key="shopping"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -4219,42 +4221,42 @@ export default function App() {
 
             {/* Mobile Header - Style centralisé harmonisé */}
             <div className="md:hidden">
-              <motion.div
+              <div
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.2, type: "spring", bounce: 0.3 }}
                 className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 mx-auto max-w-sm"
               >
                 <div className="text-center space-y-4">
-                  <motion.div
+                  <div
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: 0.4 }}
                     className="inline-flex items-center justify-center p-4 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl shadow-xl mx-auto"
                   >
                     <ShoppingCart className="w-8 h-8 text-white" />
-                  </motion.div>
+                  </div>
 
                   <div className="space-y-2">
-                    <motion.h1
+                    <h1
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.5 }}
                       className="title-main font-black bg-gradient-to-r from-red-400 via-red-500 to-red-600 bg-clip-text text-transparent"
                     >
                       COURSES
-                    </motion.h1>
-                    <motion.p
+                    </h1>
+                    <p
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.6 }}
                       className="text-responsive-base text-gray-300 font-medium"
                     >
                       Gérez votre liste de courses
-                    </motion.p>
+                    </p>
                   </div>
 
-                  <motion.div
+                  <div
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: 0.7, type: "spring" }}
@@ -4264,21 +4266,21 @@ export default function App() {
                       <div className="text-responsive-xs text-gray-400 font-medium mb-1">Articles</div>
                       <div className="text-responsive-2xl font-bold text-white">{shoppingItems.length}</div>
                     </div>
-                  </motion.div>
+                  </div>
                 </div>
-              </motion.div>
+              </div>
             </div>
 
             {/* Desktop Header - Style horizontal harmonisé */}
             <div className="hidden md:block">
-              <motion.div
+              <div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
                 className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20"
               >
                 <div className="flex items-center justify-between">
-                  <motion.div
+                  <div
                     initial={{ x: -30, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: 0.2 }}
@@ -4291,9 +4293,9 @@ export default function App() {
                       <h2 className="text-4xl font-bold text-white mb-2">Liste de Courses</h2>
                       <p className="text-xl text-gray-300">Gérez votre liste de courses</p>
                     </div>
-                  </motion.div>
+                  </div>
 
-                  <motion.div
+                  <div
                     initial={{ x: 30, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: 0.3 }}
@@ -4303,9 +4305,9 @@ export default function App() {
                       <div className="text-sm text-gray-400">Articles totaux</div>
                       <div className="text-3xl font-bold text-white">{shoppingItems.length}</div>
                     </div>
-                  </motion.div>
+                  </div>
                 </div>
-              </motion.div>
+              </div>
             </div>
 
             {/* Zone d'ajout d'article */}
@@ -4398,9 +4400,9 @@ export default function App() {
                         Courses courantes
                       </h3>
                       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
-                        <AnimatePresence initial={false}>
+                        
                           {filteredShoppingItems.filter(item => item.category === 'courant').map(item => (
-                            <motion.div 
+                            <div 
                               key={item.id}
                               layout 
                               initial={{ opacity: 0, y: 20, scale: 0.95 }} 
@@ -4435,9 +4437,9 @@ export default function App() {
                                   ✏️
                                 </Button>
                               </div>
-                            </motion.div>
+                            </div>
                           ))}
-                        </AnimatePresence>
+                        
                       </div>
                     </div>
                   )}
@@ -4450,9 +4452,9 @@ export default function App() {
                         Achats futurs
                       </h3>
                       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
-                        <AnimatePresence initial={false}>
+                        
                           {filteredShoppingItems.filter(item => item.category === 'futur').map(item => (
-                            <motion.div 
+                            <div 
                               key={item.id}
                               layout 
                               initial={{ opacity: 0, y: 20, scale: 0.95 }} 
@@ -4487,21 +4489,21 @@ export default function App() {
                                   ✏️
                                 </Button>
                               </div>
-                            </motion.div>
+                            </div>
                           ))}
-                        </AnimatePresence>
+                        
                       </div>
                     </div>
                   )}
                 </div>
               )}
             </div>
-          </motion.div>
+          </div>
         )}
 
         {/* Onglet Budget */}
         {activeTab === "budget" && (
-          <motion.div
+          <div
             key="budget"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -4513,55 +4515,55 @@ export default function App() {
 
             {/* Mobile Header - Style centralisé harmonisé */}
             <div className="md:hidden">
-              <motion.div
+              <div
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.2, type: "spring", bounce: 0.3 }}
                 className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 mx-auto max-w-sm"
               >
                 <div className="text-center space-y-4">
-                  <motion.div
+                  <div
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: 0.4 }}
                     className="inline-flex items-center justify-center p-4 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl shadow-xl mx-auto"
                   >
                     <Wallet className="w-8 h-8 text-white" />
-                  </motion.div>
+                  </div>
 
                   <div className="space-y-2">
-                    <motion.h1
+                    <h1
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.5 }}
                       className="title-main font-black bg-gradient-to-r from-red-400 via-red-500 to-red-600 bg-clip-text text-transparent"
                     >
                       BUDGET
-                    </motion.h1>
-                    <motion.p
+                    </h1>
+                    <p
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.6 }}
                       className="text-responsive-base text-gray-300 font-medium"
                     >
                       Gérez vos finances personnelles
-                    </motion.p>
+                    </p>
                   </div>
 
                 </div>
-              </motion.div>
+              </div>
             </div>
 
             {/* Desktop Header - Style horizontal harmonisé */}
             <div className="hidden md:block">
-              <motion.div
+              <div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
                 className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20"
               >
                 <div className="flex items-center justify-between">
-                  <motion.div
+                  <div
                     initial={{ x: -30, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: 0.2 }}
@@ -4574,13 +4576,13 @@ export default function App() {
                       <h2 className="text-4xl font-bold text-white mb-2">Gestion du Budget</h2>
                       <p className="text-xl text-gray-300">Gérez vos finances personnelles</p>
                     </div>
-                  </motion.div>
+                  </div>
 
                 </div>
-              </motion.div>
+              </div>
             </div>
 
-            <motion.div
+            <div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
@@ -4601,7 +4603,7 @@ export default function App() {
               
               {/* Interface Paramètres */}
               {showSettings && (
-                <motion.div
+                <div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
@@ -4964,13 +4966,13 @@ export default function App() {
                       </div>
                     </div>
                   )}
-                </motion.div>
+                </div>
               )}
               
               <div className="space-y-4">
                 {/* Ligne supérieure - Montant, Type, Catégorie, Date avec animations */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  <motion.div whileFocus={{ scale: 1.02 }}>
+                  <div whileFocus={{ scale: 1.02 }}>
                     <Input 
                       type="number"
                       placeholder="Montant (CHF)..." 
@@ -4978,9 +4980,9 @@ export default function App() {
                       onChange={(e) => setBudgetAmount(e.target.value)}
                       className="bg-gray-700/80 backdrop-blur-sm border-gray-600 text-white placeholder-gray-400 text-lg h-12 focus:border-red-500 focus:ring-red-500 transition-all duration-300 hover:bg-gray-700"
                     />
-                  </motion.div>
+                  </div>
                   
-                  <motion.div whileFocus={{ scale: 1.02 }}>
+                  <div whileFocus={{ scale: 1.02 }}>
                     <select 
                       value={budgetType} 
                       onChange={(e) => handleBudgetTypeChange(e.target.value)}
@@ -4992,9 +4994,9 @@ export default function App() {
                       <option value="epargne">Épargne</option>
                       <option value="investissements">Investissements</option>
                     </select>
-                  </motion.div>
+                  </div>
                   
-                  <motion.div whileFocus={{ scale: 1.02 }}>
+                  <div whileFocus={{ scale: 1.02 }}>
                     <select 
                       value={budgetCategory} 
                       onChange={(e) => setBudgetCategory(e.target.value)}
@@ -5004,30 +5006,30 @@ export default function App() {
                         <option key={key} value={key}>{label}</option>
                       ))}
                     </select>
-                  </motion.div>
+                  </div>
                   
-                  <motion.div whileFocus={{ scale: 1.02 }}>
+                  <div whileFocus={{ scale: 1.02 }}>
                     <Input 
                       type="date"
                       value={budgetDate} 
                       onChange={(e) => setBudgetDate(e.target.value)}
                       className="bg-gray-700/80 backdrop-blur-sm border-gray-600 text-white placeholder-gray-400 text-lg h-12 focus:border-red-500 focus:ring-red-500 transition-all duration-300 hover:bg-gray-700"
                     />
-                  </motion.div>
+                  </div>
                 </div>
                 
                 {/* Ligne inférieure - Description + Bouton avec animations */}
                 <div className="flex gap-4">
-                  <motion.div whileFocus={{ scale: 1.01 }} className="flex-1">
+                  <div whileFocus={{ scale: 1.01 }} className="flex-1">
                     <Input 
                       placeholder="Description (optionnelle)..." 
                       value={budgetDescription} 
                       onChange={(e) => setBudgetDescription(e.target.value)}
                       className="bg-gray-700/80 backdrop-blur-sm border-gray-600 text-white placeholder-gray-400 text-lg h-12 focus:border-red-500 focus:ring-red-500 transition-all duration-300 hover:bg-gray-700"
                     />
-                  </motion.div>
+                  </div>
                   
-                  <motion.div
+                  <div
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
@@ -5038,11 +5040,11 @@ export default function App() {
                       <Plus className="w-5 h-5 mr-2" />
                       {editingBudgetItem ? "Modifier" : "Ajouter"}
                     </Button>
-                  </motion.div>
+                  </div>
                 </div>
                 
                 {editingBudgetItem && (
-                  <motion.div
+                  <div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     whileHover={{ scale: 1.02 }}
@@ -5055,16 +5057,16 @@ export default function App() {
                     >
                       Annuler
                     </Button>
-                  </motion.div>
+                  </div>
                 )}
               </div>
-            </motion.div>
+            </div>
 
             {/* Jauges de progression des budgets définis */}
             {(Object.values(budgetLimits.categories).some(limit => limit > 0) || 
               Object.values(budgetLimits.epargne).some(limit => limit > 0) || 
               Object.values(budgetLimits.investissements).some(limit => limit > 0)) && (
-              <motion.div 
+              <div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50 shadow-xl mb-6"
@@ -5327,12 +5329,12 @@ export default function App() {
                     </div>
                   )}
                 </div>
-              </motion.div>
+              </div>
             )}
 
             {/* Cartes colorées résumé */}
             <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
-              <motion.div 
+              <div 
                 whileHover={{ scale: 1.05, y: -5 }}
                 className="relative overflow-hidden bg-gradient-to-br from-green-500/20 to-emerald-600/20 rounded-xl p-4 border border-green-500/30 backdrop-blur-sm group cursor-pointer min-h-[100px]"
               >
@@ -5354,9 +5356,9 @@ export default function App() {
                     <span className="text-gray-300 text-base ml-1">CHF</span>
                   </div>
                 </div>
-              </motion.div>
+              </div>
 
-              <motion.div 
+              <div 
                 whileHover={{ scale: 1.05, y: -5 }}
                 className="relative overflow-hidden bg-gradient-to-br from-red-500/20 to-red-600/20 rounded-xl p-4 border border-red-500/30 backdrop-blur-sm group cursor-pointer min-h-[100px]"
               >
@@ -5378,9 +5380,9 @@ export default function App() {
                     <span className="text-gray-300 text-base ml-1">CHF</span>
                   </div>
                 </div>
-              </motion.div>
+              </div>
 
-              <motion.div 
+              <div 
                 whileHover={{ scale: 1.05, y: -5 }}
                 className="relative overflow-hidden bg-gradient-to-br from-orange-500/20 to-orange-600/20 rounded-xl p-4 border border-orange-500/30 backdrop-blur-sm group cursor-pointer min-h-[100px]"
               >
@@ -5402,9 +5404,9 @@ export default function App() {
                     <span className="text-gray-300 text-base ml-1">CHF</span>
                   </div>
                 </div>
-              </motion.div>
+              </div>
 
-              <motion.div 
+              <div 
                 whileHover={{ scale: 1.05, y: -5 }}
                 className="relative overflow-hidden bg-gradient-to-br from-blue-500/20 to-blue-600/20 rounded-xl p-4 border border-blue-500/30 backdrop-blur-sm group cursor-pointer min-h-[100px]"
               >
@@ -5426,9 +5428,9 @@ export default function App() {
                     <span className="text-gray-300 text-base ml-1">CHF</span>
                   </div>
                 </div>
-              </motion.div>
+              </div>
 
-              <motion.div
+              <div
                 whileHover={{ scale: 1.05, y: -5 }}
                 className="relative overflow-hidden bg-gradient-to-br from-red-500/20 to-red-600/20 rounded-xl p-4 border border-red-500/30 backdrop-blur-sm group cursor-pointer min-h-[100px]"
               >
@@ -5450,9 +5452,9 @@ export default function App() {
                     <span className="text-gray-300 text-base ml-1">CHF</span>
                   </div>
                 </div>
-              </motion.div>
+              </div>
 
-              <motion.div
+              <div
                 whileHover={{ scale: 1.05, y: -5 }}
                 className={`relative overflow-hidden rounded-xl p-4 backdrop-blur-sm group cursor-pointer border min-h-[100px] ${
                   (() => {
@@ -5526,13 +5528,13 @@ export default function App() {
                     })()}
                   </div>
                 </div>
-              </motion.div>
+              </div>
 
             </div>
 
             {/* Liste des opérations */}
             {budgetItems.length > 0 && (
-              <motion.div 
+              <div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 border border-gray-700/50 shadow-2xl"
@@ -5540,7 +5542,7 @@ export default function App() {
                 <h3 className="text-lg font-semibold text-white mb-4">Opérations récentes</h3>
                 
                 <div className="flex flex-col gap-4">
-                  <AnimatePresence initial={false}>
+                  
                     {budgetItems
                       .filter(item => {
                         const itemDate = new Date(item.date);
@@ -5550,7 +5552,7 @@ export default function App() {
                       })
                       .sort((a, b) => new Date(b.date) - new Date(a.date))
                       .map(item => (
-                        <motion.div 
+                        <div 
                           key={item.id}
                           layout 
                           initial={{ opacity: 0, y: 20, scale: 0.95 }} 
@@ -5610,12 +5612,12 @@ export default function App() {
                               </Button>
                             </div>
                           </div>
-                        </motion.div>
+                        </div>
                       ))}
-                  </AnimatePresence>
+                  
                 </div>
 
-              </motion.div>
+              </div>
             )}
 
             {budgetItems.length === 0 && (
@@ -5624,12 +5626,12 @@ export default function App() {
                 <p className="text-gray-400 text-lg">Aucune opération enregistrée.</p>
               </div>
             )}
-          </motion.div>
+          </div>
         )}
 
         {/* Section des médias */}
         {activeTab === "media" && (
-          <motion.div
+          <div
             key="media"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -5641,42 +5643,42 @@ export default function App() {
 
             {/* Mobile Header - Style centralisé harmonisé */}
             <div className="md:hidden">
-              <motion.div
+              <div
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.2, type: "spring", bounce: 0.3 }}
                 className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 mx-auto max-w-sm"
               >
                 <div className="text-center space-y-4">
-                  <motion.div
+                  <div
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: 0.4 }}
                     className="inline-flex items-center justify-center p-4 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl shadow-xl mx-auto"
                   >
                     <Play className="w-8 h-8 text-white" />
-                  </motion.div>
+                  </div>
 
                   <div className="space-y-2">
-                    <motion.h1
+                    <h1
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.5 }}
                       className="title-main font-black bg-gradient-to-r from-red-400 via-red-500 to-red-600 bg-clip-text text-transparent"
                     >
                       MEDIA
-                    </motion.h1>
-                    <motion.p
+                    </h1>
+                    <p
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.6 }}
                       className="text-responsive-base text-gray-300 font-medium"
                     >
                       Suivez vos films et séries
-                    </motion.p>
+                    </p>
                   </div>
 
-                  <motion.div
+                  <div
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: 0.7, type: "spring" }}
@@ -5686,21 +5688,21 @@ export default function App() {
                       <div className="text-responsive-xs text-gray-400 font-medium mb-1">Médias</div>
                       <div className="text-responsive-2xl font-bold text-white">{mediaItems.length}</div>
                     </div>
-                  </motion.div>
+                  </div>
                 </div>
-              </motion.div>
+              </div>
             </div>
 
             {/* Desktop Header - Style horizontal harmonisé */}
             <div className="hidden md:block">
-              <motion.div
+              <div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
                 className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20"
               >
                 <div className="flex items-center justify-between">
-                  <motion.div
+                  <div
                     initial={{ x: -30, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: 0.2 }}
@@ -5713,9 +5715,9 @@ export default function App() {
                       <h2 className="text-4xl font-bold text-white mb-2">Gestionnaire de Médias</h2>
                       <p className="text-xl text-gray-300">Suivez vos films et séries</p>
                     </div>
-                  </motion.div>
+                  </div>
 
-                  <motion.div
+                  <div
                     initial={{ x: 30, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: 0.3 }}
@@ -5725,13 +5727,13 @@ export default function App() {
                       <div className="text-sm text-gray-400">Médias totaux</div>
                       <div className="text-3xl font-bold text-white">{mediaItems.length}</div>
                     </div>
-                  </motion.div>
+                  </div>
                 </div>
-              </motion.div>
+              </div>
             </div>
 
             {/* Zone d'ajout de média harmonisée */}
-            <motion.div
+            <div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
@@ -5868,7 +5870,7 @@ export default function App() {
                 <Plus className="w-5 h-5 mr-2" />
                 {editingMedia ? "Modifier" : "Ajouter"} {MEDIA_TYPES[mediaType]}
               </Button>
-            </motion.div>
+            </div>
 
             {/* Filtres */}
             <div className="bg-gray-800 rounded-xl p-4">
@@ -5922,9 +5924,9 @@ export default function App() {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
-                  <AnimatePresence initial={false}>
+                  
                     {filteredMedia.map(media => (
-                      <motion.div
+                      <div
                         key={media.id}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -6042,20 +6044,20 @@ export default function App() {
                             </div>
                           </div>
                         </div>
-                      </motion.div>
+                      </div>
                     ))}
-                  </AnimatePresence>
+                  
                 </div>
               )}
             </div>
-          </motion.div>
+          </div>
         )}
-        </AnimatePresence>
+        
 
         {/* Navigation Mobile Responsive - Style natif */}
         <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-gray-900/95 backdrop-blur-md border-t border-gray-700/50 safe-area-inset bottom-nav-optimized pwa-navigation">
           <div className="flex items-center justify-around container-safe max-w-lg mx-auto mobile-compact">
-            <motion.button
+            <button
               onClick={() => setActiveTab("dashboard")}
               className={`nav-mobile flex flex-col items-center justify-center rounded-xl transition-all duration-300 touch-target ios-touch-optimized ${
                 activeTab === "dashboard"
@@ -6067,9 +6069,9 @@ export default function App() {
             >
               <BarChart3 className={`bottom-nav-icon mb-1 ${activeTab === "dashboard" ? "text-red-400" : ""}`} />
               <span className="bottom-nav-text">Stats</span>
-            </motion.button>
+            </button>
 
-            <motion.button
+            <button
               onClick={() => setActiveTab("tasks")}
               className={`nav-mobile flex flex-col items-center justify-center rounded-xl transition-all duration-300 touch-target ios-touch-optimized ${
                 activeTab === "tasks"
@@ -6081,9 +6083,9 @@ export default function App() {
             >
               <List className={`bottom-nav-icon mb-1 ${activeTab === "tasks" ? "text-red-400" : ""}`} />
               <span className="bottom-nav-text">Tâches</span>
-            </motion.button>
+            </button>
 
-            <motion.button
+            <button
               onClick={() => setActiveTab("notes")}
               className={`nav-mobile flex flex-col items-center justify-center rounded-xl transition-all duration-300 touch-target ios-touch-optimized ${
                 activeTab === "notes"
@@ -6095,9 +6097,9 @@ export default function App() {
             >
               <FileText className={`bottom-nav-icon mb-1 ${activeTab === "notes" ? "text-red-400" : ""}`} />
               <span className="bottom-nav-text">Notes</span>
-            </motion.button>
+            </button>
 
-            <motion.button
+            <button
               onClick={() => setActiveTab("shopping")}
               className={`nav-mobile flex flex-col items-center justify-center rounded-xl transition-all duration-300 touch-target ios-touch-optimized ${
                 activeTab === "shopping"
@@ -6109,9 +6111,9 @@ export default function App() {
             >
               <ShoppingCart className={`bottom-nav-icon mb-1 ${activeTab === "shopping" ? "text-red-400" : ""}`} />
               <span className="bottom-nav-text">Courses</span>
-            </motion.button>
+            </button>
 
-            <motion.button
+            <button
               onClick={() => setActiveTab("budget")}
               className={`nav-mobile flex flex-col items-center justify-center rounded-xl transition-all duration-300 touch-target ios-touch-optimized ${
                 activeTab === "budget"
@@ -6123,9 +6125,9 @@ export default function App() {
             >
               <Wallet className={`bottom-nav-icon mb-1 ${activeTab === "budget" ? "text-red-400" : ""}`} />
               <span className="bottom-nav-text">Budget</span>
-            </motion.button>
+            </button>
 
-            <motion.button
+            <button
               onClick={() => setActiveTab("media")}
               className={`nav-mobile flex flex-col items-center justify-center rounded-xl transition-all duration-300 touch-target ios-touch-optimized ${
                 activeTab === "media"
@@ -6137,7 +6139,7 @@ export default function App() {
             >
               <Play className={`bottom-nav-icon mb-1 ${activeTab === "media" ? "text-red-400" : ""}`} />
               <span className="bottom-nav-text">Médias</span>
-            </motion.button>
+            </button>
           </div>
         </div>
 
@@ -6160,7 +6162,7 @@ export default function App() {
 
       {/* Menu priorité fixed - affiché au-dessus de tous les éléments */}
       {showPriorityMenu && (
-        <motion.div
+        <div
           initial={{ opacity: 0, y: -20, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -20, scale: 0.9 }}
@@ -6173,7 +6175,7 @@ export default function App() {
             width: menuPosition.width
           }}
         >
-          <motion.div
+          <div
             className="py-4 px-5 hover:bg-red-600/30 cursor-pointer text-white text-lg font-semibold transition-all duration-200 hover:scale-105 active:scale-95"
             whileTap={{ scale: 0.98 }}
             onClick={() => { setPriorityChoice("urgent"); setShowPriorityMenu(false); }}
@@ -6182,8 +6184,8 @@ export default function App() {
               <div className="w-4 h-4 bg-red-500 rounded-full shadow-lg"></div>
               <span>{PRIORITY_LABELS["urgent"]}</span>
             </div>
-          </motion.div>
-          <motion.div
+          </div>
+          <div
             className="py-4 px-5 hover:bg-orange-600/30 cursor-pointer text-white text-lg font-semibold transition-all duration-200 hover:scale-105 active:scale-95"
             whileTap={{ scale: 0.98 }}
             onClick={() => { setPriorityChoice("normal"); setShowPriorityMenu(false); }}
@@ -6192,8 +6194,8 @@ export default function App() {
               <div className="w-4 h-4 bg-orange-500 rounded-full shadow-lg"></div>
               <span>{PRIORITY_LABELS["normal"]}</span>
             </div>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       )}
     </div>
   );
