@@ -2272,7 +2272,11 @@ export default function App() {
                             <XAxis
                               dataKey="name"
                               stroke="#9ca3af"
-                              style={{ fontSize: window.innerWidth < 768 ? '11px' : '12px' }}
+                              style={{ fontSize: window.innerWidth < 768 ? '10px' : '12px' }}
+                              angle={window.innerWidth < 768 ? -45 : 0}
+                              textAnchor={window.innerWidth < 768 ? 'end' : 'middle'}
+                              height={window.innerWidth < 768 ? 60 : 30}
+                              interval={0}
                             />
                             <YAxis
                               stroke="#9ca3af"
@@ -2511,6 +2515,10 @@ export default function App() {
                                   dataKey="name"
                                   stroke="#9ca3af"
                                   style={{ fontSize: window.innerWidth < 768 ? '10px' : '12px' }}
+                                  angle={window.innerWidth < 768 ? -45 : 0}
+                                  textAnchor={window.innerWidth < 768 ? 'end' : 'middle'}
+                                  height={window.innerWidth < 768 ? 60 : 30}
+                                  interval={0}
                                 />
                                 <YAxis
                                   stroke="#9ca3af"
@@ -2541,6 +2549,10 @@ export default function App() {
                                   dataKey="name"
                                   stroke="#9ca3af"
                                   style={{ fontSize: window.innerWidth < 768 ? '10px' : '12px' }}
+                                  angle={window.innerWidth < 768 ? -45 : 0}
+                                  textAnchor={window.innerWidth < 768 ? 'end' : 'middle'}
+                                  height={window.innerWidth < 768 ? 60 : 30}
+                                  interval={0}
                                 />
                                 <YAxis
                                   stroke="#9ca3af"
