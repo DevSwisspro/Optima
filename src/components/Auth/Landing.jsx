@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { LogIn, UserPlus, Sparkles, TrendingUp, Shield, Zap } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { LogIn, UserPlus } from 'lucide-react';
 import LogoDevSwiss from '@/components/LogoDevSwiss';
 
 export default function Landing({ onNavigate }) {
@@ -10,19 +9,12 @@ export default function Landing({ onNavigate }) {
     setIsVisible(true);
   }, []);
 
-  const features = [
-    { icon: TrendingUp, text: 'Gestion budgétaire intelligente', color: 'text-red-400' },
-    { icon: Shield, text: 'Données 100% sécurisées', color: 'text-blue-400' },
-    { icon: Zap, text: 'Interface ultra-rapide', color: 'text-yellow-400' },
-  ];
-
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-gray-950 via-gray-900 to-black">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-red-600/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl animate-pulse delay-1000" />
-        <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl animate-pulse delay-2000" />
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-red-600/8 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gray-600/5 rounded-full blur-3xl animate-pulse delay-1000" />
       </div>
 
       {/* Content */}
@@ -33,47 +25,20 @@ export default function Landing({ onNavigate }) {
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10'
           }`}
         >
-          {/* Logo animé */}
-          <div className="flex justify-center mb-6 sm:mb-8">
-            <div className="relative group">
-              <div className="absolute inset-0 bg-gradient-to-r from-red-600 to-purple-600 rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity duration-500" />
-              <div className="relative bg-gradient-to-br from-gray-900 to-gray-800 p-4 sm:p-6 rounded-3xl border border-gray-700/50 shadow-2xl">
-                <LogoDevSwiss className="w-16 h-16 sm:w-20 sm:h-20 text-white" showText={false} />
-              </div>
-            </div>
+          {/* Logo */}
+          <div className="flex justify-center mb-3">
+            <LogoDevSwiss className="w-36 h-36 sm:w-44 sm:h-44 lg:w-48 lg:h-48 text-white drop-shadow-2xl" showText={false} />
           </div>
 
           {/* Titre */}
-          <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black text-white mb-3 sm:mb-4 tracking-tight">
-            <span className="bg-gradient-to-r from-white via-gray-200 to-white bg-clip-text text-transparent">
-              Optima
-            </span>
+          <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black mb-3 sm:mb-4 tracking-tight">
+            <span className="text-red-600">Optima</span>
           </h1>
 
           {/* Sous-titre */}
           <p className="text-lg sm:text-xl lg:text-2xl text-gray-400 max-w-2xl mx-auto font-light">
-            Votre assistant personnel pour{' '}
-            <span className="text-red-400 font-semibold">gérer</span>,{' '}
-            <span className="text-blue-400 font-semibold">optimiser</span> et{' '}
-            <span className="text-purple-400 font-semibold">réussir</span>
+            Votre outil personnel pour gérer, optimiser et contrôler vos finances.
           </p>
-        </div>
-
-        {/* Features pills */}
-        <div
-          className={`flex flex-wrap justify-center gap-3 sm:gap-4 mb-10 sm:mb-16 max-w-3xl transition-all duration-1000 delay-200 transform ${
-            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-          }`}
-        >
-          {features.map((feature, index) => (
-            <div
-              key={index}
-              className="flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-full hover:border-gray-600/50 transition-all duration-300 hover:scale-105"
-            >
-              <feature.icon className={`w-4 h-4 sm:w-5 sm:h-5 ${feature.color}`} />
-              <span className="text-xs sm:text-sm text-gray-300 font-medium">{feature.text}</span>
-            </div>
-          ))}
         </div>
 
         {/* Boutons d'action */}
@@ -118,40 +83,20 @@ export default function Landing({ onNavigate }) {
           </p>
         </div>
 
-        {/* Badge "Nouveau" */}
-        <div
-          className={`mt-12 sm:mt-16 transition-all duration-1000 delay-600 transform ${
-            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-          }`}
-        >
-          <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600/20 to-pink-600/20 backdrop-blur-xl border border-purple-500/30 rounded-full">
-            <Sparkles className="w-4 h-4 text-purple-400" />
-            <span className="text-sm text-purple-300 font-medium">
-              Nouvelle fonctionnalité : Suivi des médias
-            </span>
-          </div>
-        </div>
-
         {/* Footer */}
         <div className="mt-12 sm:mt-20 text-center">
-          <div className="flex items-center justify-center gap-2 text-gray-600 text-xs sm:text-sm">
-            <span>Propulsé par</span>
-            <LogoDevSwiss className="w-12 h-12 sm:w-14 sm:h-14 text-gray-600" showText={false} />
-            <span className="font-semibold">Dev-Swiss</span>
+          <div className="flex items-center justify-center gap-2.5 text-gray-600 text-xs sm:text-sm">
+            <span>Créé par</span>
+            <LogoDevSwiss className="w-8 h-8 text-white/60" showText={false} />
+            <span className="font-semibold text-gray-500">Dev-Swiss</span>
           </div>
           <p className="text-gray-700 text-xs mt-2">© 2025 Optima. Tous droits réservés.</p>
         </div>
       </div>
 
-      {/* Glow effects on hover */}
+      {/* Animation delays */}
       <style jsx>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-20px); }
-        }
-
         .delay-1000 { animation-delay: 1s; }
-        .delay-2000 { animation-delay: 2s; }
       `}</style>
     </div>
   );

@@ -63,13 +63,8 @@ export default function Login({ onToggleView, onSuccess, onBack }) {
 
           {/* Logo/Header */}
           <div className={`text-center mb-8 sm:mb-10 transition-all duration-700 delay-100 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10'}`}>
-            <div className="flex justify-center mb-6">
-              <div className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-r from-red-600 to-purple-600 rounded-2xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity" />
-                <div className="relative bg-gradient-to-br from-gray-900 to-gray-800 p-4 rounded-2xl border border-gray-700/50">
-                  <LogoDevSwiss className="w-12 h-12 sm:w-14 sm:h-14 text-white" showText={false} />
-                </div>
-              </div>
+            <div className="flex justify-center mb-3">
+              <LogoDevSwiss className="w-24 h-24 sm:w-28 sm:h-28 text-white drop-shadow-2xl" showText={false} />
             </div>
             <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">Bon retour !</h1>
             <p className="text-gray-400 text-sm sm:text-base">Connectez-vous à votre compte Optima</p>
@@ -176,10 +171,10 @@ export default function Login({ onToggleView, onSuccess, onBack }) {
 
           {/* Footer */}
           <div className={`mt-8 sm:mt-12 text-center transition-all duration-700 delay-300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
-            <div className="flex items-center justify-center gap-2 text-gray-600 text-xs sm:text-sm mb-2">
-              <span>Propulsé par</span>
-              <LogoDevSwiss className="w-10 h-10 text-gray-600" showText={false} />
-              <span className="font-semibold">Dev-Swiss</span>
+            <div className="flex items-center justify-center gap-2.5 text-gray-600 text-xs sm:text-sm mb-2">
+              <span>Créé par</span>
+              <LogoDevSwiss className="w-8 h-8 text-white/60" showText={false} />
+              <span className="font-semibold text-gray-500">Dev-Swiss</span>
             </div>
             <p className="text-gray-700 text-xs">© 2025 Optima. Tous droits réservés.</p>
           </div>
