@@ -1,7 +1,8 @@
 // Service Worker pour Optima PWA
-const CACHE_NAME = 'optima-v1.0.0';
-const STATIC_CACHE = 'optima-static-v1';
-const DYNAMIC_CACHE = 'optima-dynamic-v1';
+// IMPORTANT: Incrémenter ces versions à chaque déploiement pour forcer la mise à jour
+const CACHE_NAME = 'optima-v2025-10-07T15-55-59';
+const STATIC_CACHE = 'optima-static-v2025-10-07T15-55-59';
+const DYNAMIC_CACHE = 'optima-dynamic-v2025-10-07T15-55-59';
 
 // Fichiers à mettre en cache immédiatement
 const STATIC_FILES = [
