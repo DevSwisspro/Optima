@@ -1,15 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Eye, EyeOff, Mail, Lock, LogIn } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, LogIn, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import LogoDevSwiss from '@/components/LogoDevSwiss';
 
-export default function Login({ onToggleView, onSuccess }) {
+export default function Login({ onToggleView, onSuccess, onBack }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    setIsVisible(true);
+  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -35,19 +41,42 @@ export default function Login({ onToggleView, onSuccess }) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-black p-4">
-      <div className="w-full max-w-md">
-        {/* Logo/Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-red-500 to-red-700 rounded-2xl mb-4 shadow-xl">
-            <span className="text-3xl font-bold text-white">O</span>
-          </div>
-          <h1 className="text-4xl font-bold text-white mb-2">Bienvenue</h1>
-          <p className="text-gray-400">Connectez-vous à votre compte Optima</p>
-        </div>
+    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-gray-950 via-gray-900 to-black">
+      {/* Animated background */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-red-600/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl animate-pulse delay-1000" />
+      </div>
 
-        {/* Formulaire de connexion */}
-        <div className="bg-gray-800/50 backdrop-blur-xl rounded-3xl p-8 border border-gray-700/50 shadow-2xl">
+      <div className={`relative z-10 min-h-screen flex items-center justify-center p-4 sm:p-6 transition-all duration-700 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
+        <div className="w-full max-w-md">
+          {/* Bouton retour */}
+          {onBack && (
+            <button
+              onClick={onBack}
+              className="mb-6 flex items-center gap-2 text-gray-400 hover:text-white transition-colors duration-200"
+            >
+              <ArrowLeft className="w-5 h-5" />
+              <span className="text-sm font-medium">Retour</span>
+            </button>
+          )}
+
+          {/* Logo/Header */}
+          <div className={`text-center mb-8 sm:mb-10 transition-all duration-700 delay-100 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10'}`}>
+            <div className="flex justify-center mb-6">
+              <div className="relative group">
+                <div className="absolute inset-0 bg-gradient-to-r from-red-600 to-purple-600 rounded-2xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity" />
+                <div className="relative bg-gradient-to-br from-gray-900 to-gray-800 p-4 rounded-2xl border border-gray-700/50">
+                  <LogoDevSwiss className="w-12 h-12 sm:w-14 sm:h-14 text-white" showText={false} />
+                </div>
+              </div>
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">Bon retour !</h1>
+            <p className="text-gray-400 text-sm sm:text-base">Connectez-vous à votre compte Optima</p>
+          </div>
+
+          {/* Formulaire de connexion */}
+          <div className={`bg-gray-800/30 backdrop-blur-2xl rounded-3xl p-6 sm:p-8 border border-gray-700/50 shadow-2xl transition-all duration-700 delay-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           {error && (
             <div className="mb-6 p-4 bg-red-500/10 border border-red-500/50 rounded-xl text-red-400 text-sm">
               {error}
@@ -99,28 +128,31 @@ export default function Login({ onToggleView, onSuccess }) {
             </div>
 
             {/* Bouton de connexion */}
-            <Button
+            <button
               type="submit"
               disabled={loading}
-              className="w-full h-12 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold rounded-xl shadow-lg transition-all duration-300"
+              className="group relative w-full"
             >
-              {loading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Connexion...
-                </span>
-              ) : (
-                <span className="flex items-center justify-center gap-2">
-                  <LogIn className="w-5 h-5" />
-                  Se connecter
-                </span>
-              )}
-            </Button>
+              <div className="absolute inset-0 bg-gradient-to-r from-red-600 to-red-700 rounded-xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity duration-300" />
+              <div className="relative flex items-center justify-center gap-3 px-6 py-3.5 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 rounded-xl shadow-xl transform transition-all duration-300 group-hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+                {loading ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <span className="text-base font-bold text-white">Connexion...</span>
+                  </>
+                ) : (
+                  <>
+                    <LogIn className="w-5 h-5 text-white" />
+                    <span className="text-base font-bold text-white">Se connecter</span>
+                  </>
+                )}
+              </div>
+            </button>
           </form>
 
           {/* Lien vers inscription */}
           <div className="mt-6 text-center">
-            <p className="text-gray-400">
+            <p className="text-gray-400 text-sm sm:text-base">
               Pas encore de compte ?{' '}
               <button
                 onClick={() => onToggleView('register')}
@@ -140,11 +172,17 @@ export default function Login({ onToggleView, onSuccess }) {
               Mot de passe oublié ?
             </button>
           </div>
-        </div>
+          </div>
 
-        {/* Footer */}
-        <div className="mt-8 text-center text-sm text-gray-500">
-          <p>© 2025 Optima. Tous droits réservés.</p>
+          {/* Footer */}
+          <div className={`mt-8 sm:mt-12 text-center transition-all duration-700 delay-300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
+            <div className="flex items-center justify-center gap-2 text-gray-600 text-xs sm:text-sm mb-2">
+              <span>Propulsé par</span>
+              <LogoDevSwiss className="w-10 h-10 text-gray-600" showText={false} />
+              <span className="font-semibold">Dev-Swiss</span>
+            </div>
+            <p className="text-gray-700 text-xs">© 2025 Optima. Tous droits réservés.</p>
+          </div>
         </div>
       </div>
     </div>
