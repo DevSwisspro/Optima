@@ -1,305 +1,312 @@
 -- =====================================================
--- OPTIMA - Schéma de base de données Supabase complet
+-- SCH�MA SQL POUR OPTIMA - � EX�CUTER DANS SUPABASE
+-- =====================================================
+-- Instructions :
+-- 1. Allez sur https://app.supabase.com
+-- 2. S�lectionnez votre projet
+-- 3. Allez dans "SQL Editor"
+-- 4. Cr�ez une nouvelle requ�te et collez ce code
+-- 5. Cliquez sur "Run" pour ex�cuter
 -- =====================================================
 
--- Enable RLS (Row Level Security) by default
-ALTER DEFAULT PRIVILEGES REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;
+-- Enable UUID extension if not already enabled
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- =====================================================
--- 1. TABLE TASKS (Tâches)
+-- TABLE: tasks (T�ches)
 -- =====================================================
-CREATE TABLE tasks (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
-    title TEXT NOT NULL,
-    priority TEXT CHECK (priority IN ('urgent', 'normal')) DEFAULT 'normal',
+CREATE TABLE IF NOT EXISTS public.tasks (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    text TEXT NOT NULL,
+    priority TEXT DEFAULT 'normal' CHECK (priority IN ('urgent', 'normal', 'low')),
     completed BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Index pour les performances
-CREATE INDEX tasks_user_id_idx ON tasks(user_id);
-CREATE INDEX tasks_priority_idx ON tasks(priority);
+-- Index pour am�liorer les performances
+CREATE INDEX IF NOT EXISTS idx_tasks_user_id ON public.tasks(user_id);
+CREATE INDEX IF NOT EXISTS idx_tasks_created_at ON public.tasks(created_at DESC);
+
+-- RLS (Row Level Security) pour tasks
+ALTER TABLE public.tasks ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view their own tasks"
+    ON public.tasks FOR SELECT
+    USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own tasks"
+    ON public.tasks FOR INSERT
+    WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own tasks"
+    ON public.tasks FOR UPDATE
+    USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own tasks"
+    ON public.tasks FOR DELETE
+    USING (auth.uid() = user_id);
 
 -- =====================================================
--- 2. TABLE NOTES (Notes)
+-- TABLE: notes (Notes)
 -- =====================================================
-CREATE TABLE notes (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
-    title TEXT DEFAULT 'Note sans titre',
+CREATE TABLE IF NOT EXISTS public.notes (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    title TEXT,
     content TEXT NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Index pour les performances
-CREATE INDEX notes_user_id_idx ON notes(user_id);
-CREATE INDEX notes_title_idx ON notes(title);
+-- Index pour am�liorer les performances
+CREATE INDEX IF NOT EXISTS idx_notes_user_id ON public.notes(user_id);
+CREATE INDEX IF NOT EXISTS idx_notes_created_at ON public.notes(created_at DESC);
+
+-- RLS pour notes
+ALTER TABLE public.notes ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view their own notes"
+    ON public.notes FOR SELECT
+    USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own notes"
+    ON public.notes FOR INSERT
+    WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own notes"
+    ON public.notes FOR UPDATE
+    USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own notes"
+    ON public.notes FOR DELETE
+    USING (auth.uid() = user_id);
 
 -- =====================================================
--- 3. TABLE SHOPPING_ITEMS (Courses)
+-- TABLE: shopping_items (Liste de courses)
 -- =====================================================
-CREATE TABLE shopping_items (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+CREATE TABLE IF NOT EXISTS public.shopping_items (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
     name TEXT NOT NULL,
-    quantity INTEGER DEFAULT 1,
-    unit TEXT DEFAULT 'p',
-    category TEXT CHECK (category IN ('courant', 'futur')) DEFAULT 'courant',
-    purchased BOOLEAN DEFAULT FALSE,
+    quantity NUMERIC DEFAULT 1,
+    unit TEXT DEFAULT 'pcs',
+    category TEXT DEFAULT 'now' CHECK (category IN ('now', 'later')),
+    checked BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Index pour les performances
-CREATE INDEX shopping_items_user_id_idx ON shopping_items(user_id);
-CREATE INDEX shopping_items_category_idx ON shopping_items(category);
+-- Index pour am�liorer les performances
+CREATE INDEX IF NOT EXISTS idx_shopping_items_user_id ON public.shopping_items(user_id);
+CREATE INDEX IF NOT EXISTS idx_shopping_items_category ON public.shopping_items(category);
+
+-- RLS pour shopping_items
+ALTER TABLE public.shopping_items ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view their own shopping items"
+    ON public.shopping_items FOR SELECT
+    USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own shopping items"
+    ON public.shopping_items FOR INSERT
+    WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own shopping items"
+    ON public.shopping_items FOR UPDATE
+    USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own shopping items"
+    ON public.shopping_items FOR DELETE
+    USING (auth.uid() = user_id);
 
 -- =====================================================
--- 4. TABLE BUDGET_ITEMS (Budget)
+-- TABLE: budget_items (Entr�es budg�taires)
 -- =====================================================
-CREATE TABLE budget_items (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+CREATE TABLE IF NOT EXISTS public.budget_items (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
     description TEXT NOT NULL,
-    amount DECIMAL(10,2) NOT NULL,
-    type TEXT CHECK (type IN ('revenus', 'depenses_fixes', 'depenses_variables', 'epargne', 'investissements')) NOT NULL,
-    category TEXT NOT NULL,
+    amount NUMERIC NOT NULL,
+    type TEXT NOT NULL CHECK (type IN ('revenus', 'depenses_fixes', 'depenses_variables', 'epargne', 'investissements')),
+    category TEXT,
     date DATE NOT NULL,
+    recurring BOOLEAN DEFAULT FALSE,
+    recurring_frequency TEXT CHECK (recurring_frequency IN ('daily', 'weekly', 'monthly', 'yearly') OR recurring_frequency IS NULL),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Index pour les performances
-CREATE INDEX budget_items_user_id_idx ON budget_items(user_id);
-CREATE INDEX budget_items_type_idx ON budget_items(type);
-CREATE INDEX budget_items_date_idx ON budget_items(date);
+-- Index pour am�liorer les performances
+CREATE INDEX IF NOT EXISTS idx_budget_items_user_id ON public.budget_items(user_id);
+CREATE INDEX IF NOT EXISTS idx_budget_items_date ON public.budget_items(date DESC);
+CREATE INDEX IF NOT EXISTS idx_budget_items_type ON public.budget_items(type);
+
+-- RLS pour budget_items
+ALTER TABLE public.budget_items ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view their own budget items"
+    ON public.budget_items FOR SELECT
+    USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own budget items"
+    ON public.budget_items FOR INSERT
+    WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own budget items"
+    ON public.budget_items FOR UPDATE
+    USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own budget items"
+    ON public.budget_items FOR DELETE
+    USING (auth.uid() = user_id);
 
 -- =====================================================
--- 5. TABLE MEDIA_ITEMS (Médias - Films/Séries/Animés)
+-- TABLE: media_items (Films, S�ries, Anim�s)
 -- =====================================================
-CREATE TABLE media_items (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+CREATE TABLE IF NOT EXISTS public.media_items (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
     title TEXT NOT NULL,
     original_title TEXT,
+    type TEXT NOT NULL CHECK (type IN ('movie', 'tv', 'anime')),
+    status TEXT NOT NULL CHECK (status IN ('watched', 'watching', 'towatch')),
+    rating INTEGER CHECK (rating >= 1 AND rating <= 10 OR rating IS NULL),
+    comment TEXT,
     overview TEXT,
     poster_path TEXT,
     release_date TEXT,
-    vote_average DECIMAL(3,1),
-    genres JSONB DEFAULT '[]',
-    type TEXT CHECK (type IN ('movie', 'tv', 'anime', 'documentary')) NOT NULL,
-    status TEXT CHECK (status IN ('watched', 'towatch', 'watching')) DEFAULT 'watched',
-    rating INTEGER CHECK (rating >= 1 AND rating <= 5),
-    comment TEXT,
-    date_added TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    date_watched TIMESTAMP WITH TIME ZONE,
+    vote_average NUMERIC,
+    genres TEXT[],
     api_id TEXT,
+    date_watched TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Index pour les performances
-CREATE INDEX media_items_user_id_idx ON media_items(user_id);
-CREATE INDEX media_items_type_idx ON media_items(type);
-CREATE INDEX media_items_status_idx ON media_items(status);
-CREATE INDEX media_items_rating_idx ON media_items(rating);
+-- Index pour am�liorer les performances
+CREATE INDEX IF NOT EXISTS idx_media_items_user_id ON public.media_items(user_id);
+CREATE INDEX IF NOT EXISTS idx_media_items_type ON public.media_items(type);
+CREATE INDEX IF NOT EXISTS idx_media_items_status ON public.media_items(status);
+CREATE INDEX IF NOT EXISTS idx_media_items_created_at ON public.media_items(created_at DESC);
+
+-- RLS pour media_items
+ALTER TABLE public.media_items ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view their own media items"
+    ON public.media_items FOR SELECT
+    USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own media items"
+    ON public.media_items FOR INSERT
+    WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own media items"
+    ON public.media_items FOR UPDATE
+    USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own media items"
+    ON public.media_items FOR DELETE
+    USING (auth.uid() = user_id);
 
 -- =====================================================
--- 6. TABLE USER_SETTINGS (Paramètres utilisateur)
+-- TABLE: user_settings (Param�tres utilisateur)
 -- =====================================================
-CREATE TABLE user_settings (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL UNIQUE,
-    recurring_expenses JSONB DEFAULT '[]',
-    budget_limits JSONB DEFAULT '{}',
-    preferences JSONB DEFAULT '{}',
+CREATE TABLE IF NOT EXISTS public.user_settings (
+    user_id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    budget_limits JSONB DEFAULT '{}'::jsonb,
+    preferences JSONB DEFAULT '{}'::jsonb,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Index pour les performances
-CREATE INDEX user_settings_user_id_idx ON user_settings(user_id);
+-- RLS pour user_settings
+ALTER TABLE public.user_settings ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view their own settings"
+    ON public.user_settings FOR SELECT
+    USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own settings"
+    ON public.user_settings FOR INSERT
+    WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own settings"
+    ON public.user_settings FOR UPDATE
+    USING (auth.uid() = user_id);
 
 -- =====================================================
--- FONCTIONS DE MISE À JOUR AUTOMATIQUE (updated_at)
+-- FONCTIONS TRIGGER pour updated_at automatique
 -- =====================================================
-CREATE OR REPLACE FUNCTION update_updated_at_column()
+CREATE OR REPLACE FUNCTION public.handle_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
     NEW.updated_at = NOW();
     RETURN NEW;
 END;
-$$ language 'plpgsql';
+$$ LANGUAGE plpgsql;
 
--- Triggers pour mettre à jour updated_at automatiquement
-CREATE TRIGGER update_tasks_updated_at BEFORE UPDATE ON tasks
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+-- Appliquer les triggers sur toutes les tables
+CREATE TRIGGER set_tasks_updated_at
+    BEFORE UPDATE ON public.tasks
+    FOR EACH ROW
+    EXECUTE FUNCTION public.handle_updated_at();
 
-CREATE TRIGGER update_notes_updated_at BEFORE UPDATE ON notes
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER set_notes_updated_at
+    BEFORE UPDATE ON public.notes
+    FOR EACH ROW
+    EXECUTE FUNCTION public.handle_updated_at();
 
-CREATE TRIGGER update_shopping_items_updated_at BEFORE UPDATE ON shopping_items
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER set_shopping_items_updated_at
+    BEFORE UPDATE ON public.shopping_items
+    FOR EACH ROW
+    EXECUTE FUNCTION public.handle_updated_at();
 
-CREATE TRIGGER update_budget_items_updated_at BEFORE UPDATE ON budget_items
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER set_budget_items_updated_at
+    BEFORE UPDATE ON public.budget_items
+    FOR EACH ROW
+    EXECUTE FUNCTION public.handle_updated_at();
 
-CREATE TRIGGER update_media_items_updated_at BEFORE UPDATE ON media_items
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER set_media_items_updated_at
+    BEFORE UPDATE ON public.media_items
+    FOR EACH ROW
+    EXECUTE FUNCTION public.handle_updated_at();
 
-CREATE TRIGGER update_user_settings_updated_at BEFORE UPDATE ON user_settings
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
--- =====================================================
--- POLITIQUES RLS (Row Level Security)
--- =====================================================
-
--- Activer RLS sur toutes les tables
-ALTER TABLE tasks ENABLE ROW LEVEL SECURITY;
-ALTER TABLE notes ENABLE ROW LEVEL SECURITY;
-ALTER TABLE shopping_items ENABLE ROW LEVEL SECURITY;
-ALTER TABLE budget_items ENABLE ROW LEVEL SECURITY;
-ALTER TABLE media_items ENABLE ROW LEVEL SECURITY;
-ALTER TABLE user_settings ENABLE ROW LEVEL SECURITY;
-
--- POLITIQUES TASKS
-CREATE POLICY "Users can insert their own tasks" ON tasks
-    FOR INSERT WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users can view their own tasks" ON tasks
-    FOR SELECT USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can update their own tasks" ON tasks
-    FOR UPDATE USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can delete their own tasks" ON tasks
-    FOR DELETE USING (auth.uid() = user_id);
-
--- POLITIQUES NOTES
-CREATE POLICY "Users can insert their own notes" ON notes
-    FOR INSERT WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users can view their own notes" ON notes
-    FOR SELECT USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can update their own notes" ON notes
-    FOR UPDATE USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can delete their own notes" ON notes
-    FOR DELETE USING (auth.uid() = user_id);
-
--- POLITIQUES SHOPPING_ITEMS
-CREATE POLICY "Users can insert their own shopping items" ON shopping_items
-    FOR INSERT WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users can view their own shopping items" ON shopping_items
-    FOR SELECT USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can update their own shopping items" ON shopping_items
-    FOR UPDATE USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can delete their own shopping items" ON shopping_items
-    FOR DELETE USING (auth.uid() = user_id);
-
--- POLITIQUES BUDGET_ITEMS
-CREATE POLICY "Users can insert their own budget items" ON budget_items
-    FOR INSERT WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users can view their own budget items" ON budget_items
-    FOR SELECT USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can update their own budget items" ON budget_items
-    FOR UPDATE USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can delete their own budget items" ON budget_items
-    FOR DELETE USING (auth.uid() = user_id);
-
--- POLITIQUES MEDIA_ITEMS
-CREATE POLICY "Users can insert their own media items" ON media_items
-    FOR INSERT WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users can view their own media items" ON media_items
-    FOR SELECT USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can update their own media items" ON media_items
-    FOR UPDATE USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can delete their own media items" ON media_items
-    FOR DELETE USING (auth.uid() = user_id);
-
--- POLITIQUES USER_SETTINGS
-CREATE POLICY "Users can insert their own settings" ON user_settings
-    FOR INSERT WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users can view their own settings" ON user_settings
-    FOR SELECT USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can update their own settings" ON user_settings
-    FOR UPDATE USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can delete their own settings" ON user_settings
-    FOR DELETE USING (auth.uid() = user_id);
+CREATE TRIGGER set_user_settings_updated_at
+    BEFORE UPDATE ON public.user_settings
+    FOR EACH ROW
+    EXECUTE FUNCTION public.handle_updated_at();
 
 -- =====================================================
--- FONCTION POUR CRÉER AUTOMATIQUEMENT LES PARAMÈTRES UTILISATEUR
+-- FONCTION pour cr�er automatiquement user_settings
 -- =====================================================
-CREATE OR REPLACE FUNCTION create_user_settings()
+CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-    INSERT INTO user_settings (user_id, preferences)
-    VALUES (NEW.id, '{"theme": "dark", "language": "fr"}');
+    INSERT INTO public.user_settings (user_id, budget_limits, preferences)
+    VALUES (
+        NEW.id,
+        '{
+            "shortTerm": {"depenses_fixes": 0, "depenses_variables": 0},
+            "longTerm": {"epargne": 0, "investissements": 0}
+        }'::jsonb,
+        '{}'::jsonb
+    );
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Trigger pour créer automatiquement les paramètres lors de l'inscription
+-- Trigger pour cr�er automatiquement les param�tres utilisateur
 CREATE TRIGGER on_auth_user_created
     AFTER INSERT ON auth.users
-    FOR EACH ROW EXECUTE FUNCTION create_user_settings();
+    FOR EACH ROW
+    EXECUTE FUNCTION public.handle_new_user();
 
 -- =====================================================
--- VUES UTILES POUR LE DASHBOARD
+-- FIN DU SCH�MA
 -- =====================================================
-
--- Vue pour les statistiques du budget par mois
-CREATE VIEW monthly_budget_stats AS
-SELECT
-    user_id,
-    DATE_TRUNC('month', date) as month,
-    type,
-    SUM(amount) as total_amount,
-    COUNT(*) as item_count
-FROM budget_items
-GROUP BY user_id, DATE_TRUNC('month', date), type;
-
--- Vue pour les statistiques des médias
-CREATE VIEW media_stats AS
-SELECT
-    user_id,
-    type,
-    status,
-    AVG(rating) as avg_rating,
-    COUNT(*) as item_count
-FROM media_items
-GROUP BY user_id, type, status;
-
+-- Toutes les tables sont cr��es avec RLS activ�
+-- Chaque utilisateur peut uniquement voir et modifier ses propres donn�es
+-- Les triggers g�rent automatiquement les timestamps updated_at
 -- =====================================================
--- INSERTION DE DONNÉES EXEMPLE (Optionnel)
--- =====================================================
-
--- Ces données ne seront pas insérées car elles nécessitent un user_id réel
--- Vous pourrez les ajouter après connexion dans l'interface
-
-/*
--- Exemple de tâche (à remplacer user_id par votre vraie ID)
-INSERT INTO tasks (user_id, title, priority) VALUES
-    ('your-user-id', 'Configurer Supabase', 'urgent'),
-    ('your-user-id', 'Tester l''application', 'normal');
-
--- Exemple de média
-INSERT INTO media_items (user_id, title, type, status, rating, comment) VALUES
-    ('your-user-id', 'Inception', 'movie', 'watched', 5, 'Un chef-d''œuvre de Christopher Nolan!');
-*/
