@@ -1902,14 +1902,14 @@ export default function App({ session }) {
     setMediaComment(media.comment || "");
     setSelectedApiResult({
       title: media.title,
-      originalTitle: media.originalTitle,
+      originalTitle: media.original_title,
       overview: media.overview,
-      posterPath: media.posterPath,
-      releaseDate: media.releaseDate,
+      posterPath: media.poster_path,
+      releaseDate: media.release_date,
       // voteAverage supprimé - plus de notes API
       genres: media.genres,
       mediaType: media.type,
-      id: media.apiId
+      id: media.api_id
     });
   };
 
@@ -6228,9 +6228,9 @@ export default function App({ session }) {
 
                             {/* Poster - propre sans overlay */}
                             <div className="flex-shrink-0">
-                              {media.posterPath ? (
+                              {media.poster_path ? (
                                 <img
-                                  src={media.posterPath}
+                                  src={media.poster_path}
                                   alt={media.title}
                                   className="w-full h-64 object-cover rounded-t-lg shadow-md"
                                   loading="lazy"
@@ -6270,9 +6270,9 @@ export default function App({ session }) {
 
                                   {/* Infos essentielles */}
                                   <div className="flex items-center gap-3 text-sm text-gray-400">
-                                    {media.releaseDate && (
+                                    {media.release_date && (
                                       <span className="flex items-center gap-1">
-                                        📅 {typeof media.releaseDate === 'string' ? media.releaseDate.split('-')[0] : media.releaseDate}
+                                        📅 {typeof media.release_date === 'string' ? media.release_date.split('-')[0] : media.release_date}
                                       </span>
                                     )}
                                   </div>
