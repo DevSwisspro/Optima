@@ -67,7 +67,7 @@ export default function Register({ onToggleView, onSuccess, onBack }) {
           data: {
             full_name: fullName.trim(),
           },
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          // Pas de emailRedirectTo pour forcer l'utilisation d'OTP au lieu de Magic Link
         },
       });
 
