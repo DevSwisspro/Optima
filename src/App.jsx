@@ -762,6 +762,7 @@ export default function App({ session }) {
   const [priorityChoice, setPriorityChoice] = useState("normal");
   const [showPriorityMenu, setShowPriorityMenu] = useState(false);
   const priorityMenuRef = useRef(null);
+  const priorityFloatingMenuRef = useRef(null);
   const priorityButtonMobileRef = useRef(null);
   const priorityButtonDesktopRef = useRef(null);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0, width: 0 });
@@ -1085,7 +1086,11 @@ export default function App({ session }) {
   // Gérer la fermeture du menu de priorité au clic externe
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (priorityMenuRef.current && !priorityMenuRef.current.contains(event.target)) {
+      // Vérifier si le clic est à l'extérieur du bouton ET du menu flottant
+      const clickedOutsideButton = priorityMenuRef.current && !priorityMenuRef.current.contains(event.target);
+      const clickedOutsideMenu = priorityFloatingMenuRef.current && !priorityFloatingMenuRef.current.contains(event.target);
+
+      if (clickedOutsideButton && clickedOutsideMenu) {
         setShowPriorityMenu(false);
       }
     };
@@ -6444,6 +6449,7 @@ export default function App({ session }) {
       {/* Menu priorité fixed - affiché au-dessus de tous les éléments */}
       {showPriorityMenu && (
         <div
+          ref={priorityFloatingMenuRef}
           initial={{ opacity: 0, y: -20, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -20, scale: 0.9 }}

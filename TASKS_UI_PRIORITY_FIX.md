@@ -43,6 +43,35 @@ const filteredTasks = tasks.filter(t => (q ? t.title.toLowerCase().includes(q) :
 
 ---
 
+### Problème 3 : Menu de Sélection de Priorité Non Fonctionnel
+
+**Symptôme** :
+- Cliquer sur "À faire rapidement" dans le menu ne changeait pas la sélection
+- La valeur restait bloquée sur "À faire prochainement"
+- Le menu se fermait immédiatement sans enregistrer le choix
+
+**Cause Racine** :
+Le `useEffect` de fermeture du menu (ligne 1087) vérifiait uniquement si le clic était en dehors de `priorityMenuRef` (le div contenant le bouton).
+
+**Mais** : Le menu flottant lui-même est un élément `position: fixed` (ligne 6451) qui est **rendu en dehors** du `priorityMenuRef`.
+
+**Résultat** : Quand l'utilisateur cliquait sur une option du menu :
+1. Le clic se propageait
+2. `handleClickOutside` détectait que le clic était en dehors de `priorityMenuRef`
+3. Le menu se fermait **immédiatement**
+4. Le `onClick` de l'option ne se déclenchait jamais (ou trop tard)
+
+```javascript
+// ❌ AVANT - Ne vérifie que le bouton
+const handleClickOutside = (event) => {
+  if (priorityMenuRef.current && !priorityMenuRef.current.contains(event.target)) {
+    setShowPriorityMenu(false); // Se ferme avant que l'option soit sélectionnée !
+  }
+};
+```
+
+---
+
 ## ✅ Correctifs Appliqués
 
 ### Correctif 1 : Refonte Complète du Design TaskRow
@@ -259,6 +288,75 @@ const filteredTasks = tasks.filter(t => (q ? t.text.toLowerCase().includes(q) : 
 
 ---
 
+### Correctif 4 : Menu de Sélection de Priorité
+
+**Fichier** : `src/App.jsx` lignes 764-765, 1087-1105, 6451
+
+#### Étape 1 : Ajouter une ref pour le menu flottant
+
+**Ligne 764-765** :
+```javascript
+// AVANT
+const priorityMenuRef = useRef(null);
+const priorityButtonMobileRef = useRef(null);
+
+// APRÈS
+const priorityMenuRef = useRef(null);
+const priorityFloatingMenuRef = useRef(null); // ✅ Nouvelle ref pour le menu
+const priorityButtonMobileRef = useRef(null);
+```
+
+#### Étape 2 : Modifier le useEffect de fermeture
+
+**Lignes 1087-1105** :
+```javascript
+// AVANT
+const handleClickOutside = (event) => {
+  if (priorityMenuRef.current && !priorityMenuRef.current.contains(event.target)) {
+    setShowPriorityMenu(false);
+  }
+};
+
+// APRÈS
+const handleClickOutside = (event) => {
+  // Vérifier si le clic est à l'extérieur du bouton ET du menu flottant
+  const clickedOutsideButton = priorityMenuRef.current && !priorityMenuRef.current.contains(event.target);
+  const clickedOutsideMenu = priorityFloatingMenuRef.current && !priorityFloatingMenuRef.current.contains(event.target);
+
+  if (clickedOutsideButton && clickedOutsideMenu) {
+    setShowPriorityMenu(false);
+  }
+};
+```
+
+#### Étape 3 : Attacher la ref au menu flottant
+
+**Ligne 6451** :
+```javascript
+// AVANT
+{showPriorityMenu && (
+  <div
+    initial={{ opacity: 0, y: -20, scale: 0.9 }}
+    animate={{ opacity: 1, y: 0, scale: 1 }}
+    ...
+
+// APRÈS
+{showPriorityMenu && (
+  <div
+    ref={priorityFloatingMenuRef} // ✅ Ref attachée au menu
+    initial={{ opacity: 0, y: -20, scale: 0.9 }}
+    animate={{ opacity: 1, y: 0, scale: 1 }}
+    ...
+```
+
+**Bénéfices** :
+- ✅ Le menu ne se ferme plus prématurément
+- ✅ Les clics sur les options du menu sont bien détectés
+- ✅ `setPriorityChoice()` s'exécute correctement
+- ✅ Les deux priorités ("urgent" et "normal") fonctionnent maintenant
+
+---
+
 ## 📊 Comparaison Avant/Après
 
 | Aspect | Avant | Après |
@@ -269,6 +367,7 @@ const filteredTasks = tasks.filter(t => (q ? t.text.toLowerCase().includes(q) : 
 | **Badge priorité** | Gradient plein + animations | Fond semi-transparent + texte coloré |
 | **Bouton complétion** | Classes multiples + framer-motion | Taille fixe + `active:scale-95` simple |
 | **Filtre recherche** | ❌ `t.title` (undefined) | ✅ `t.text` (correct) |
+| **Menu priorité** | ❌ Se ferme avant sélection | ✅ Fonctionne correctement |
 | **Lisibilité code** | ~70 lignes complexes | ~40 lignes claires |
 | **Performance** | Animations multiples | Transitions CSS simples |
 
@@ -403,12 +502,13 @@ const filteredTasks = tasks.filter(t => (q ? t.text.toLowerCase().includes(q) : 
 ```bash
 git add src/App.jsx TASKS_UI_PRIORITY_FIX.md
 git commit -m "$(cat <<'EOF'
-UI: Refonte design module Tâches + Fix filtre recherche
+UI: Refonte design module Tâches + Fix menu priorité
 
 Problèmes corrigés:
 - Design visuel surchargé avec trop d'effets (brillance, swipe, gradients multiples)
 - Manque d'espacement et d'alignement clair
 - Filtre de recherche cassé (t.title → t.text)
+- Menu de sélection de priorité ne fonctionnait pas (se fermait avant sélection)
 - Incohérence visuelle avec le reste d'Optima
 
 Changements UI:
@@ -428,12 +528,15 @@ Changements Badge:
 - whitespace-nowrap pour éviter le wrap
 
 Correctifs techniques:
+- src/App.jsx:765 - Ajout priorityFloatingMenuRef pour le menu
+- src/App.jsx:1087-1105 - Fix handleClickOutside pour vérifier bouton ET menu
 - src/App.jsx:1920 - Filtre t.title → t.text
 - src/App.jsx:1973-1990 - Refonte PriorityBadge
 - src/App.jsx:1995-2035 - Refonte TaskRow
+- src/App.jsx:6452 - Ajout ref au menu flottant
 
 Modules affectés:
-- Tâches (affichage, recherche, design)
+- Tâches (affichage, recherche, design, sélection priorité)
 
 Bénéfices:
 - Design moderne et professionnel
@@ -441,9 +544,10 @@ Bénéfices:
 - Performance améliorée (moins d'animations)
 - Code plus maintenable
 - Filtre de recherche fonctionnel
+- Menu de priorité fonctionnel (urgent + normal)
 
 Documentation:
-- TASKS_UI_PRIORITY_FIX.md créé avec analyse complète
+- TASKS_UI_PRIORITY_FIX.md mis à jour avec analyse complète
 
 🤖 Generated with Claude Code
 Co-Authored-By: Claude <noreply@anthropic.com>
