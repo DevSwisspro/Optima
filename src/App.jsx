@@ -2120,14 +2120,7 @@ export default function App({ session, onLogout }) {
         {/* Contenu Principal avec Transitions Fluides */}
         
           {activeTab === "dashboard" && (
-            <div
-              key="dashboard"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="space-y-4 md:space-y-8"
-            >
+            <PageTransition pageKey="dashboard">
               {/* Header Dashboard - Mobile vs Desktop */}
               <div
                 initial={{ opacity: 0, y: -20 }}
@@ -2637,7 +2630,7 @@ export default function App({ session, onLogout }) {
                   </button>
                 </div>
               )}
-            </div>
+            </PageTransition>
           )}
 
           {activeTab === "budget-dashboard" && (
@@ -3875,14 +3868,7 @@ export default function App({ session, onLogout }) {
           )}
 
           {activeTab === "tasks" && (
-            <div
-              key="tasks"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="space-y-4 md:space-y-8"
-            >
+            <PageTransition pageKey="tasks">
               {/* Header Tâches - Mobile vs Desktop harmonisé */}
               <div
                 initial={{ opacity: 0, y: -20 }}
@@ -4167,18 +4153,11 @@ export default function App({ session, onLogout }) {
                   </div>
                 )}
               </div>
-            </div>
+            </PageTransition>
           )}
 
           {activeTab === "notes" && (
-            <div
-              key="notes"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="space-y-4 md:space-y-8"
-            >
+            <PageTransition pageKey="notes">
               {/* Header Notes - Mobile vs Desktop harmonisé */}
 
               {/* Mobile Header - Version ultra-compacte */}
@@ -4454,19 +4433,12 @@ export default function App({ session, onLogout }) {
                   </div>
                 )}
               </div>
-            </div>
+            </PageTransition>
           )}
 
         {/* Section des courses */}
         {activeTab === "shopping" && (
-          <div
-            key="shopping"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="performance-optimized smooth-scroll safe-area-inset space-y-8"
-          >
+          <PageTransition pageKey="shopping">
             {/* Header Courses - Mobile vs Desktop harmonisé */}
 
             {/* Mobile Header - Style centralisé harmonisé */}
@@ -4750,19 +4722,12 @@ export default function App({ session, onLogout }) {
                 </div>
               )}
             </div>
-          </div>
+          </PageTransition>
         )}
 
         {/* Onglet Budget */}
         {activeTab === "budget" && (
-          <div
-            key="budget"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="performance-optimized smooth-scroll safe-area-inset space-y-8"
-          >
+          <PageTransition pageKey="budget">
             {/* Header Budget - Mobile vs Desktop harmonisé */}
 
             {/* Mobile Header - Style centralisé harmonisé */}
@@ -5878,19 +5843,12 @@ export default function App({ session, onLogout }) {
                 <p className="text-gray-400 text-lg">Aucune opération enregistrée.</p>
               </div>
             )}
-          </div>
+          </PageTransition>
         )}
 
         {/* Section des médias */}
         {activeTab === "media" && (
-          <div
-            key="media"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="performance-optimized smooth-scroll safe-area-inset space-y-8"
-          >
+          <PageTransition pageKey="media">
             {/* Header Media - Mobile vs Desktop harmonisé */}
 
             {/* Mobile Header - Style centralisé harmonisé */}
@@ -6311,9 +6269,9 @@ export default function App({ session, onLogout }) {
                 </div>
               )}
             </div>
-          </div>
+          </PageTransition>
         )}
-        
+
 
         {/* Navigation Mobile Premium - Glassmorphism */}
         <motion.nav
@@ -6414,7 +6372,7 @@ export default function App({ session, onLogout }) {
 
       {/* Menu priorité fixed - affiché au-dessus de tous les éléments */}
       {showPriorityMenu && (
-        <div
+        <motion.div
           ref={priorityFloatingMenuRef}
           initial={{ opacity: 0, y: -20, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -6428,7 +6386,7 @@ export default function App({ session, onLogout }) {
             width: menuPosition.width
           }}
         >
-          <div
+          <motion.div
             className="py-4 px-5 hover:bg-red-600/30 cursor-pointer text-white text-lg font-semibold transition-all duration-200 hover:scale-105 active:scale-95"
             whileTap={{ scale: 0.98 }}
             onClick={() => { setPriorityChoice("urgent"); setShowPriorityMenu(false); }}
@@ -6437,8 +6395,8 @@ export default function App({ session, onLogout }) {
               <div className="w-4 h-4 bg-red-500 rounded-full shadow-lg"></div>
               <span>{PRIORITY_LABELS["urgent"]}</span>
             </div>
-          </div>
-          <div
+          </motion.div>
+          <motion.div
             className="py-4 px-5 hover:bg-orange-600/30 cursor-pointer text-white text-lg font-semibold transition-all duration-200 hover:scale-105 active:scale-95"
             whileTap={{ scale: 0.98 }}
             onClick={() => { setPriorityChoice("normal"); setShowPriorityMenu(false); }}
@@ -6447,8 +6405,8 @@ export default function App({ session, onLogout }) {
               <div className="w-4 h-4 bg-orange-500 rounded-full shadow-lg"></div>
               <span>{PRIORITY_LABELS["normal"]}</span>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
 
       {/* Menu Flottant Premium */}
