@@ -1605,33 +1605,33 @@ export default function App({ session }) {
 
   // Filtrer les courses
   const filteredShoppingItems = useMemo(() => {
-    let filtered = shoppingItems.filter(item => !item.purchased); // Ne montrer que les non achetés
-    
+    let filtered = shoppingItems.filter(item => !item.checked); // Ne montrer que les non cochés
+
     // Regrouper les articles identiques et cumuler les quantités
     const groupedItems = filtered.reduce((acc, item) => {
       const key = `${item.name}-${item.category}-${item.unit}`;
       if (acc[key]) {
         acc[key].quantity += item.quantity;
         // Garder la date de création la plus récente
-        if (new Date(item.createdAt) > new Date(acc[key].createdAt)) {
-          acc[key].createdAt = item.createdAt;
+        if (new Date(item.created_at) > new Date(acc[key].created_at)) {
+          acc[key].created_at = item.created_at;
         }
       } else {
         acc[key] = { ...item };
       }
       return acc;
     }, {});
-    
+
     // Convertir en tableau
     const groupedArray = Object.values(groupedItems);
-    
-    // Trier par catégorie (Courses courantes en premier) puis par date de création
+
+    // Trier par catégorie (Courses courantes 'now' en premier) puis par date de création
     return groupedArray.sort((a, b) => {
-      // Courses courantes en premier
-      if (a.category === 'courant' && b.category === 'futur') return -1;
-      if (a.category === 'futur' && b.category === 'courant') return 1;
-      // Même catégorie : trier par date de création
-      return new Date(b.createdAt) - new Date(a.createdAt);
+      // Courses courantes (now) en premier
+      if (a.category === 'now' && b.category === 'later') return -1;
+      if (a.category === 'later' && b.category === 'now') return 1;
+      // Même catégorie : trier par date de création (plus récent en premier)
+      return new Date(b.created_at) - new Date(a.created_at);
     });
   }, [shoppingItems]);
 
@@ -4703,15 +4703,15 @@ export default function App({ session }) {
               ) : (
                 <div className="space-y-6">
                   {/* Section Courses courantes */}
-                  {filteredShoppingItems.filter(item => item.category === 'courant').length > 0 && (
+                  {filteredShoppingItems.filter(item => item.category === 'now').length > 0 && (
                     <div>
                       <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                         <span className="w-2 h-2 bg-green-500 rounded-full"></span>
                         Courses courantes
                       </h3>
                       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
-                        
-                          {filteredShoppingItems.filter(item => item.category === 'courant').map(item => (
+
+                          {filteredShoppingItems.filter(item => item.category === 'now').map(item => (
                             <div 
                               key={item.id}
                               layout 
@@ -4755,15 +4755,15 @@ export default function App({ session }) {
                   )}
 
                   {/* Section Achats futurs */}
-                  {filteredShoppingItems.filter(item => item.category === 'futur').length > 0 && (
+                  {filteredShoppingItems.filter(item => item.category === 'later').length > 0 && (
                     <div>
                       <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                         <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
                         Achats futurs
                       </h3>
                       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
-                        
-                          {filteredShoppingItems.filter(item => item.category === 'futur').map(item => (
+
+                          {filteredShoppingItems.filter(item => item.category === 'later').map(item => (
                             <div 
                               key={item.id}
                               layout 
