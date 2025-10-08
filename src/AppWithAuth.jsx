@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import AuthContainer from '@/components/Auth/AuthContainer';
+import LoaderPremium from '@/components/LoaderPremium';
 import App from './App';
 
 export default function AppWithAuth() {
@@ -28,16 +29,14 @@ export default function AppWithAuth() {
     // La session sera automatiquement mise à jour via onAuthStateChange
   };
 
-  // Écran de chargement
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setSession(null);
+  };
+
+  // Écran de chargement premium
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-950 via-gray-900 to-black">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-red-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-white text-lg font-semibold">Chargement...</p>
-        </div>
-      </div>
-    );
+    return <LoaderPremium fullScreen />;
   }
 
   // Si pas de session, afficher les écrans d'authentification
@@ -46,5 +45,5 @@ export default function AppWithAuth() {
   }
 
   // Si session active, afficher l'application principale
-  return <App session={session} />;
+  return <App session={session} onLogout={handleLogout} />;
 }

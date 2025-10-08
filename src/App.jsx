@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Check, Plus, Trash2, Sparkles, Search, List, FileText, ShoppingCart, Wallet, BarChart3, ArrowLeft, TrendingUp, PieChart as PieChartIcon, Calendar, Table, Download, Filter, ChevronLeft, ChevronRight, Settings, X, Play, Star, Edit } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, LabelList } from 'recharts';
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,9 @@ import Header from "@/components/Header";
 import { formatCurrency } from "@/lib/utils";
 import LogoDevSwiss from "@/components/LogoDevSwiss";
 import { supabase } from "@/lib/supabase";
+import FloatingMenu from "@/components/FloatingMenu";
+import PageTransition from "@/components/PageTransition";
+import LoaderPremium from "@/components/LoaderPremium";
 
 // --- Helpers -----------------------------------------------------------
 const LS_KEY = "todo_coach_v2";
@@ -752,7 +756,7 @@ function logSupabaseError(context, error) {
 }
 
 // --- Main App ---------------------------------------------------------------
-export default function App({ session }) {
+export default function App({ session, onLogout }) {
   // Extraire l'utilisateur de la session
   const user = session?.user;
   const userId = user?.id;
@@ -2037,49 +2041,11 @@ export default function App({ session }) {
   );
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <div className="max-w-7xl mx-auto space-y-4 md:space-y-6 pt-4 md:pt-8 pb-24 md:pb-8 px-4 sm:px-6 lg:px-8 xl:px-12">
-        {/* Titre principal avec logo responsive - Desktop */}
-        <div className="text-center mobile-header-compact hidden md:block">
-          <div className="flex flex-col items-center spacing-responsive-md mobile-spacing">
-            <div>
-              <LogoDevSwiss className="logo-responsive text-white" showText={false} />
-            </div>
-            <h1 className="title-main font-black tracking-tight uppercase mobile-text-tight ultra-smooth landscape-compact" style={{
-              fontFamily: '"Bebas Neue", "Arial Black", "Helvetica Neue", sans-serif',
-              fontWeight: '900',
-              letterSpacing: '-0.02em',
-              background: 'linear-gradient(135deg, #ef4444, #dc2626)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-              textShadow: '2px 2px 0px rgba(220, 38, 38, 0.3)'
-            }}>
-              OPTIMA
-            </h1>
-          </div>
-        </div>
+    <div className="min-h-screen gradient-dark text-white relative overflow-hidden">
+      {/* Header Premium moderne */}
+      <Header />
 
-        {/* Titre principal avec logo - Mobile optimisé */}
-        <div className="md:hidden text-center pt-safe mb-6">
-          <div className="flex flex-col items-center gap-3">
-            <div>
-              <LogoDevSwiss className="w-16 h-16 text-white" showText={false} />
-            </div>
-            <h1 className="text-3xl font-black tracking-tight uppercase" style={{
-              fontFamily: '"Bebas Neue", "Arial Black", "Helvetica Neue", sans-serif',
-              fontWeight: '900',
-              letterSpacing: '-0.02em',
-              background: 'linear-gradient(135deg, #ef4444, #dc2626)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-              textShadow: '2px 2px 0px rgba(220, 38, 38, 0.3)'
-            }}>
-              OPTIMA
-            </h1>
-          </div>
-        </div>
+      <div className="max-w-7xl mx-auto space-y-4 md:space-y-6 pb-24 md:pb-8 px-4 sm:px-6 lg:px-8">
 
         {/* Navigation Desktop - Version cachée sur mobile */}
         <div className="hidden md:flex space-x-2 mb-12">
@@ -6349,94 +6315,85 @@ export default function App({ session }) {
         )}
         
 
-        {/* Navigation Mobile Responsive - Style natif */}
-        <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-gray-900/95 backdrop-blur-md border-t border-gray-700/50 safe-area-inset bottom-nav-optimized pwa-navigation">
-          <div className="flex items-center justify-around container-safe max-w-lg mx-auto mobile-compact">
-            <button
-              onClick={() => setActiveTab("dashboard")}
-              className={`nav-mobile flex flex-col items-center justify-center rounded-xl transition-all duration-300 touch-target ios-touch-optimized ${
-                activeTab === "dashboard"
-                  ? "bg-red-600/20 text-red-400 scale-110"
-                  : "text-gray-400 hover:text-white active:scale-95"
-              }`}
-              whileTap={{ scale: 0.9 }}
-              whileHover={{ scale: 1.05 }}
-            >
-              <BarChart3 className={`bottom-nav-icon mb-1 ${activeTab === "dashboard" ? "text-red-400" : ""}`} />
-              <span className="bottom-nav-text">Stats</span>
-            </button>
+        {/* Navigation Mobile Premium - Glassmorphism */}
+        <motion.nav
+          className="md:hidden fixed bottom-0 left-0 right-0 z-50 glass-strong border-t border-white/10 safe-area-inset no-print"
+          initial={{ y: 100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 100, damping: 20, delay: 0.3 }}
+        >
+          <div className="flex items-center justify-around max-w-lg mx-auto px-2 py-3">
+            {[
+              { id: "dashboard", icon: BarChart3, label: "Stats" },
+              { id: "tasks", icon: List, label: "Tâches" },
+              { id: "notes", icon: FileText, label: "Notes" },
+              { id: "shopping", icon: ShoppingCart, label: "Courses" },
+              { id: "budget", icon: Wallet, label: "Budget" },
+              { id: "media", icon: Play, label: "Médias" }
+            ].map((tab, index) => (
+              <motion.button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`relative flex flex-col items-center justify-center px-3 py-2 rounded-xl transition-all duration-300 ${
+                  activeTab === tab.id
+                    ? "text-primary"
+                    : "text-gray-400 hover:text-white"
+                }`}
+                whileTap={{ scale: 0.9 }}
+                whileHover={{ scale: 1.05 }}
+                initial={{ y: 50, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.4 + index * 0.05 }}
+              >
+                {/* Background actif avec glow */}
+                {activeTab === tab.id && (
+                  <motion.div
+                    className="absolute inset-0 bg-primary/20 rounded-xl shadow-glow-primary"
+                    layoutId="activeTab"
+                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                  />
+                )}
 
-            <button
-              onClick={() => setActiveTab("tasks")}
-              className={`nav-mobile flex flex-col items-center justify-center rounded-xl transition-all duration-300 touch-target ios-touch-optimized ${
-                activeTab === "tasks"
-                  ? "bg-red-600/20 text-red-400 scale-110"
-                  : "text-gray-400 hover:text-white active:scale-95"
-              }`}
-              whileTap={{ scale: 0.9 }}
-              whileHover={{ scale: 1.05 }}
-            >
-              <List className={`bottom-nav-icon mb-1 ${activeTab === "tasks" ? "text-red-400" : ""}`} />
-              <span className="bottom-nav-text">Tâches</span>
-            </button>
+                {/* Icône */}
+                <motion.div
+                  animate={{
+                    scale: activeTab === tab.id ? 1.1 : 1,
+                    y: activeTab === tab.id ? -2 : 0
+                  }}
+                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                  className="relative z-10"
+                >
+                  <tab.icon className="w-6 h-6 mb-1" strokeWidth={activeTab === tab.id ? 2.5 : 2} />
+                </motion.div>
 
-            <button
-              onClick={() => setActiveTab("notes")}
-              className={`nav-mobile flex flex-col items-center justify-center rounded-xl transition-all duration-300 touch-target ios-touch-optimized ${
-                activeTab === "notes"
-                  ? "bg-red-600/20 text-red-400 scale-110"
-                  : "text-gray-400 hover:text-white active:scale-95"
-              }`}
-              whileTap={{ scale: 0.9 }}
-              whileHover={{ scale: 1.05 }}
-            >
-              <FileText className={`bottom-nav-icon mb-1 ${activeTab === "notes" ? "text-red-400" : ""}`} />
-              <span className="bottom-nav-text">Notes</span>
-            </button>
+                {/* Label */}
+                <span className={`text-xs font-medium relative z-10 ${
+                  activeTab === tab.id ? "font-semibold" : ""
+                }`}>
+                  {tab.label}
+                </span>
 
-            <button
-              onClick={() => setActiveTab("shopping")}
-              className={`nav-mobile flex flex-col items-center justify-center rounded-xl transition-all duration-300 touch-target ios-touch-optimized ${
-                activeTab === "shopping"
-                  ? "bg-red-600/20 text-red-400 scale-110"
-                  : "text-gray-400 hover:text-white active:scale-95"
-              }`}
-              whileTap={{ scale: 0.9 }}
-              whileHover={{ scale: 1.05 }}
-            >
-              <ShoppingCart className={`bottom-nav-icon mb-1 ${activeTab === "shopping" ? "text-red-400" : ""}`} />
-              <span className="bottom-nav-text">Courses</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab("budget")}
-              className={`nav-mobile flex flex-col items-center justify-center rounded-xl transition-all duration-300 touch-target ios-touch-optimized ${
-                activeTab === "budget"
-                  ? "bg-red-600/20 text-red-400 scale-110"
-                  : "text-gray-400 hover:text-white active:scale-95"
-              }`}
-              whileTap={{ scale: 0.9 }}
-              whileHover={{ scale: 1.05 }}
-            >
-              <Wallet className={`bottom-nav-icon mb-1 ${activeTab === "budget" ? "text-red-400" : ""}`} />
-              <span className="bottom-nav-text">Budget</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab("media")}
-              className={`nav-mobile flex flex-col items-center justify-center rounded-xl transition-all duration-300 touch-target ios-touch-optimized ${
-                activeTab === "media"
-                  ? "bg-red-600/20 text-red-400 scale-110"
-                  : "text-gray-300 hover:text-white active:scale-95"
-              }`}
-              whileTap={{ scale: 0.9 }}
-              whileHover={{ scale: 1.05 }}
-            >
-              <Play className={`bottom-nav-icon mb-1 ${activeTab === "media" ? "text-red-400" : ""}`} />
-              <span className="bottom-nav-text">Médias</span>
-            </button>
+                {/* Indicateur dot pour l'onglet actif */}
+                {activeTab === tab.id && (
+                  <motion.div
+                    className="absolute -top-1 w-1.5 h-1.5 bg-primary rounded-full"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                  />
+                )}
+              </motion.button>
+            ))}
           </div>
-        </div>
+
+          {/* Barre de progression subtile en haut */}
+          <motion.div
+            className="absolute top-0 left-0 h-0.5 bg-gradient-to-r from-primary via-primary-light to-primary"
+            initial={{ width: "0%" }}
+            animate={{ width: "100%" }}
+            transition={{ duration: 0.8, delay: 0.5 }}
+          />
+        </motion.nav>
 
         {/* Footer responsive */}
         <footer className="text-center mobile-compact border-t border-gray-800 md:mb-0 p-responsive-md pb-safe">
@@ -6493,6 +6450,12 @@ export default function App({ session }) {
           </div>
         </div>
       )}
+
+      {/* Menu Flottant Premium */}
+      <FloatingMenu
+        onLogout={onLogout}
+        userName={user?.email?.split('@')[0] || 'Utilisateur'}
+      />
     </div>
   );
 }
