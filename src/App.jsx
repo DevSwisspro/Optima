@@ -1917,7 +1917,7 @@ export default function App({ session }) {
 
   const tasksByPriority = useMemo(() => {
     const q = filter.q.toLowerCase();
-    const filteredTasks = tasks.filter(t => (q ? t.title.toLowerCase().includes(q) : true));
+    const filteredTasks = tasks.filter(t => (q ? t.text.toLowerCase().includes(q) : true));
 
     return {
       urgent: filteredTasks.filter(t => t.priority === 'urgent'),
@@ -1972,21 +1972,18 @@ export default function App({ session }) {
 
   const PriorityBadge = ({ p }) => (
     <div
-      initial={{ scale: 0.8, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      whileHover={{ scale: 1.05 }}
-      className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold shadow-lg border transition-all duration-300 ${
-        p === "urgent" ? "bg-gradient-to-r from-red-500 to-red-600 text-white shadow-red-500/30 border-red-400/50" :
-        p === "normal" ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-orange-500/30 border-orange-400/50" :
-        "bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-gray-500/30 border-gray-400/50"
+      className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold shadow-md border transition-all duration-200 ${
+        p === "urgent" ? "bg-red-500/20 text-red-400 border-red-500/40" :
+        p === "normal" ? "bg-orange-500/20 text-orange-400 border-orange-500/40" :
+        "bg-gray-500/20 text-gray-400 border-gray-500/40"
       }`}
     >
       <div className={`w-2 h-2 rounded-full ${
-        p === "urgent" ? "bg-white/90" :
-        p === "normal" ? "bg-white/90" :
-        "bg-white/90"
+        p === "urgent" ? "bg-red-500" :
+        p === "normal" ? "bg-orange-500" :
+        "bg-gray-500"
       }`}></div>
-      <span className="text-xs font-semibold">
+      <span className="whitespace-nowrap">
         {PRIORITY_LABELS[p]}
       </span>
     </div>
@@ -1995,70 +1992,40 @@ export default function App({ session }) {
   const TaskRow = ({ t }) => (
     <div
       layout
-      initial={{ opacity: 0, y: 20, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: -20, scale: 0.95 }}
-      whileTap={{ scale: 0.98 }}
-      whileHover={{ scale: 1.01, y: -1 }}
-      className={`group relative overflow-hidden rounded-2xl glass-dark neo-shadow border border-white/20 transition-all duration-300 ${
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      className={`group relative rounded-xl bg-gradient-to-br from-gray-900/90 to-gray-800/90 border border-white/10 hover:border-red-500/30 transition-all duration-300 ${
         t.completed ? "opacity-60" : ""
       }`}
     >
-      <div className="relative flex items-center mobile-spacing p-responsive-sm touch-target">
-        {/* Touch target responsive pour mobile */}
+      <div className="relative flex items-center gap-4 p-4 md:p-5">
+        {/* Bouton de complétion */}
         <button
           onClick={() => completeTask(t.id)}
-          whileTap={{ scale: 0.92 }}
-          whileHover={{ scale: 1.08 }}
-          className="relative touch-target rounded-2xl bg-gradient-to-br from-red-500 to-red-600 hover:from-red-400 hover:to-red-500 shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center iphone-optimized performance-optimized group-hover:shadow-red-500/40"
+          className="flex-shrink-0 w-10 h-10 md:w-11 md:h-11 rounded-xl bg-gradient-to-br from-red-500 to-red-600 hover:from-red-400 hover:to-red-500 shadow-lg hover:shadow-red-500/50 transition-all duration-300 flex items-center justify-center active:scale-95"
         >
-          <Check className="icon-responsive-md text-white drop-shadow-sm" />
-
-          {/* Effet de brillance au survol */}
-          <div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent rounded-2xl"
-            initial={{ x: '-100%', opacity: 0 }}
-            whileHover={{ x: '100%', opacity: 1 }}
-            transition={{ duration: 0.6 }}
-          />
+          <Check className="w-5 h-5 md:w-6 md:h-6 text-white" />
         </button>
 
-        <div className="flex-1 min-w-0 mobile-compact">
-          <div className="flex items-start mobile-spacing">
-            <span className="font-semibold text-responsive-lg break-words leading-tight flex-1 text-white group-hover:text-gray-100 transition-colors duration-300 cursor-pointer mobile-text-tight mobile-readability">
-              {t.text}
-            </span>
+        {/* Contenu de la tâche */}
+        <div className="flex-1 min-w-0 flex items-center justify-between gap-4">
+          <span className="text-base md:text-lg font-medium text-white break-words leading-relaxed">
+            {t.text}
+          </span>
 
-            {/* Badge de priorité redesigné pour mobile */}
-            <div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.1 }}
-            >
-              <PriorityBadge p={t.priority} />
-            </div>
-          </div>
-
-          {/* Indicateur visuel subtil pour le swipe (optionnel) */}
-          <div
-            className="absolute right-2 top-1/2 transform -translate-y-1/2 opacity-20 group-hover:opacity-40 transition-opacity duration-300"
-            initial={{ x: 10, opacity: 0 }}
-            animate={{ x: 0, opacity: 0.2 }}
-          >
-            <div className="flex gap-1">
-              <div className="w-1 h-1 bg-white rounded-full"></div>
-              <div className="w-1 h-1 bg-white rounded-full"></div>
-              <div className="w-1 h-1 bg-white rounded-full"></div>
-            </div>
+          {/* Badge de priorité */}
+          <div className="flex-shrink-0">
+            <PriorityBadge p={t.priority} />
           </div>
         </div>
       </div>
 
-      {/* Effet de gradient sur les bords pour design moderne */}
+      {/* Effet de lueur au survol */}
       <div
-        className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+        className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
         style={{
-          background: 'linear-gradient(90deg, transparent 0%, rgba(220, 38, 38, 0.1) 50%, transparent 100%)'
+          background: 'linear-gradient(90deg, transparent 0%, rgba(239, 68, 68, 0.05) 50%, transparent 100%)'
         }}
       />
     </div>
