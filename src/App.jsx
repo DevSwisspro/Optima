@@ -999,7 +999,8 @@ export default function App({ session }) {
             setBudgetLimits(prevLimits => ({
               categories: { ...prevLimits.categories, ...(data.budget_limits.categories || {}) },
               epargne: { ...prevLimits.epargne, ...(data.budget_limits.epargne || {}) },
-              investissements: { ...prevLimits.investissements, ...(data.budget_limits.investissements || {}) }
+              investissements: { ...prevLimits.investissements, ...(data.budget_limits.investissements || {}) },
+              longTerm: { ...prevLimits.longTerm, ...(data.budget_limits.longTerm || {}) }
             }));
           }
           if (data.preferences?.recurring_expenses) setRecurringExpenses(data.preferences.recurring_expenses);
@@ -2442,7 +2443,7 @@ export default function App({ session }) {
                   </div>
 
                   {/* Jauges de progression des objectifs */}
-                  {(budgetLimits.longTerm.epargne > 0 || budgetLimits.longTerm.investissements > 0) && (
+                  {(budgetLimits?.longTerm?.epargne > 0 || budgetLimits?.longTerm?.investissements > 0) && (
                     <div 
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -2451,7 +2452,7 @@ export default function App({ session }) {
                       <h3 className="text-xl font-bold text-white mb-4">Progression des objectifs</h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Jauge Épargne */}
-                        {budgetLimits.longTerm.epargne > 0 && (
+                        {budgetLimits?.longTerm?.epargne > 0 && (
                           <div className="space-y-3">
                             <div className="flex justify-between items-center">
                               <span className="text-white font-medium">Objectif d'épargne</span>
@@ -2499,9 +2500,9 @@ export default function App({ session }) {
                             </div>
                           </div>
                         )}
-                        
+
                         {/* Jauge Investissements */}
-                        {budgetLimits.longTerm.investissements > 0 && (
+                        {budgetLimits?.longTerm?.investissements > 0 && (
                           <div className="space-y-3">
                             <div className="flex justify-between items-center">
                               <span className="text-white font-medium">Objectif d'investissement</span>
@@ -5237,9 +5238,9 @@ export default function App({ session }) {
                             <Input
                               type="number"
                               placeholder="Objectif total (CHF)"
-                              value={budgetLimits.longTerm.epargne}
+                              value={budgetLimits?.longTerm?.epargne || 0}
                               onChange={(e) => setBudgetLimits({
-                                ...budgetLimits, 
+                                ...budgetLimits,
                                 longTerm: {
                                   ...budgetLimits.longTerm,
                                   epargne: parseFloat(e.target.value) || 0
@@ -5255,9 +5256,9 @@ export default function App({ session }) {
                             <Input
                               type="number"
                               placeholder="Objectif total (CHF)"
-                              value={budgetLimits.longTerm.investissements}
+                              value={budgetLimits?.longTerm?.investissements || 0}
                               onChange={(e) => setBudgetLimits({
-                                ...budgetLimits, 
+                                ...budgetLimits,
                                 longTerm: {
                                   ...budgetLimits.longTerm,
                                   investissements: parseFloat(e.target.value) || 0
