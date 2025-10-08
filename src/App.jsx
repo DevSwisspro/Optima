@@ -4064,7 +4064,7 @@ export default function App({ session }) {
                         onChange={(e) => setInput(e.target.value)}
                         placeholder="Que voulez-vous accomplir ?"
                         onKeyDown={(e) => { if (e.key === "Enter") addTask(); }}
-                        className="w-full h-14 sm:h-12 text-base sm:text-base rounded-xl border-0 bg-white/10 text-white placeholder:text-gray-300 font-medium focus:bg-white/15 focus:ring-2 focus:ring-red-500 transition-all duration-300 px-4"
+                        className="w-full h-14 sm:h-12 text-base sm:text-base rounded-xl border-0 bg-gray-800/90 text-white placeholder:text-gray-400 font-medium focus:bg-gray-700 focus:ring-2 focus:ring-red-500 focus:text-white transition-all duration-300 px-4 shadow-inner"
                       />
                     </div>
 
