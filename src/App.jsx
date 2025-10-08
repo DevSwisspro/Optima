@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import Header from "@/components/Header";
 import { formatCurrency } from "@/lib/utils";
 import LogoDevSwiss from "@/components/LogoDevSwiss";
+import { supabase } from "@/lib/supabase";
 
 // --- Helpers -----------------------------------------------------------
 const LS_KEY = "todo_coach_v2";
@@ -731,7 +732,10 @@ function ding() {
 }
 
 // --- Main App ---------------------------------------------------------------
-export default function App() {
+export default function App({ session }) {
+  // Extraire l'utilisateur de la session
+  const user = session?.user;
+  const userId = user?.id;
   const [tasks, setTasks] = useState([]);
   const [filter, setFilter] = useState({ q: "" });
   const [input, setInput] = useState("");
@@ -882,39 +886,71 @@ export default function App() {
   const [editingBudgetItem, setEditingBudgetItem] = useState(null);
   const [budgetFilter, setBudgetFilter] = useState({});
 
+  // Charger les tâches depuis Supabase
   useEffect(() => {
-    try { const raw = localStorage.getItem(LS_KEY); if (raw) setTasks(JSON.parse(raw)); } catch {}
-  }, []);
+    if (!userId) return;
 
-  useEffect(() => {
-    try { localStorage.setItem(LS_KEY, JSON.stringify(tasks)); } catch {}
-  }, [tasks]);
+    const loadTasks = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('tasks')
+          .select('*')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false });
 
-  // Charger les notes depuis le localStorage
-  useEffect(() => {
-    try { 
-      const raw = localStorage.getItem(LS_NOTES_KEY); 
-      if (raw) setNotes(JSON.parse(raw)); 
-    } catch {}
-  }, []);
+        if (error) throw error;
+        if (data) setTasks(data);
+      } catch (error) {
+        console.error('Erreur chargement tasks:', error);
+      }
+    };
 
-  // Sauvegarder les notes dans le localStorage
-  useEffect(() => {
-    try { localStorage.setItem(LS_NOTES_KEY, JSON.stringify(notes)); } catch {}
-  }, [notes]);
+    loadTasks();
+  }, [userId]);
 
-  // Charger les courses depuis le localStorage
+  // Charger les notes depuis Supabase
   useEffect(() => {
-    try { 
-      const raw = localStorage.getItem(LS_SHOPPING_KEY); 
-      if (raw) setShoppingItems(JSON.parse(raw)); 
-    } catch {}
-  }, []);
+    if (!userId) return;
 
-  // Sauvegarder les courses dans le localStorage
+    const loadNotes = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('notes')
+          .select('*')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        if (data) setNotes(data);
+      } catch (error) {
+        console.error('Erreur chargement notes:', error);
+      }
+    };
+
+    loadNotes();
+  }, [userId]);
+
+  // Charger les courses depuis Supabase
   useEffect(() => {
-    try { localStorage.setItem(LS_SHOPPING_KEY, JSON.stringify(shoppingItems)); } catch {}
-  }, [shoppingItems]);
+    if (!userId) return;
+
+    const loadShopping = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('shopping_items')
+          .select('*')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        if (data) setShoppingItems(data);
+      } catch (error) {
+        console.error('Erreur chargement shopping:', error);
+      }
+    };
+
+    loadShopping();
+  }, [userId]);
 
   // Corriger priorityChoice si il contient une valeur invalide
   useEffect(() => {
@@ -923,39 +959,99 @@ export default function App() {
     }
   }, [priorityChoice]);
 
-  // Charger les paramètres depuis le localStorage
+  // Charger les paramètres utilisateur depuis Supabase
   useEffect(() => {
-    try { 
-      const rawRecurring = localStorage.getItem(LS_RECURRING_KEY);
-      if (rawRecurring) setRecurringExpenses(JSON.parse(rawRecurring));
-      
-      const rawLimits = localStorage.getItem(LS_BUDGET_LIMITS_KEY);
-      if (rawLimits) setBudgetLimits(JSON.parse(rawLimits));
-    } catch {}
-  }, []);
+    if (!userId) return;
 
-  // Sauvegarder les dépenses récurrentes dans le localStorage
-  useEffect(() => {
-    try { localStorage.setItem(LS_RECURRING_KEY, JSON.stringify(recurringExpenses)); } catch {}
-  }, [recurringExpenses]);
+    const loadSettings = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('user_settings')
+          .select('*')
+          .eq('user_id', userId)
+          .single();
 
-  // Sauvegarder les limites de budget dans le localStorage
-  useEffect(() => {
-    try { localStorage.setItem(LS_BUDGET_LIMITS_KEY, JSON.stringify(budgetLimits)); } catch {}
-  }, [budgetLimits]);
+        if (error && error.code !== 'PGRST116') throw error; // Ignore si pas trouvé
 
-  // Charger les médias depuis le localStorage
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(LS_MEDIA_KEY);
-      if (raw) setMediaItems(JSON.parse(raw));
-    } catch {}
-  }, []);
+        if (data) {
+          if (data.budget_limits) setBudgetLimits(data.budget_limits);
+          if (data.preferences?.recurring_expenses) setRecurringExpenses(data.preferences.recurring_expenses);
+        }
+      } catch (error) {
+        console.error('Erreur chargement settings:', error);
+      }
+    };
 
-  // Sauvegarder les médias dans le localStorage
+    loadSettings();
+  }, [userId]);
+
+  // Sauvegarder les limites de budget dans Supabase quand elles changent
   useEffect(() => {
-    try { localStorage.setItem(LS_MEDIA_KEY, JSON.stringify(mediaItems)); } catch {}
-  }, [mediaItems]);
+    if (!userId || Object.keys(budgetLimits).length === 0) return;
+
+    const saveBudgetLimits = async () => {
+      try {
+        const { error } = await supabase
+          .from('user_settings')
+          .upsert({
+            user_id: userId,
+            budget_limits: budgetLimits
+          });
+
+        if (error) throw error;
+      } catch (error) {
+        console.error('Erreur sauvegarde budget limits:', error);
+      }
+    };
+
+    const timeoutId = setTimeout(saveBudgetLimits, 500); // Debounce
+    return () => clearTimeout(timeoutId);
+  }, [budgetLimits, userId]);
+
+  // Sauvegarder les dépenses récurrentes dans Supabase quand elles changent
+  useEffect(() => {
+    if (!userId) return;
+
+    const saveRecurringExpenses = async () => {
+      try {
+        const { error } = await supabase
+          .from('user_settings')
+          .upsert({
+            user_id: userId,
+            preferences: { recurring_expenses: recurringExpenses }
+          });
+
+        if (error) throw error;
+      } catch (error) {
+        console.error('Erreur sauvegarde recurring expenses:', error);
+      }
+    };
+
+    const timeoutId = setTimeout(saveRecurringExpenses, 500); // Debounce
+    return () => clearTimeout(timeoutId);
+  }, [recurringExpenses, userId]);
+
+  // Charger les médias depuis Supabase
+  useEffect(() => {
+    if (!userId) return;
+
+    const loadMedia = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('media_items')
+          .select('*')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        if (data) setMediaItems(data);
+      } catch (error) {
+        console.error('Erreur chargement media:', error);
+      }
+    };
+
+    loadMedia();
+  }, [userId]);
 
   // Gérer la fermeture du menu de priorité au clic externe
   useEffect(() => {
@@ -1158,65 +1254,89 @@ export default function App() {
     }
   }, [recurringExpenses, budgetItems]);
 
-  // Charger le budget depuis le localStorage ou forcer les données de test
+  // Charger le budget depuis Supabase
   useEffect(() => {
-    // FORCER LES DONNÉES DE TEST (à décommenter pour réinitialiser)
-    const FORCE_TEST_DATA = true; // Mettre à false après test
-    
-    if (FORCE_TEST_DATA) {
-      const testData = generateTestData();
-      setBudgetItems(testData);
-      localStorage.setItem(LS_BUDGET_KEY, JSON.stringify(testData));
-      return;
-    }
+    if (!userId) return;
 
-    try { 
-      const raw = localStorage.getItem(LS_BUDGET_KEY); 
-      if (raw) {
-        const parsedData = JSON.parse(raw);
-        // Vérifier si on a des données valides
-        if (parsedData && parsedData.length > 0) {
-          setBudgetItems(parsedData);
-        } else {
-          // Si array vide, charger les données de test
-          const testData = generateTestData();
-          setBudgetItems(testData);
-          localStorage.setItem(LS_BUDGET_KEY, JSON.stringify(testData));
-        }
-      } else {
-        // Si pas de données sauvegardées, charger les données de test
-        const testData = generateTestData();
-        setBudgetItems(testData);
-        localStorage.setItem(LS_BUDGET_KEY, JSON.stringify(testData));
+    const loadBudget = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('budget_items')
+          .select('*')
+          .eq('user_id', userId)
+          .order('date', { ascending: false });
+
+        if (error) throw error;
+        if (data) setBudgetItems(data);
+      } catch (error) {
+        console.error('Erreur chargement budget:', error);
       }
-    } catch {
-      // En cas d'erreur, charger les données de test
-      const testData = generateTestData();
-      setBudgetItems(testData);
-      localStorage.setItem(LS_BUDGET_KEY, JSON.stringify(testData));
-    }
-  }, []);
+    };
 
-  // Sauvegarder le budget dans le localStorage
-  useEffect(() => {
-    try { localStorage.setItem(LS_BUDGET_KEY, JSON.stringify(budgetItems)); } catch {}
-  }, [budgetItems]);
+    loadBudget();
+  }, [userId]);
 
-  const addTask = () => {
+  const addTask = async () => {
     const parsed = parseTaskNLP(input);
-    if (!parsed.title) return;
-    const t = { id: uuid(), title: parsed.title, priority: priorityChoice || parsed.priority, completed: false };
-    setTasks(prev => [t, ...prev]);
-    setInput("");
-    setPriorityChoice("normal");
+    if (!parsed.title || !userId) return;
+
+    const newTask = {
+      user_id: userId,
+      text: parsed.title,
+      priority: priorityChoice || parsed.priority,
+      completed: false
+    };
+
+    try {
+      const { data, error } = await supabase
+        .from('tasks')
+        .insert(newTask)
+        .select()
+        .single();
+
+      if (error) throw error;
+      setTasks(prev => [data, ...prev]);
+      setInput("");
+      setPriorityChoice("normal");
+    } catch (error) {
+      console.error('Erreur ajout task:', error);
+    }
   };
 
-  const completeTask = (id) => {
-    setTasks(prev => prev.filter(t => t.id !== id));
-    ding();
+  const completeTask = async (id) => {
+    if (!userId) return;
+
+    try {
+      const { error } = await supabase
+        .from('tasks')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', userId);
+
+      if (error) throw error;
+      setTasks(prev => prev.filter(t => t.id !== id));
+      ding();
+    } catch (error) {
+      console.error('Erreur completion task:', error);
+    }
   };
 
-  const removeTask = (id) => setTasks(prev => prev.filter(t => t.id !== id));
+  const removeTask = async (id) => {
+    if (!userId) return;
+
+    try {
+      const { error } = await supabase
+        .from('tasks')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', userId);
+
+      if (error) throw error;
+      setTasks(prev => prev.filter(t => t.id !== id));
+    } catch (error) {
+      console.error('Erreur suppression task:', error);
+    }
+  };
 
   // Fonction pour calculer la position du menu priorité
   const calculateMenuPosition = (buttonRef) => {
@@ -1239,40 +1359,75 @@ export default function App() {
   };
 
   // Fonctions pour les notes
-  const addNote = () => {
-    if (!noteTitle.trim() && !noteContent.trim()) return;
+  const addNote = async () => {
+    if (!noteContent.trim() || !userId) return;
+
     const newNote = {
-      id: uuid(),
-      title: noteTitle.trim() || "Note sans titre",
-      content: noteContent.trim(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      user_id: userId,
+      title: noteTitle.trim() || null,
+      content: noteContent.trim()
     };
-    setNotes(prev => [newNote, ...prev]);
-    setNoteTitle("");
-    setNoteContent("");
+
+    try {
+      const { data, error } = await supabase
+        .from('notes')
+        .insert(newNote)
+        .select()
+        .single();
+
+      if (error) throw error;
+      setNotes(prev => [data, ...prev]);
+      setNoteTitle("");
+      setNoteContent("");
+    } catch (error) {
+      console.error('Erreur ajout note:', error);
+    }
   };
 
-  const updateNote = () => {
-    if (!editingNote) return;
-    const updatedNote = {
-      ...editingNote,
-      title: noteTitle.trim() || "Note sans titre",
-      content: noteContent.trim(),
-      updatedAt: new Date().toISOString()
-    };
-    setNotes(prev => prev.map(note => note.id === editingNote.id ? updatedNote : note));
-    setEditingNote(null);
-    setNoteTitle("");
-    setNoteContent("");
-  };
+  const updateNote = async () => {
+    if (!editingNote || !userId) return;
 
-  const deleteNote = (id) => {
-    setNotes(prev => prev.filter(note => note.id !== id));
-    if (editingNote && editingNote.id === id) {
+    const updates = {
+      title: noteTitle.trim() || null,
+      content: noteContent.trim()
+    };
+
+    try {
+      const { error } = await supabase
+        .from('notes')
+        .update(updates)
+        .eq('id', editingNote.id)
+        .eq('user_id', userId);
+
+      if (error) throw error;
+      setNotes(prev => prev.map(note => note.id === editingNote.id ? { ...note, ...updates } : note));
       setEditingNote(null);
       setNoteTitle("");
       setNoteContent("");
+    } catch (error) {
+      console.error('Erreur update note:', error);
+    }
+  };
+
+  const deleteNote = async (id) => {
+    if (!userId) return;
+
+    try {
+      const { error } = await supabase
+        .from('notes')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', userId);
+
+      if (error) throw error;
+      setNotes(prev => prev.filter(note => note.id !== id));
+      if (editingNote && editingNote.id === id) {
+        setEditingNote(null);
+        setNoteTitle("");
+        setNoteContent("");
+      }
+    } catch (error) {
+      console.error('Erreur suppression note:', error);
     }
   };
 
@@ -1300,57 +1455,107 @@ export default function App() {
   }, [notes, noteFilter]);
 
   // Fonctions pour les courses
-  const addShoppingItem = () => {
-    if (!itemName.trim()) return;
-    const quantity = Math.max(1, itemQuantity || 1); // Assurer une quantité valide
+  const addShoppingItem = async () => {
+    if (!itemName.trim() || !userId) return;
+    const quantity = Math.max(1, itemQuantity || 1);
+
     const newItem = {
-      id: uuid(),
+      user_id: userId,
       name: itemName.trim(),
       quantity: quantity,
       unit: itemUnit,
-      category: itemCategory,
-      purchased: false,
-      createdAt: new Date().toISOString()
+      category: itemCategory === 'courant' ? 'now' : 'later',
+      checked: false
     };
-    setShoppingItems(prev => [newItem, ...prev]);
-    setItemName("");
-    setItemQuantity(1);
-    setItemUnit("p");
-    setItemCategory("courant");
-  };
 
-  const updateShoppingItem = () => {
-    if (!editingItem) return;
-    const quantity = Math.max(1, itemQuantity || 1); // Assurer une quantité valide
-    const updatedItem = {
-      ...editingItem,
-      name: itemName.trim(),
-      quantity: quantity,
-      unit: itemUnit,
-      category: itemCategory,
-      updatedAt: new Date().toISOString()
-    };
-    setShoppingItems(prev => prev.map(item => item.id === editingItem.id ? updatedItem : item));
-    setEditingItem(null);
-    setItemName("");
-    setItemQuantity(1);
-    setItemUnit("p");
-    setItemCategory("courant");
-  };
+    try {
+      const { data, error } = await supabase
+        .from('shopping_items')
+        .insert(newItem)
+        .select()
+        .single();
 
-  const deleteShoppingItem = (id) => {
-    setShoppingItems(prev => prev.filter(item => item.id !== id));
-    if (editingItem && editingItem.id === id) {
-      setEditingItem(null);
+      if (error) throw error;
+      setShoppingItems(prev => [data, ...prev]);
       setItemName("");
+      setItemQuantity(1);
+      setItemUnit("p");
       setItemCategory("courant");
+    } catch (error) {
+      console.error('Erreur ajout shopping:', error);
     }
   };
 
-  const togglePurchased = (id) => {
-    setShoppingItems(prev => prev.map(item => 
-      item.id === id ? { ...item, purchased: !item.purchased } : item
-    ));
+  const updateShoppingItem = async () => {
+    if (!editingItem || !userId) return;
+    const quantity = Math.max(1, itemQuantity || 1);
+
+    const updates = {
+      name: itemName.trim(),
+      quantity: quantity,
+      unit: itemUnit,
+      category: itemCategory === 'courant' ? 'now' : 'later'
+    };
+
+    try {
+      const { error } = await supabase
+        .from('shopping_items')
+        .update(updates)
+        .eq('id', editingItem.id)
+        .eq('user_id', userId);
+
+      if (error) throw error;
+      setShoppingItems(prev => prev.map(item => item.id === editingItem.id ? { ...item, ...updates } : item));
+      setEditingItem(null);
+      setItemName("");
+      setItemQuantity(1);
+      setItemUnit("p");
+      setItemCategory("courant");
+    } catch (error) {
+      console.error('Erreur update shopping:', error);
+    }
+  };
+
+  const deleteShoppingItem = async (id) => {
+    if (!userId) return;
+
+    try {
+      const { error } = await supabase
+        .from('shopping_items')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', userId);
+
+      if (error) throw error;
+      setShoppingItems(prev => prev.filter(item => item.id !== id));
+      if (editingItem && editingItem.id === id) {
+        setEditingItem(null);
+        setItemName("");
+        setItemCategory("courant");
+      }
+    } catch (error) {
+      console.error('Erreur suppression shopping:', error);
+    }
+  };
+
+  const togglePurchased = async (id) => {
+    const item = shoppingItems.find(i => i.id === id);
+    if (!item || !userId) return;
+
+    try {
+      const { error } = await supabase
+        .from('shopping_items')
+        .update({ checked: !item.checked })
+        .eq('id', id)
+        .eq('user_id', userId);
+
+      if (error) throw error;
+      setShoppingItems(prev => prev.map(i =>
+        i.id === id ? { ...i, checked: !i.checked } : i
+      ));
+    } catch (error) {
+      console.error('Erreur toggle shopping:', error);
+    }
   };
 
   const startEditItem = (item) => {
@@ -1402,58 +1607,93 @@ export default function App() {
   }, [shoppingItems]);
 
   // Fonctions pour le budget
-  const addBudgetItem = () => {
-    if (!budgetAmount) return;
+  const addBudgetItem = async () => {
+    if (!budgetAmount || !userId) return;
     const amount = parseFloat(budgetAmount);
     if (isNaN(amount)) return;
-    
+
     const newItem = {
-      id: uuid(),
+      user_id: userId,
       description: budgetDescription.trim() || BUDGET_CATEGORIES[budgetType][budgetCategory],
       amount: amount,
       type: budgetType,
       category: budgetCategory,
       date: budgetDate,
-      createdAt: new Date().toISOString()
+      recurring: false
     };
-    setBudgetItems(prev => [newItem, ...prev]);
-    setBudgetDescription("");
-    setBudgetAmount("");
-    setBudgetDate(new Date().toISOString().split('T')[0]);
+
+    try {
+      const { data, error } = await supabase
+        .from('budget_items')
+        .insert(newItem)
+        .select()
+        .single();
+
+      if (error) throw error;
+      setBudgetItems(prev => [data, ...prev]);
+      setBudgetDescription("");
+      setBudgetAmount("");
+      setBudgetDate(new Date().toISOString().split('T')[0]);
+    } catch (error) {
+      console.error('Erreur ajout budget:', error);
+    }
   };
 
-  const updateBudgetItem = () => {
-    if (!editingBudgetItem || !budgetAmount) return;
+  const updateBudgetItem = async () => {
+    if (!editingBudgetItem || !budgetAmount || !userId) return;
     const amount = parseFloat(budgetAmount);
     if (isNaN(amount)) return;
-    
-    const updatedItem = {
-      ...editingBudgetItem,
+
+    const updates = {
       description: budgetDescription.trim() || BUDGET_CATEGORIES[budgetType][budgetCategory],
       amount: amount,
       type: budgetType,
       category: budgetCategory,
-      date: budgetDate,
-      updatedAt: new Date().toISOString()
+      date: budgetDate
     };
-    setBudgetItems(prev => prev.map(item => item.id === editingBudgetItem.id ? updatedItem : item));
-    setEditingBudgetItem(null);
-    setBudgetDescription("");
-    setBudgetAmount("");
-    setBudgetType("revenus");
-    setBudgetCategory("salaire");
-    setBudgetDate(new Date().toISOString().split('T')[0]);
-  };
 
-  const deleteBudgetItem = (id) => {
-    setBudgetItems(prev => prev.filter(item => item.id !== id));
-    if (editingBudgetItem && editingBudgetItem.id === id) {
+    try {
+      const { error } = await supabase
+        .from('budget_items')
+        .update(updates)
+        .eq('id', editingBudgetItem.id)
+        .eq('user_id', userId);
+
+      if (error) throw error;
+      setBudgetItems(prev => prev.map(item => item.id === editingBudgetItem.id ? { ...item, ...updates } : item));
       setEditingBudgetItem(null);
       setBudgetDescription("");
       setBudgetAmount("");
       setBudgetType("revenus");
       setBudgetCategory("salaire");
       setBudgetDate(new Date().toISOString().split('T')[0]);
+    } catch (error) {
+      console.error('Erreur update budget:', error);
+    }
+  };
+
+  const deleteBudgetItem = async (id) => {
+    if (!userId) return;
+
+    try {
+      const { error } = await supabase
+        .from('budget_items')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', userId);
+
+      if (error) throw error;
+      setBudgetItems(prev => prev.filter(item => item.id !== id));
+      if (editingBudgetItem && editingBudgetItem.id === id) {
+        setEditingBudgetItem(null);
+        setBudgetDescription("");
+        setBudgetAmount("");
+        setBudgetType("revenus");
+        setBudgetCategory("salaire");
+        setBudgetDate(new Date().toISOString().split('T')[0]);
+      }
+    } catch (error) {
+      console.error('Erreur suppression budget:', error);
     }
   };
 
@@ -1536,37 +1776,53 @@ export default function App() {
   };
 
   // Fonctions pour les médias
-  const addMedia = () => {
-    if (!mediaTitle.trim()) return;
+  const addMedia = async () => {
+    if (!mediaTitle.trim() || !userId) return;
 
     const newMedia = {
-      id: uuid(),
+      user_id: userId,
       title: mediaTitle.trim(),
-      originalTitle: selectedApiResult?.originalTitle || '',
-      overview: selectedApiResult?.overview || '',
-      posterPath: selectedApiResult?.posterPath || null,
-      releaseDate: selectedApiResult?.releaseDate || null,
-      // voteAverage supprimé - plus de notes API
+      original_title: selectedApiResult?.originalTitle || null,
+      overview: selectedApiResult?.overview || null,
+      poster_path: selectedApiResult?.posterPath || null,
+      release_date: selectedApiResult?.releaseDate || null,
       genres: selectedApiResult?.genres || [],
       type: mediaType,
       status: mediaStatus,
       rating: mediaStatus === 'watched' ? mediaRating : null,
       comment: mediaStatus === 'watched' ? mediaComment.trim() : '',
-      dateAdded: new Date().toISOString(),
-      dateWatched: mediaStatus === 'watched' ? new Date().toISOString() : null,
-      apiId: selectedApiResult?.id || null
+      date_watched: mediaStatus === 'watched' ? new Date().toISOString() : null,
+      api_id: selectedApiResult?.id || null
     };
 
-    if (editingMedia) {
-      setMediaItems(prev => prev.map(item =>
-        item.id === editingMedia.id ? { ...newMedia, id: editingMedia.id, dateAdded: editingMedia.dateAdded } : item
-      ));
-      setEditingMedia(null);
-    } else {
-      setMediaItems(prev => [newMedia, ...prev]);
-    }
+    try {
+      if (editingMedia) {
+        const { error } = await supabase
+          .from('media_items')
+          .update(newMedia)
+          .eq('id', editingMedia.id)
+          .eq('user_id', userId);
 
-    resetMediaForm();
+        if (error) throw error;
+        setMediaItems(prev => prev.map(item =>
+          item.id === editingMedia.id ? { ...item, ...newMedia } : item
+        ));
+        setEditingMedia(null);
+      } else {
+        const { data, error } = await supabase
+          .from('media_items')
+          .insert(newMedia)
+          .select()
+          .single();
+
+        if (error) throw error;
+        setMediaItems(prev => [data, ...prev]);
+      }
+
+      resetMediaForm();
+    } catch (error) {
+      console.error('Erreur ajout/update media:', error);
+    }
   };
 
   const resetMediaForm = () => {
@@ -1580,11 +1836,24 @@ export default function App() {
     setShowSuggestions(false);
   };
 
-  const deleteMedia = (id) => {
-    setMediaItems(prev => prev.filter(item => item.id !== id));
-    if (editingMedia && editingMedia.id === id) {
-      setEditingMedia(null);
-      resetMediaForm();
+  const deleteMedia = async (id) => {
+    if (!userId) return;
+
+    try {
+      const { error } = await supabase
+        .from('media_items')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', userId);
+
+      if (error) throw error;
+      setMediaItems(prev => prev.filter(item => item.id !== id));
+      if (editingMedia && editingMedia.id === id) {
+        setEditingMedia(null);
+        resetMediaForm();
+      }
+    } catch (error) {
+      console.error('Erreur suppression media:', error);
     }
   };
 
