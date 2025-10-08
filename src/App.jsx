@@ -2026,7 +2026,7 @@ export default function App({ session }) {
         <div className="flex-1 min-w-0 mobile-compact">
           <div className="flex items-start mobile-spacing">
             <span className="font-semibold text-responsive-lg break-words leading-tight flex-1 text-white group-hover:text-gray-100 transition-colors duration-300 cursor-pointer mobile-text-tight mobile-readability">
-              {t.title}
+              {t.text}
             </span>
 
             {/* Badge de priorité redesigné pour mobile */}
