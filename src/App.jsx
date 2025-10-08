@@ -6230,11 +6230,20 @@ export default function App({ session }) {
                             <div className="flex-shrink-0">
                               {media.poster_path ? (
                                 <img
-                                  src={media.poster_path}
+                                  src={
+                                    media.poster_path.startsWith('http')
+                                      ? media.poster_path
+                                      : `https://image.tmdb.org/t/p/w500${media.poster_path}`
+                                  }
                                   alt={media.title}
                                   className="w-full h-64 object-cover rounded-t-lg shadow-md"
                                   loading="lazy"
                                   decoding="async"
+                                  onError={(e) => {
+                                    console.error('Erreur chargement image:', media.poster_path);
+                                    e.target.style.display = 'none';
+                                    e.target.parentElement.innerHTML = '<div class="w-full h-64 bg-gray-700/50 flex items-center justify-center rounded-t-lg"><svg class="w-8 h-8 text-gray-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"/></svg></div>';
+                                  }}
                                 />
                               ) : (
                                 <div className="w-full h-64 bg-gray-700/50 flex items-center justify-center rounded-t-lg">

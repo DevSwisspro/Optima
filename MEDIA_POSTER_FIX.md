@@ -96,30 +96,29 @@ const startEditMedia = (media) => {
 
 ---
 
-## ✅ Correctifs Appliqués
+#### Problème 4 : Chemins Relatifs vs URLs Complètes (NOUVEAU)
 
-### Correctif 1 : Affichage du Poster
+**Symptôme** :
+Après le correctif initial, les images ne s'affichent toujours pas pour certains médias.
 
-**Fichier** : `src/App.jsx` lignes 6231-6233
+**Cause Racine Supplémentaire** :
+Il se peut que certains médias aient été sauvegardés avec un **chemin relatif** (`/abc123.jpg`) au lieu d'une URL complète (`https://image.tmdb.org/t/p/w500/abc123.jpg`).
 
-**Avant** :
+**Problème** :
 ```javascript
-{media.posterPath ? (
-  <img
-    src={media.posterPath}
-    alt={media.title}
-    className="w-full h-64 object-cover rounded-t-lg shadow-md"
-    loading="lazy"
-    decoding="async"
-  />
-) : (
-  <div className="w-full h-64 bg-gray-700/50 flex items-center justify-center rounded-t-lg">
-    <Play className="w-8 h-8 text-gray-500" />
-  </div>
-)}
+// Si poster_path = "/abc123.jpg" (chemin relatif)
+<img src="/abc123.jpg" />  // ❌ Cherche l'image sur le serveur local !
 ```
 
-**Après** :
+---
+
+## ✅ Correctifs Appliqués
+
+### Correctif 1 : Affichage du Poster avec Fallback URL
+
+**Fichier** : `src/App.jsx` lignes 6231-6247
+
+**Avant** :
 ```javascript
 {media.poster_path ? (
   <img
@@ -136,7 +135,39 @@ const startEditMedia = (media) => {
 )}
 ```
 
-**Bénéfice** : Les affiches des médias s'affichent de nouveau.
+**Après** :
+```javascript
+{media.poster_path ? (
+  <img
+    src={
+      media.poster_path.startsWith('http')
+        ? media.poster_path
+        : `https://image.tmdb.org/t/p/w500${media.poster_path}`
+    }
+    alt={media.title}
+    className="w-full h-64 object-cover rounded-t-lg shadow-md"
+    loading="lazy"
+    decoding="async"
+    onError={(e) => {
+      console.error('Erreur chargement image:', media.poster_path);
+      e.target.style.display = 'none';
+      e.target.parentElement.innerHTML = '<div class="w-full h-64 bg-gray-700/50 flex items-center justify-center rounded-t-lg"><svg class="w-8 h-8 text-gray-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"/></svg></div>';
+    }}
+  />
+) : (
+  <div className="w-full h-64 bg-gray-700/50 flex items-center justify-center rounded-t-lg">
+    <Play className="w-8 h-8 text-gray-500" />
+  </div>
+)}
+```
+
+**Améliorations** :
+- ✅ Détection automatique : Si `poster_path` commence par `http`, utilisation directe
+- ✅ Sinon : Construction de l'URL complète avec le préfixe TMDB
+- ✅ Gestion d'erreurs : Si l'image ne charge pas, affichage d'un placeholder
+- ✅ Logging : Erreur enregistrée dans la console pour débogage
+
+**Bénéfice** : Les affiches s'affichent pour **tous** les médias, qu'ils aient une URL complète ou un chemin relatif.
 
 ---
 
@@ -222,14 +253,15 @@ const startEditMedia = (media) => {
 
 | Fichier | Lignes Modifiées | Changement |
 |---------|------------------|------------|
-| `src/App.jsx` | 6231, 6233 | `media.posterPath` → `media.poster_path` |
+| `src/App.jsx` | 6233-6237 | Ajout fallback URL + détection `http` |
+| `src/App.jsx` | 6242-6246 | Gestion erreur `onError` avec placeholder |
 | `src/App.jsx` | 6273, 6275 | `media.releaseDate` → `media.release_date` |
 | `src/App.jsx` | 1905 | `media.originalTitle` → `media.original_title` |
 | `src/App.jsx` | 1907 | `media.posterPath` → `media.poster_path` |
 | `src/App.jsx` | 1908 | `media.releaseDate` → `media.release_date` |
 | `src/App.jsx` | 1912 | `media.apiId` → `media.api_id` |
 
-**Total** : 8 propriétés corrigées pour alignement avec Supabase
+**Total** : 9 modifications (snake_case + fallback URL + gestion erreurs)
 
 ---
 
@@ -356,25 +388,27 @@ const startEditMedia = (media) => {
 ```bash
 git add src/App.jsx MEDIA_POSTER_FIX.md
 git commit -m "$(cat <<'EOF'
-Fix: Corriger affichage jaquettes médias (posterPath → poster_path)
+Fix: Affichage jaquettes médias (URL fallback + snake_case)
 
 Problème corrigé:
 - Jaquettes (affiches) des films/séries/animés ne s'affichaient plus
 - Années de sortie manquantes
 - Perte de données lors de l'édition de médias
 - Incohérence camelCase vs snake_case
+- Chemins relatifs non convertis en URLs complètes
 
 Changements:
-- Utiliser poster_path au lieu de posterPath (lignes 6231, 6233)
-- Utiliser release_date au lieu de releaseDate (lignes 6273, 6275)
-- Corriger startEditMedia pour utiliser snake_case (lignes 1905, 1907, 1908, 1912)
+- Ajout fallback URL pour chemins relatifs (détection startsWith('http'))
+- Construction automatique URL TMDB si chemin relatif
+- Gestion erreur onError avec placeholder SVG
+- Utiliser snake_case pour toutes les propriétés Supabase
 
 Modules affectés:
 - Médias (affichage, édition)
 
 Correctifs techniques:
-- src/App.jsx:6231 - media.posterPath → media.poster_path
-- src/App.jsx:6233 - src={media.posterPath} → src={media.poster_path}
+- src/App.jsx:6233-6237 - Fallback URL avec détection http
+- src/App.jsx:6242-6246 - Gestion erreur onError
 - src/App.jsx:6273 - media.releaseDate → media.release_date
 - src/App.jsx:6275 - Affichage année avec release_date
 - src/App.jsx:1905 - media.originalTitle → media.original_title
@@ -383,13 +417,14 @@ Correctifs techniques:
 - src/App.jsx:1912 - media.apiId → media.api_id
 
 Bénéfices:
-- Jaquettes de nouveau visibles sur toutes les cartes
+- Jaquettes visibles pour tous les médias (URL complète ou relative)
+- Gestion robuste des erreurs de chargement d'images
 - Années de sortie affichées
 - Édition préserve toutes les données API
 - Cohérence avec schéma Supabase
 
 Documentation:
-- MEDIA_POSTER_FIX.md créé avec analyse complète
+- MEDIA_POSTER_FIX.md mis à jour avec fallback URL
 
 🤖 Generated with Claude Code
 Co-Authored-By: Claude <noreply@anthropic.com>
