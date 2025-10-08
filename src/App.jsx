@@ -1567,23 +1567,24 @@ export default function App({ session }) {
     }
   };
 
-  const togglePurchased = async (id) => {
-    const item = shoppingItems.find(i => i.id === id);
-    if (!item || !userId) return;
+  const handleItemBought = async (id) => {
+    if (!userId) return;
 
     try {
+      // Supprimer définitivement l'article de Supabase
       const { error } = await supabase
         .from('shopping_items')
-        .update({ checked: !item.checked })
+        .delete()
         .eq('id', id)
         .eq('user_id', userId);
 
       if (error) throw error;
-      setShoppingItems(prev => prev.map(i =>
-        i.id === id ? { ...i, checked: !i.checked } : i
-      ));
+
+      // Retirer l'article du state local pour mise à jour immédiate de l'UI
+      setShoppingItems(prev => prev.filter(item => item.id !== id));
     } catch (error) {
-      console.error('Erreur toggle shopping:', error);
+      console.error('Erreur suppression article acheté:', error);
+      logSupabaseError('Suppression article shopping', error);
     }
   };
 
@@ -1603,12 +1604,13 @@ export default function App({ session }) {
     setItemCategory("courant");
   };
 
-  // Filtrer les courses
+  // Filtrer et regrouper les courses
   const filteredShoppingItems = useMemo(() => {
-    let filtered = shoppingItems.filter(item => !item.checked); // Ne montrer que les non cochés
+    // Plus besoin de filtrer sur 'checked' car les articles achetés sont supprimés définitivement
+    // Tous les items de shoppingItems sont actifs (non achetés)
 
     // Regrouper les articles identiques et cumuler les quantités
-    const groupedItems = filtered.reduce((acc, item) => {
+    const groupedItems = shoppingItems.reduce((acc, item) => {
       const key = `${item.name}-${item.category}-${item.unit}`;
       if (acc[key]) {
         acc[key].quantity += item.quantity;
@@ -4724,7 +4726,8 @@ export default function App({ session }) {
                                 <Button 
                                   size="icon" 
                                   variant="outline" 
-                                  onClick={() => togglePurchased(item.id)} 
+                                  onClick={() => handleItemBought(item.id)}
+                                  title="Vu / Acheté" 
                                   className="relative rounded-full bg-gradient-to-br from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 active:scale-95 group-hover:shadow-green-500/50"
                                 >
                                   <Check className="w-5 h-5 text-white" />
@@ -4776,7 +4779,8 @@ export default function App({ session }) {
                                 <Button 
                                   size="icon" 
                                   variant="outline" 
-                                  onClick={() => togglePurchased(item.id)} 
+                                  onClick={() => handleItemBought(item.id)}
+                                  title="Vu / Acheté" 
                                   className="relative rounded-full bg-gradient-to-br from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 active:scale-95 group-hover:shadow-green-500/50"
                                 >
                                   <Check className="w-5 h-5 text-white" />
