@@ -731,6 +731,26 @@ function ding() {
   o.start(); o.stop(ctx.currentTime + 0.16);
 }
 
+// --- Helper pour afficher les erreurs Supabase de manière détaillée --------
+function logSupabaseError(context, error) {
+  console.error(`❌ ${context}:`, {
+    message: error.message,
+    details: error.details,
+    hint: error.hint,
+    code: error.code,
+    status: error.status
+  });
+
+  // Afficher des conseils selon le type d'erreur
+  if (error.code === 'PGRST116') {
+    console.warn('💡 Aucune donnée trouvée (c\'est normal pour un nouvel utilisateur)');
+  } else if (error.code === '42501') {
+    console.warn('💡 Erreur de permissions RLS - vérifiez que les policies Supabase sont correctes');
+  } else if (error.message?.includes('Failed to fetch')) {
+    console.warn('💡 Impossible de contacter Supabase - vérifiez votre connexion internet et les variables d\'environnement');
+  }
+}
+
 // --- Main App ---------------------------------------------------------------
 export default function App({ session }) {
   // Extraire l'utilisateur de la session
@@ -901,7 +921,7 @@ export default function App({ session }) {
         if (error) throw error;
         if (data) setTasks(data);
       } catch (error) {
-        console.error('Erreur chargement tasks:', error);
+        logSupabaseError('Chargement tasks', error);
       }
     };
 
@@ -923,7 +943,7 @@ export default function App({ session }) {
         if (error) throw error;
         if (data) setNotes(data);
       } catch (error) {
-        console.error('Erreur chargement notes:', error);
+        logSupabaseError('Chargement notes', error);
       }
     };
 
@@ -945,7 +965,7 @@ export default function App({ session }) {
         if (error) throw error;
         if (data) setShoppingItems(data);
       } catch (error) {
-        console.error('Erreur chargement shopping:', error);
+        logSupabaseError('Chargement shopping', error);
       }
     };
 
@@ -974,11 +994,19 @@ export default function App({ session }) {
         if (error && error.code !== 'PGRST116') throw error; // Ignore si pas trouvé
 
         if (data) {
-          if (data.budget_limits) setBudgetLimits(data.budget_limits);
+          // Merger avec les valeurs par défaut pour éviter les propriétés manquantes
+          if (data.budget_limits) {
+            setBudgetLimits(prevLimits => ({
+              categories: { ...prevLimits.categories, ...(data.budget_limits.categories || {}) },
+              epargne: { ...prevLimits.epargne, ...(data.budget_limits.epargne || {}) },
+              investissements: { ...prevLimits.investissements, ...(data.budget_limits.investissements || {}) }
+            }));
+          }
           if (data.preferences?.recurring_expenses) setRecurringExpenses(data.preferences.recurring_expenses);
         }
       } catch (error) {
-        console.error('Erreur chargement settings:', error);
+        console.error('❌ Erreur chargement settings:', error);
+        console.error('Détails:', error.message);
       }
     };
 
@@ -1046,7 +1074,7 @@ export default function App({ session }) {
         if (error) throw error;
         if (data) setMediaItems(data);
       } catch (error) {
-        console.error('Erreur chargement media:', error);
+        logSupabaseError('Chargement media', error);
       }
     };
 
@@ -1269,7 +1297,7 @@ export default function App({ session }) {
         if (error) throw error;
         if (data) setBudgetItems(data);
       } catch (error) {
-        console.error('Erreur chargement budget:', error);
+        logSupabaseError('Chargement budget', error);
       }
     };
 
@@ -5344,9 +5372,9 @@ export default function App({ session }) {
             </div>
 
             {/* Jauges de progression des budgets définis */}
-            {(Object.values(budgetLimits.categories).some(limit => limit > 0) || 
-              Object.values(budgetLimits.epargne).some(limit => limit > 0) || 
-              Object.values(budgetLimits.investissements).some(limit => limit > 0)) && (
+            {(budgetLimits?.categories && Object.values(budgetLimits.categories).some(limit => limit > 0) ||
+              budgetLimits?.epargne && Object.values(budgetLimits.epargne).some(limit => limit > 0) ||
+              budgetLimits?.investissements && Object.values(budgetLimits.investissements).some(limit => limit > 0)) && (
               <div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -5359,7 +5387,7 @@ export default function App({ session }) {
                 
                 <div className="space-y-6">
                   {/* Dépenses Variables */}
-                  {Object.values(budgetLimits.categories).some(limit => limit > 0) && (
+                  {budgetLimits?.categories && Object.values(budgetLimits.categories).some(limit => limit > 0) && (
                     <div>
                       <h4 className="text-md font-semibold text-white mb-3 text-red-400">Dépenses Variables</h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -5445,7 +5473,7 @@ export default function App({ session }) {
                   )}
 
                   {/* Épargne */}
-                  {Object.values(budgetLimits.epargne).some(limit => limit > 0) && (
+                  {budgetLimits?.epargne && Object.values(budgetLimits.epargne).some(limit => limit > 0) && (
                     <div>
                       <h4 className="text-md font-semibold text-white mb-3 text-blue-400">Épargne</h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -5527,7 +5555,7 @@ export default function App({ session }) {
                   )}
 
                   {/* Investissements */}
-                  {Object.values(budgetLimits.investissements).some(limit => limit > 0) && (
+                  {budgetLimits?.investissements && Object.values(budgetLimits.investissements).some(limit => limit > 0) && (
                     <div>
                       <h4 className="text-md font-semibold text-white mb-3 text-red-400">Investissements</h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
