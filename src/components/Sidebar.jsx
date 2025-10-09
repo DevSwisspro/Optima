@@ -375,6 +375,7 @@ export default function Sidebar({ activeTab, setActiveTab, session, onLogout }) 
           {/* Paramètres */}
           <motion.button
             onClick={() => setIsSettingsOpen(true)}
+            data-mobile-settings-btn
             className="relative flex flex-col items-center justify-center gap-0.5 px-3 py-2.5 rounded-xl transition-all duration-200 min-w-[70px] min-h-[56px] active:bg-white/5"
             whileTap={{ scale: 0.92 }}
             initial={{ opacity: 0, y: 20 }}

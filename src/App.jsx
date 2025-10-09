@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Header from "@/components/Header";
+import MobileHeader from "@/components/MobileHeader";
 import Sidebar from "@/components/Sidebar";
 import { formatCurrency } from "@/lib/utils";
 import LogoDevSwiss from "@/components/LogoDevSwiss";
@@ -2046,8 +2047,14 @@ export default function App({ session, onLogout }) {
 
   return (
     <div className="min-h-screen gradient-dark text-white relative overflow-hidden">
-      {/* Header Premium moderne */}
+      {/* Header Desktop Premium */}
       <Header session={session} onLogout={onLogout} />
+
+      {/* Header Mobile avec titre OPTIMA */}
+      <MobileHeader onSettingsClick={() => {
+        // Le Sidebar gère déjà le panneau de paramètres
+        document.querySelector('[data-mobile-settings-btn]')?.click();
+      }} />
 
       {/* Sidebar Navigation */}
       <Sidebar
@@ -2057,7 +2064,7 @@ export default function App({ session, onLogout }) {
         onLogout={onLogout}
       />
 
-      <div className="max-w-7xl mx-auto space-y-4 md:space-y-6 pb-24 md:pb-8 px-4 sm:px-6 lg:px-8 md:ml-20">
+      <div className="max-w-7xl mx-auto space-y-4 md:space-y-6 pb-24 md:pb-8 px-4 sm:px-6 lg:px-8 md:ml-20 pt-16 md:pt-0">
         {/* Contenu Principal avec Transitions Fluides */}
         
           {activeTab === "dashboard" && (
