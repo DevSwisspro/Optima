@@ -7,13 +7,16 @@ import {
   ShoppingCart,
   Wallet,
   Play,
-  Settings
+  Settings,
+  Plus
 } from 'lucide-react';
 import SettingsPanel from './SettingsPanel';
+import FloatingActionMenu from './FloatingActionMenu';
 
 export default function Sidebar({ activeTab, setActiveTab, session, onLogout }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isActionMenuOpen, setIsActionMenuOpen] = useState(false);
 
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -179,82 +182,186 @@ export default function Sidebar({ activeTab, setActiveTab, session, onLogout }) 
         </div>
       </motion.aside>
 
-      {/* Navigation Mobile (bottom bar) */}
+      {/* Navigation Mobile (bottom bar intelligent) */}
       <motion.nav
         className="md:hidden fixed bottom-0 left-0 right-0 z-50 glass-strong border-t border-white/10 safe-area-bottom"
         initial={{ y: 100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ type: "spring", stiffness: 100, damping: 20, delay: 0.3 }}
       >
-        <div className="flex items-center justify-around max-w-lg mx-auto px-1 py-2 pb-safe">
-          {menuItems.map((item, index) => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
-
-            return (
-              <motion.button
-                key={item.id}
-                onClick={() => setActiveTab(item.id)}
-                className="relative flex flex-col items-center justify-center gap-0.5 px-2 py-2.5 rounded-xl transition-all duration-200 min-w-[60px] min-h-[56px] active:bg-white/5"
-                whileTap={{ scale: 0.92 }}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
-              >
-                {/* Background actif */}
-                {isActive && (
-                  <motion.div
-                    className="absolute inset-0 bg-primary/20 rounded-xl shadow-glow-primary"
-                    layoutId="activeMobileTab"
-                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                  />
-                )}
-
-                {/* Icône */}
-                <Icon
-                  className={`w-6 h-6 relative z-10 transition-colors ${
-                    isActive ? 'text-primary drop-shadow-glow' : 'text-gray-400'
-                  }`}
-                />
-
-                {/* Label */}
-                <span
-                  className={`text-[10px] font-semibold relative z-10 transition-colors leading-tight ${
-                    isActive ? 'text-white' : 'text-gray-500'
-                  }`}
-                >
-                  {item.label}
-                </span>
-
-                {/* Dot indicator */}
-                {isActive && (
-                  <motion.div
-                    className="absolute -top-1 w-1 h-1 bg-primary rounded-full"
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: 'spring' }}
-                  />
-                )}
-              </motion.button>
-            );
-          })}
-
-          {/* Bouton Paramètres mobile */}
+        <div className="relative flex items-center justify-around max-w-lg mx-auto px-2 py-2 pb-safe">
+          {/* Dashboard */}
           <motion.button
-            onClick={() => setIsSettingsOpen(true)}
-            className="relative flex flex-col items-center justify-center gap-0.5 px-2 py-2.5 rounded-xl transition-all duration-200 min-w-[60px] min-h-[56px] active:bg-white/5"
+            onClick={() => setActiveTab('dashboard')}
+            className={`relative flex flex-col items-center justify-center gap-0.5 px-3 py-2.5 rounded-xl transition-all duration-200 min-w-[70px] min-h-[56px] ${
+              activeTab === 'dashboard' ? 'active:bg-primary/5' : 'active:bg-white/5'
+            }`}
             whileTap={{ scale: 0.92 }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: menuItems.length * 0.05 }}
+            transition={{ delay: 0.05 }}
           >
-            <Settings className="w-6 h-6 text-gray-400" />
-            <span className="text-[10px] font-semibold text-gray-500 leading-tight">
+            {activeTab === 'dashboard' && (
+              <motion.div
+                className="absolute inset-0 bg-primary/20 rounded-xl shadow-glow-primary"
+                layoutId="activeMobileTab"
+                transition={{ type: "spring", stiffness: 380, damping: 30 }}
+              />
+            )}
+            <LayoutDashboard
+              className={`w-6 h-6 relative z-10 transition-colors ${
+                activeTab === 'dashboard' ? 'text-primary drop-shadow-glow' : 'text-gray-400'
+              }`}
+            />
+            <span
+              className={`text-[10px] font-semibold relative z-10 transition-colors leading-tight ${
+                activeTab === 'dashboard' ? 'text-white' : 'text-gray-500'
+              }`}
+            >
+              Dashboard
+            </span>
+            {activeTab === 'dashboard' && (
+              <motion.div
+                className="absolute -top-1 w-1 h-1 bg-primary rounded-full"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: 'spring' }}
+              />
+            )}
+          </motion.button>
+
+          {/* Budget */}
+          <motion.button
+            onClick={() => setActiveTab('budget')}
+            className={`relative flex flex-col items-center justify-center gap-0.5 px-3 py-2.5 rounded-xl transition-all duration-200 min-w-[70px] min-h-[56px] ${
+              activeTab === 'budget' ? 'active:bg-primary/5' : 'active:bg-white/5'
+            }`}
+            whileTap={{ scale: 0.92 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            {activeTab === 'budget' && (
+              <motion.div
+                className="absolute inset-0 bg-primary/20 rounded-xl shadow-glow-primary"
+                layoutId="activeMobileTab"
+                transition={{ type: "spring", stiffness: 380, damping: 30 }}
+              />
+            )}
+            <Wallet
+              className={`w-6 h-6 relative z-10 transition-colors ${
+                activeTab === 'budget' ? 'text-primary drop-shadow-glow' : 'text-gray-400'
+              }`}
+            />
+            <span
+              className={`text-[10px] font-semibold relative z-10 transition-colors leading-tight ${
+                activeTab === 'budget' ? 'text-white' : 'text-gray-500'
+              }`}
+            >
+              Budget
+            </span>
+            {activeTab === 'budget' && (
+              <motion.div
+                className="absolute -top-1 w-1 h-1 bg-primary rounded-full"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: 'spring' }}
+              />
+            )}
+          </motion.button>
+
+          {/* Bouton central flottant (+) */}
+          <motion.button
+            onClick={() => setIsActionMenuOpen(true)}
+            className="relative flex items-center justify-center w-16 h-16 -mt-8 bg-gradient-to-br from-red-500 to-red-600 rounded-full shadow-2xl shadow-red-500/40"
+            whileTap={{ scale: 0.9 }}
+            whileHover={{ scale: 1.05 }}
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ type: "spring", stiffness: 400, damping: 20, delay: 0.15 }}
+          >
+            {/* Glow effect */}
+            <motion.div
+              className="absolute inset-0 rounded-full bg-red-400 blur-xl opacity-50"
+              animate={{
+                scale: [1, 1.2, 1],
+                opacity: [0.5, 0.7, 0.5]
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            />
+            <Plus className="w-7 h-7 text-white relative z-10" strokeWidth={2.5} />
+          </motion.button>
+
+          {/* Médias */}
+          <motion.button
+            onClick={() => setActiveTab('media')}
+            className={`relative flex flex-col items-center justify-center gap-0.5 px-3 py-2.5 rounded-xl transition-all duration-200 min-w-[70px] min-h-[56px] ${
+              activeTab === 'media' ? 'active:bg-primary/5' : 'active:bg-white/5'
+            }`}
+            whileTap={{ scale: 0.92 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            {activeTab === 'media' && (
+              <motion.div
+                className="absolute inset-0 bg-primary/20 rounded-xl shadow-glow-primary"
+                layoutId="activeMobileTab"
+                transition={{ type: "spring", stiffness: 380, damping: 30 }}
+              />
+            )}
+            <Play
+              className={`w-6 h-6 relative z-10 transition-colors ${
+                activeTab === 'media' ? 'text-primary drop-shadow-glow' : 'text-gray-400'
+              }`}
+            />
+            <span
+              className={`text-[10px] font-semibold relative z-10 transition-colors leading-tight ${
+                activeTab === 'media' ? 'text-white' : 'text-gray-500'
+              }`}
+            >
+              Médias
+            </span>
+            {activeTab === 'media' && (
+              <motion.div
+                className="absolute -top-1 w-1 h-1 bg-primary rounded-full"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: 'spring' }}
+              />
+            )}
+          </motion.button>
+
+          {/* Paramètres */}
+          <motion.button
+            onClick={() => setIsSettingsOpen(true)}
+            className="relative flex flex-col items-center justify-center gap-0.5 px-3 py-2.5 rounded-xl transition-all duration-200 min-w-[70px] min-h-[56px] active:bg-white/5"
+            whileTap={{ scale: 0.92 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+          >
+            <Settings className="w-6 h-6 text-gray-400 relative z-10" />
+            <span className="text-[10px] font-semibold text-gray-500 leading-tight relative z-10">
               Réglages
             </span>
           </motion.button>
         </div>
       </motion.nav>
+
+      {/* Menu flottant d'actions */}
+      <FloatingActionMenu
+        isOpen={isActionMenuOpen}
+        onClose={() => setIsActionMenuOpen(false)}
+        onAction={(section) => {
+          setActiveTab(section);
+          setIsActionMenuOpen(false);
+        }}
+      />
 
       {/* Panneau de paramètres */}
       <SettingsPanel
