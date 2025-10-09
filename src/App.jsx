@@ -2125,8 +2125,9 @@ export default function App({ session, onLogout }) {
         
           {activeTab === "dashboard" && (
             <PageTransition pageKey="dashboard">
+              <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 space-y-8">
               {/* Header Dashboard - Mobile vs Desktop */}
-              <div
+              <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
@@ -2134,7 +2135,7 @@ export default function App({ session, onLogout }) {
               >
                 {/* Mobile Header - Centré et épuré */}
                 <div className="md:hidden">
-                  <div
+                  <motion.div
                     initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: 0.2, type: "spring", bounce: 0.3 }}
@@ -2149,11 +2150,11 @@ export default function App({ session, onLogout }) {
                         <p className="text-sm text-gray-300">Vue d'ensemble</p>
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
 
                   {/* Filtres Mobile - Style Cards */}
-                  <div className="mt-6 space-y-3">
-                    <select
+                  <div className="mt-6 space-y-3 max-w-sm mx-auto">
+                    <motion.select
                       initial={{ x: -50, opacity: 0 }}
                       animate={{ x: 0, opacity: 1 }}
                       transition={{ delay: 0.3 }}
@@ -2164,9 +2165,9 @@ export default function App({ session, onLogout }) {
                       {getAvailableYears(budgetItems).length > 0 ? getAvailableYears(budgetItems).map(year => (
                         <option key={year} value={year} className="bg-gray-800">{year}</option>
                       )) : <option value={new Date().getFullYear()} className="bg-gray-800">{new Date().getFullYear()}</option>}
-                    </select>
+                    </motion.select>
 
-                    <select
+                    <motion.select
                       initial={{ x: 50, opacity: 0 }}
                       animate={{ x: 0, opacity: 1 }}
                       transition={{ delay: 0.4 }}
@@ -2180,9 +2181,9 @@ export default function App({ session, onLogout }) {
                           {new Date(2024, i).toLocaleDateString('fr-FR', { month: 'long' })}
                         </option>
                       ))}
-                    </select>
+                    </motion.select>
 
-                    <button
+                    <motion.button
                       initial={{ y: 50, opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
                       transition={{ delay: 0.5 }}
@@ -2193,7 +2194,7 @@ export default function App({ session, onLogout }) {
                     >
                       <TrendingUp className="w-5 h-5 sm:w-5 sm:h-5" />
                       Budget Avancé
-                    </button>
+                    </motion.button>
                   </div>
                 </div>
 
@@ -2201,7 +2202,7 @@ export default function App({ session, onLogout }) {
                 <div className="hidden md:block">
                   <div className="glass-dark rounded-3xl p-8 border border-white/10 card-premium">
                     <div className="flex flex-row justify-between items-center">
-                      <div
+                      <motion.div
                         initial={{ x: -30, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ delay: 0.2 }}
@@ -2214,9 +2215,9 @@ export default function App({ session, onLogout }) {
                           <h2 className="text-4xl font-bold text-white mb-2">Dashboard Global</h2>
                           <p className="text-xl text-gray-300">Analyse complète de vos finances</p>
                         </div>
-                      </div>
+                      </motion.div>
 
-                      <div
+                      <motion.div
                         initial={{ x: 30, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ delay: 0.3 }}
@@ -2225,7 +2226,7 @@ export default function App({ session, onLogout }) {
                         <select
                           value={dashboardFilter.year}
                           onChange={(e) => setDashboardFilter(prev => ({ ...prev, year: parseInt(e.target.value) }))}
-                          className="glass-dark text-white px-6 py-3 rounded-xl border border-white/20 focus:border-red-500 focus:ring-2 focus:ring-red-500/30 text-base font-semibold hover-lift"
+                          className="glass-dark text-white px-6 py-3 rounded-xl border border-white/20 focus:border-red-500 focus:ring-2 focus:ring-red-500/30 text-base font-semibold hover-lift h-12"
                         >
                           {getAvailableYears(budgetItems).length > 0 ? getAvailableYears(budgetItems).map(year => (
                             <option key={year} value={year} className="bg-gray-800">{year}</option>
@@ -2235,7 +2236,7 @@ export default function App({ session, onLogout }) {
                         <select
                           value={dashboardFilter.month}
                           onChange={(e) => setDashboardFilter(prev => ({ ...prev, month: e.target.value }))}
-                          className="glass-dark text-white px-6 py-3 rounded-xl border border-white/20 focus:border-red-500 focus:ring-2 focus:ring-red-500/30 text-base font-semibold hover-lift"
+                          className="glass-dark text-white px-6 py-3 rounded-xl border border-white/20 focus:border-red-500 focus:ring-2 focus:ring-red-500/30 text-base font-semibold hover-lift h-12"
                         >
                           <option value="all" className="bg-gray-800">Toute l'année</option>
                           {Array.from({ length: 12 }, (_, i) => (
@@ -2245,20 +2246,20 @@ export default function App({ session, onLogout }) {
                           ))}
                         </select>
 
-                        <button
+                        <motion.button
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={() => setActiveTab("budget-dashboard")}
-                          className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white px-6 sm:px-8 py-3 sm:py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-3 min-h-[48px]"
+                          className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white px-6 sm:px-8 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-3 h-12"
                         >
                           <TrendingUp className="w-5 h-5" />
                           Budget Avancé
-                        </button>
-                      </div>
+                        </motion.button>
+                      </motion.div>
                     </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
 
               {budgetItems.length > 0 ? (
                 <>
@@ -2266,7 +2267,7 @@ export default function App({ session, onLogout }) {
 
                   {/* Version Mobile - Cards verticales centrées */}
                   <div className="md:hidden">
-                    <div
+                    <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.6 }}
@@ -2291,13 +2292,13 @@ export default function App({ session, onLogout }) {
                         const Icon = config.icon;
 
                         return (
-                          <div
+                          <motion.div
                             key={type}
                             initial={{ x: index % 2 === 0 ? -100 : 100, opacity: 0 }}
                             animate={{ x: 0, opacity: 1 }}
                             transition={{ delay: 0.7 + index * 0.1, type: "spring", bounce: 0.3 }}
                             whileTap={{ scale: 0.98 }}
-                            className={`glass-dark rounded-3xl p-6 border border-white/20 neo-shadow bg-gradient-to-br ${config.bgColor} card-premium`}
+                            className={`glass-dark rounded-3xl p-6 border border-white/20 neo-shadow bg-gradient-to-br ${config.bgColor} card-premium w-full max-w-sm mx-auto`}
                           >
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-4">
@@ -2313,27 +2314,27 @@ export default function App({ session, onLogout }) {
                                   </div>
                                 </div>
                               </div>
-                              <div
+                              <motion.div
                                 animate={{ rotate: [0, 5, -5, 0] }}
                                 transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                                 className="text-2xl opacity-20"
                               >
                                 {type === 'revenus' ? '📈' : type === 'epargne' ? '💰' : type === 'investissements' ? '📊' : '💸'}
-                              </div>
+                              </motion.div>
                             </div>
-                          </div>
+                          </motion.div>
                         );
                       })}
-                    </div>
+                    </motion.div>
                   </div>
 
                   {/* Version Desktop - Grid horizontal classique amélioré */}
                   <div className="hidden md:block">
-                    <div
+                    <motion.div
                       initial={{ opacity: 0, y: 30 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.4 }}
-                      className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 lg:gap-6"
+                      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6"
                     >
                       {Object.entries({
                         revenus: { label: 'Revenus', color: 'text-green-400', icon: TrendingUp },
@@ -2354,16 +2355,16 @@ export default function App({ session, onLogout }) {
                         const Icon = config.icon;
 
                         return (
-                          <div
+                          <motion.div
                             key={type}
                             initial={{ y: 50, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
                             transition={{ delay: 0.5 + index * 0.1, type: "spring", bounce: 0.2 }}
                             whileHover={{ y: -8, scale: 1.02 }}
-                            className="glass-dark rounded-3xl p-6 border border-white/10 neo-shadow hover-lift card-premium"
+                            className="glass-dark rounded-2xl p-6 border border-white/10 neo-shadow hover-lift card-premium h-full"
                           >
-                            <div className="text-center">
-                              <div className={`inline-flex p-3 bg-gradient-to-br from-gray-700 to-gray-800 rounded-2xl mb-3 shadow-lg`}>
+                            <div className="text-center h-full flex flex-col justify-center">
+                              <div className={`inline-flex p-3 bg-gradient-to-br from-gray-700 to-gray-800 rounded-2xl mb-3 shadow-lg mx-auto`}>
                                 <Icon className={`w-6 h-6 ${config.color}`} />
                               </div>
                               <div className={`text-sm font-semibold ${config.color} mb-2`}>
@@ -2373,15 +2374,15 @@ export default function App({ session, onLogout }) {
                                 {type === 'revenus' || type === 'epargne' || type === 'investissements' ? '+' : '-'}{formatCurrency(total).replace(' CHF', '')} CHF
                               </div>
                             </div>
-                          </div>
+                          </motion.div>
                         );
                       })}
-                    </div>
+                    </motion.div>
                   </div>
 
                   {/* Jauges de progression des objectifs */}
                   {(budgetLimits?.longTerm?.epargne > 0 || budgetLimits?.longTerm?.investissements > 0) && (
-                    <div 
+                    <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm card-responsive border border-gray-700/30 hover-lift ultra-smooth card-premium"
@@ -2488,7 +2489,7 @@ export default function App({ session, onLogout }) {
                           </div>
                         )}
                       </div>
-                    </div>
+                    </motion.div>
                   )}
 
                   {/* Graphiques mensuels */}
@@ -2636,6 +2637,7 @@ export default function App({ session, onLogout }) {
                   </button>
                 </div>
               )}
+              </div>
             </PageTransition>
           )}
 
