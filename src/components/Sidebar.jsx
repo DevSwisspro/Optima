@@ -274,26 +274,62 @@ export default function Sidebar({ activeTab, setActiveTab, session, onLogout }) 
           <motion.button
             onClick={() => setIsActionMenuOpen(true)}
             className="relative flex items-center justify-center w-16 h-16 -mt-8 bg-gradient-to-br from-red-500 to-red-600 rounded-full shadow-2xl shadow-red-500/40"
-            whileTap={{ scale: 0.9 }}
+            whileTap={{ scale: 0.88 }}
             whileHover={{ scale: 1.05 }}
             initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ type: "spring", stiffness: 400, damping: 20, delay: 0.15 }}
+            animate={{
+              opacity: 1,
+              scale: 1,
+              boxShadow: [
+                '0 20px 50px rgba(239, 68, 68, 0.4)',
+                '0 20px 60px rgba(239, 68, 68, 0.5)',
+                '0 20px 50px rgba(239, 68, 68, 0.4)'
+              ]
+            }}
+            transition={{
+              scale: { type: "spring", stiffness: 400, damping: 20, delay: 0.15 },
+              opacity: { duration: 0.3, delay: 0.15 },
+              boxShadow: {
+                duration: 2.5,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }
+            }}
           >
-            {/* Glow effect */}
+            {/* Pulse ring externe */}
             <motion.div
-              className="absolute inset-0 rounded-full bg-red-400 blur-xl opacity-50"
+              className="absolute inset-0 rounded-full border-2 border-red-400"
               animate={{
-                scale: [1, 1.2, 1],
-                opacity: [0.5, 0.7, 0.5]
+                scale: [1, 1.4, 1],
+                opacity: [0.6, 0, 0.6]
               }}
               transition={{
-                duration: 2,
+                duration: 2.5,
+                repeat: Infinity,
+                ease: "easeOut"
+              }}
+            />
+
+            {/* Glow effect doux */}
+            <motion.div
+              className="absolute inset-0 rounded-full bg-red-400 blur-xl"
+              animate={{
+                scale: [1, 1.15, 1],
+                opacity: [0.4, 0.6, 0.4]
+              }}
+              transition={{
+                duration: 2.5,
                 repeat: Infinity,
                 ease: "easeInOut"
               }}
             />
-            <Plus className="w-7 h-7 text-white relative z-10" strokeWidth={2.5} />
+
+            <motion.div
+              animate={{ rotate: isActionMenuOpen ? 45 : 0 }}
+              transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <Plus className="w-7 h-7 text-white relative z-10" strokeWidth={2.5} />
+            </motion.div>
           </motion.button>
 
           {/* Médias */}

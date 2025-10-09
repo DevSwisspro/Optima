@@ -5,7 +5,7 @@ const PageTransition = ({ children, pageKey }) => {
   const pageVariants = {
     initial: {
       opacity: 0,
-      x: -20,
+      x: -15,
       scale: 0.98,
     },
     animate: {
@@ -13,17 +13,17 @@ const PageTransition = ({ children, pageKey }) => {
       x: 0,
       scale: 1,
       transition: {
-        duration: 0.4,
-        ease: [0.4, 0, 0.2, 1],
+        duration: 0.35,
+        ease: [0.22, 1, 0.36, 1],
       }
     },
     exit: {
       opacity: 0,
-      x: 20,
+      x: 15,
       scale: 0.98,
       transition: {
-        duration: 0.3,
-        ease: [0.4, 0, 0.2, 1],
+        duration: 0.25,
+        ease: [0.22, 1, 0.36, 1],
       }
     }
   };
