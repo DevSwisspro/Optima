@@ -6425,7 +6425,7 @@ export default function App({ session, onLogout }) {
       {/* Menu Flottant Premium */}
       <FloatingMenu
         onLogout={onLogout}
-        userName={user?.email?.split('@')[0] || 'Utilisateur'}
+        user={session?.user}
       />
     </div>
   );
