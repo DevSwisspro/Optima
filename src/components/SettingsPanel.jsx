@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   X,
@@ -12,12 +12,42 @@ import {
   Camera,
   ChevronRight,
   Shield,
-  Sparkles
+  Settings
 } from 'lucide-react';
 
 export default function SettingsPanel({ isOpen, onClose, user, onLogout }) {
   const [showPasswordChange, setShowPasswordChange] = useState(false);
   const [showProfileEdit, setShowProfileEdit] = useState(false);
+
+  // Bloquer le scroll du body quand le panneau est ouvert
+  useEffect(() => {
+    if (isOpen) {
+      // Sauvegarder la position de scroll actuelle
+      const scrollY = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+      document.body.style.overflowY = 'scroll'; // Garder la scrollbar pour éviter le jump
+    } else {
+      // Restaurer le scroll
+      const scrollY = document.body.style.top;
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      document.body.style.overflowY = '';
+      if (scrollY) {
+        window.scrollTo(0, parseInt(scrollY || '0') * -1);
+      }
+    }
+
+    return () => {
+      // Cleanup au démontage
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      document.body.style.overflowY = '';
+    };
+  }, [isOpen]);
 
   // Backdrop animation
   const backdropVariants = {
@@ -135,7 +165,7 @@ export default function SettingsPanel({ isOpen, onClose, user, onLogout }) {
             <div className="flex items-center justify-between p-6 border-b border-white/10">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-gradient-to-br from-red-500 to-red-600 rounded-xl">
-                  <Sparkles className="w-6 h-6 text-white" />
+                  <Settings className="w-6 h-6 text-white" />
                 </div>
                 <div>
                   <h2 className="text-2xl font-bold text-white">Paramètres</h2>
@@ -307,7 +337,7 @@ export default function SettingsPanel({ isOpen, onClose, user, onLogout }) {
             <div className="flex items-center justify-between px-6 pb-4 border-b border-white/10">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-gradient-to-br from-red-500 to-red-600 rounded-xl">
-                  <Sparkles className="w-5 h-5 text-white" />
+                  <Settings className="w-5 h-5 text-white" />
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-white">Paramètres</h2>
