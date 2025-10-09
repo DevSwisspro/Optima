@@ -1999,23 +1999,27 @@ export default function App({ session, onLogout }) {
   );
 
   const TaskRow = ({ t }) => (
-    <div
+    <motion.div
       layout
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
+      initial={{ opacity: 0, x: -20, scale: 0.95 }}
+      animate={{ opacity: 1, x: 0, scale: 1 }}
+      exit={{ opacity: 0, x: 20, scale: 0.95 }}
+      transition={{ duration: 0.2 }}
       className={`group relative rounded-xl bg-gradient-to-br from-gray-900/90 to-gray-800/90 border border-white/10 hover:border-red-500/30 transition-all duration-300 ${
         t.completed ? "opacity-60" : ""
       }`}
     >
       <div className="relative flex items-center gap-4 p-4 md:p-5">
         {/* Bouton de complétion */}
-        <button
+        <motion.button
           onClick={() => completeTask(t.id)}
-          className="flex-shrink-0 w-10 h-10 md:w-11 md:h-11 rounded-xl bg-gradient-to-br from-red-500 to-red-600 hover:from-red-400 hover:to-red-500 shadow-lg hover:shadow-red-500/50 transition-all duration-300 flex items-center justify-center active:scale-95"
+          whileTap={{ scale: 0.9 }}
+          whileHover={{ scale: 1.1 }}
+          transition={{ type: "spring", stiffness: 400, damping: 17 }}
+          className="flex-shrink-0 w-10 h-10 md:w-11 md:h-11 rounded-xl bg-gradient-to-br from-red-500 to-red-600 hover:from-red-400 hover:to-red-500 shadow-lg hover:shadow-red-500/50 transition-all duration-300 flex items-center justify-center"
         >
           <Check className="w-5 h-5 md:w-6 md:h-6 text-white" />
-        </button>
+        </motion.button>
 
         {/* Contenu de la tâche */}
         <div className="flex-1 min-w-0 flex items-center justify-between gap-4">
@@ -2037,7 +2041,7 @@ export default function App({ session, onLogout }) {
           background: 'linear-gradient(90deg, transparent 0%, rgba(239, 68, 68, 0.05) 50%, transparent 100%)'
         }}
       />
-    </div>
+    </motion.div>
   );
 
   return (
@@ -2134,7 +2138,7 @@ export default function App({ session, onLogout }) {
                     initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: 0.2, type: "spring", bounce: 0.3 }}
-                    className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 mx-auto max-w-sm"
+                    className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 mx-auto max-w-sm card-premium"
                   >
                     <div className="flex flex-col items-center gap-4">
                       <div className="p-4 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl shadow-xl">
@@ -2195,7 +2199,7 @@ export default function App({ session, onLogout }) {
 
                 {/* Desktop Header - Style traditionnel amélioré */}
                 <div className="hidden md:block">
-                  <div className="glass-dark rounded-3xl p-8 border border-white/10">
+                  <div className="glass-dark rounded-3xl p-8 border border-white/10 card-premium">
                     <div className="flex flex-row justify-between items-center">
                       <div
                         initial={{ x: -30, opacity: 0 }}
@@ -2293,7 +2297,7 @@ export default function App({ session, onLogout }) {
                             animate={{ x: 0, opacity: 1 }}
                             transition={{ delay: 0.7 + index * 0.1, type: "spring", bounce: 0.3 }}
                             whileTap={{ scale: 0.98 }}
-                            className={`glass-dark rounded-3xl p-6 border border-white/20 neo-shadow bg-gradient-to-br ${config.bgColor}`}
+                            className={`glass-dark rounded-3xl p-6 border border-white/20 neo-shadow bg-gradient-to-br ${config.bgColor} card-premium`}
                           >
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-4">
@@ -2356,7 +2360,7 @@ export default function App({ session, onLogout }) {
                             animate={{ y: 0, opacity: 1 }}
                             transition={{ delay: 0.5 + index * 0.1, type: "spring", bounce: 0.2 }}
                             whileHover={{ y: -8, scale: 1.02 }}
-                            className="glass-dark rounded-3xl p-6 border border-white/10 neo-shadow hover-lift"
+                            className="glass-dark rounded-3xl p-6 border border-white/10 neo-shadow hover-lift card-premium"
                           >
                             <div className="text-center">
                               <div className={`inline-flex p-3 bg-gradient-to-br from-gray-700 to-gray-800 rounded-2xl mb-3 shadow-lg`}>
@@ -2380,7 +2384,7 @@ export default function App({ session, onLogout }) {
                     <div 
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm card-responsive border border-gray-700/30 hover-lift ultra-smooth"
+                      className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm card-responsive border border-gray-700/30 hover-lift ultra-smooth card-premium"
                     >
                       <h3 className="text-xl font-bold text-white mb-4">Progression des objectifs</h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -2490,10 +2494,11 @@ export default function App({ session, onLogout }) {
                   {/* Graphiques mensuels */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Graphique en barres mensuelles */}
-                    <div
+                    <motion.div
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
-                      className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm card-responsive border border-gray-700/30 hover-lift ultra-smooth"
+                      transition={{ duration: 0.5, delay: 0.2 }}
+                      className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm card-responsive border border-gray-700/30 hover-lift ultra-smooth card-premium"
                     >
                       <h3 className="text-xl font-bold text-white mb-4">Évolution mensuelle {dashboardFilter.year}</h3>
                       <div className="w-full" style={{ height: window.innerWidth < 768 ? '280px' : '320px' }}>
@@ -2525,13 +2530,14 @@ export default function App({ session, onLogout }) {
                           </BarChart>
                         </ResponsiveContainer>
                       </div>
-                    </div>
+                    </motion.div>
 
                     {/* Graphique camembert répartition annuelle */}
-                    <div
+                    <motion.div
                       initial={{ opacity: 0, x: 20 }}
                       animate={{ opacity: 1, x: 0 }}
-                      className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm card-responsive border border-gray-700/30 hover-lift ultra-smooth"
+                      transition={{ duration: 0.5, delay: 0.3 }}
+                      className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm card-responsive border border-gray-700/30 hover-lift ultra-smooth card-premium"
                     >
                       <h3 className="text-xl font-bold text-white mb-4">Répartition {dashboardFilter.month === 'all' ? dashboardFilter.year : `${new Date(dashboardFilter.year, dashboardFilter.month - 1).toLocaleDateString('fr-FR', { month: 'long' })} ${dashboardFilter.year}`}</h3>
                       <div className="w-full" style={{ height: window.innerWidth < 768 ? '280px' : '320px' }}>
@@ -2608,7 +2614,7 @@ export default function App({ session, onLogout }) {
                           </PieChart>
                         </ResponsiveContainer>
                       </div>
-                    </div>
+                    </motion.div>
                   </div>
 
                   {/* Graphiques annuels */}
@@ -2643,7 +2649,7 @@ export default function App({ session, onLogout }) {
               className="space-y-8"
             >
               {/* Header avec navigation et tabs */}
-              <div className="bg-gradient-to-r from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50">
+              <div className="bg-gradient-to-r from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50 card-premium">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                   <div className="flex items-center gap-4">
                     {/* Bouton retour */}
@@ -2736,7 +2742,7 @@ export default function App({ session, onLogout }) {
                       
                       <div className="space-y-6">
                         {/* Graphique barres empilées mensuelles */}
-                        <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/30">
+                        <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/30 card-premium">
                           <h3 className="text-xl font-bold text-white mb-4">Revenus vs Dépenses par mois</h3>
                           <div className="w-full" style={{ height: window.innerWidth < 768 ? '350px' : '500px' }}>
                             <ResponsiveContainer width="100%" height="100%">
@@ -2770,7 +2776,7 @@ export default function App({ session, onLogout }) {
                         </div>
 
                         {/* Courbe du solde mensuel */}
-                        <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/30">
+                        <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/30 card-premium">
                           <h3 className="text-xl font-bold text-white mb-4">Évolution du solde mensuel</h3>
                           <div className="w-full" style={{ height: window.innerWidth < 768 ? '300px' : '500px' }}>
                             <ResponsiveContainer width="100%" height="100%">
@@ -2828,7 +2834,7 @@ export default function App({ session, onLogout }) {
                       </div>
                       
                       {/* BLOC 1: Liste exhaustive des dépenses */}
-                      <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/30">
+                      <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/30 card-premium">
                         <h3 className="text-xl font-bold text-white mb-4">Dépenses {categoriesViewYear}</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-96 overflow-y-auto">
                           {processCategoriesData(budgetItems, categoriesViewYear)
@@ -2885,7 +2891,7 @@ export default function App({ session, onLogout }) {
                       </div>
 
                       {/* BLOC 2: Camembert global */}
-                      <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/30">
+                      <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/30 card-premium">
                         <h3 className="text-xl font-bold text-white mb-4">Vue d'ensemble - Toutes catégories</h3>
                         <div className="w-full flex justify-center">
                           <div className="w-full" style={{ height: window.innerWidth < 768 ? '350px' : '500px' }}>
@@ -2934,7 +2940,7 @@ export default function App({ session, onLogout }) {
                       </div>
 
                       {/* BLOC 3: Graphique barres par catégorie */}
-                      <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/30">
+                      <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/30 card-premium">
                         <h3 className="text-xl font-bold text-white mb-4">Barres par catégorie</h3>
                         <div className="w-full" style={{ height: window.innerWidth < 768 ? '450px' : '600px' }}>
                           <ResponsiveContainer width="100%" height="100%">
@@ -2991,7 +2997,7 @@ export default function App({ session, onLogout }) {
                       </div>
 
                       {/* BLOC 4: Liste des investissements */}
-                      <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/30">
+                      <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/30 card-premium">
                         <h3 className="text-xl font-bold text-white mb-4">Investissements {categoriesViewYear}</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-96 overflow-y-auto">
                           {processCategoriesData(budgetItems, categoriesViewYear)
@@ -3048,7 +3054,7 @@ export default function App({ session, onLogout }) {
                       </div>
 
                       {/* BLOC 5: Camembert Investissements/Épargne */}
-                      <div className="bg-gradient-to-br from-blue-900/30 to-green-900/30 backdrop-blur-sm rounded-xl p-6 border border-blue-700/30">
+                      <div className="bg-gradient-to-br from-blue-900/30 to-green-900/30 backdrop-blur-sm rounded-xl p-6 border border-blue-700/30 card-premium">
                         <h3 className="text-xl font-bold text-white mb-4">Investissements & Épargne</h3>
                         <div className="w-full flex justify-center">
                           <div className="w-full" style={{ height: window.innerWidth < 768 ? '320px' : '450px' }}>
@@ -3105,7 +3111,7 @@ export default function App({ session, onLogout }) {
                       className="space-y-6"
                     >
                       {/* Sélecteur de périodes et granularité */}
-                      <div className="bg-gradient-to-r from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/30">
+                      <div className="bg-gradient-to-r from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/30 card-premium">
                         <div className="flex justify-between items-center mb-4">
                           <h3 className="text-xl font-bold text-white">Choisir les périodes à comparer</h3>
                           
@@ -3253,7 +3259,7 @@ export default function App({ session, onLogout }) {
                       </div>
 
                       {/* Graphique de comparaison ultra-clair */}
-                      <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/30">
+                      <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/30 card-premium">
                         <div className="text-center mb-6">
                           <h3 className="text-2xl font-bold text-white mb-2">Comparaison simple</h3>
                           <div className="flex items-center justify-center gap-4 text-lg">
@@ -3462,7 +3468,7 @@ export default function App({ session, onLogout }) {
                       </div>
 
                       {/* Tableau comparatif détaillé */}
-                      <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/30">
+                      <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/30 card-premium">
                         <h3 className="text-xl font-bold text-white mb-6 text-center">Tableau comparatif détaillé</h3>
                         <div className="overflow-x-auto">
                           <table className="w-full text-white">
@@ -3580,7 +3586,7 @@ export default function App({ session, onLogout }) {
                       </div>
 
                       {/* Résumé visuel amélioré avec pourcentages */}
-                      <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/30">
+                      <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/30 card-premium">
                         <h3 className="text-xl font-bold text-white mb-6 text-center">Synthèse comparative</h3>
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                           {(() => {
@@ -3710,7 +3716,7 @@ export default function App({ session, onLogout }) {
                       className="space-y-6"
                     >
                       {/* Contrôles du tableau */}
-                      <div className="bg-gradient-to-r from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/30">
+                      <div className="bg-gradient-to-r from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/30 card-premium">
                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                           <h3 className="text-xl font-bold text-white">Liste des opérations</h3>
                           <div className="flex flex-wrap gap-3">
@@ -3886,7 +3892,7 @@ export default function App({ session, onLogout }) {
 
                 {/* Desktop Header - Style Dashboard */}
                 <div className="hidden md:block">
-                  <div className="glass-dark rounded-3xl p-8 border border-white/10">
+                  <div className="glass-dark rounded-3xl p-8 border border-white/10 card-premium">
                     <div className="flex flex-row justify-between items-center">
                       <div
                         initial={{ x: -30, opacity: 0 }}
@@ -3936,7 +3942,7 @@ export default function App({ session, onLogout }) {
 
                     {/* Priorité mobile compacte */}
                     <div className="relative" style={{zIndex: 100}} ref={priorityMenuRef}>
-                      <button
+                      <motion.button
                         ref={priorityButtonMobileRef}
                         onClick={() => togglePriorityMenu(true)}
                         whileTap={{ scale: 0.98 }}
@@ -3949,26 +3955,28 @@ export default function App({ session, onLogout }) {
                           <div className="w-4 h-4 rounded-full bg-white/80"></div>
                           <span>{PRIORITY_LABELS[priorityChoice] || PRIORITY_LABELS['normal']}</span>
                         </div>
-                        <span
+                        <motion.span
                           className="text-white text-xl"
                           animate={{ rotate: showPriorityMenu ? 180 : 0 }}
                           transition={{ duration: 0.2 }}
                         >
                           ▼
-                        </span>
-                      </button>
+                        </motion.span>
+                      </motion.button>
 
                     </div>
 
                     {/* Bouton mobile compact */}
-                    <button
+                    <motion.button
                       onClick={addTask}
-                      whileTap={{ scale: 0.98 }}
+                      whileTap={{ scale: 0.95 }}
+                      whileHover={{ scale: 1.02 }}
+                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
                       className="w-full min-h-[48px] sm:min-h-[44px] bg-gradient-to-r from-red-600 to-red-700 text-white flex items-center justify-center gap-2 rounded-lg text-base sm:text-base font-semibold"
                     >
                       <Plus className="w-5 h-5 sm:w-4 sm:h-4" />
                       Ajouter
-                    </button>
+                    </motion.button>
                   </div>
                 </div>
               </div>
@@ -3979,7 +3987,7 @@ export default function App({ session, onLogout }) {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
-                  className="glass-dark rounded-3xl p-8 border border-white/10"
+                  className="glass-dark rounded-3xl p-8 border border-white/10 card-premium"
                 >
                   <div className="flex items-center gap-4 sm:gap-6">
                     <div className="flex-1">
@@ -3993,7 +4001,7 @@ export default function App({ session, onLogout }) {
                     </div>
 
                     <div className="relative" style={{zIndex: 100}} ref={priorityMenuRef}>
-                      <button
+                      <motion.button
                         ref={priorityButtonDesktopRef}
                         onClick={() => {
                           calculateMenuPosition(priorityButtonDesktopRef);
@@ -4007,26 +4015,27 @@ export default function App({ session, onLogout }) {
                       >
                         <div className="w-3 h-3 rounded-full bg-white/80"></div>
                         <span>{PRIORITY_LABELS[priorityChoice] || PRIORITY_LABELS['normal']}</span>
-                        <span
+                        <motion.span
                           className="text-white ml-auto"
                           animate={{ rotate: showPriorityMenu ? 180 : 0 }}
                           transition={{ duration: 0.2 }}
                         >
                           ▼
-                        </span>
-                      </button>
+                        </motion.span>
+                      </motion.button>
 
                     </div>
 
-                    <button
+                    <motion.button
                       onClick={addTask}
                       whileTap={{ scale: 0.95 }}
-                      whileHover={{ scale: 1.05 }}
+                      whileHover={{ scale: 1.02 }}
+                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
                       className="min-h-[48px] sm:min-h-[44px] px-6 sm:px-8 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-3"
                     >
                       <Plus className="w-5 h-5" />
                       Ajouter
-                    </button>
+                    </motion.button>
                   </div>
                 </div>
               </div>
@@ -4036,7 +4045,7 @@ export default function App({ session, onLogout }) {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
-                className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20"
+                className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 card-premium"
               >
                 <div className="flex items-center gap-4">
                   <div className="p-3 sm:p-3 bg-gradient-to-br from-gray-600 to-gray-700 rounded-2xl shadow-lg">
@@ -4058,7 +4067,7 @@ export default function App({ session, onLogout }) {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.8 }}
-                className="glass-dark rounded-3xl p-6 min-h-96 neo-shadow border border-white/20"
+                className="glass-dark rounded-3xl p-6 min-h-96 neo-shadow border border-white/20 card-premium"
               >
                 {(tasksByPriority.urgent.length === 0 && tasksByPriority.normal.length === 0) ? (
                   <div
@@ -4106,9 +4115,9 @@ export default function App({ session, onLogout }) {
                           </div>
                         </div>
                         <div className="flex flex-col mobile-spacing">
-                          
-                            {tasksByPriority.urgent.map(t => <TaskRow key={t.id} t={t} />)}
-                          
+                          <AnimatePresence mode="popLayout">
+                            {tasksByPriority.urgent.map((t, index) => <TaskRow key={t.id} t={t} />)}
+                          </AnimatePresence>
                         </div>
                       </div>
                     )}
@@ -4143,9 +4152,9 @@ export default function App({ session, onLogout }) {
                           </div>
                         </div>
                         <div className="flex flex-col mobile-spacing">
-                          
-                            {tasksByPriority.normal.map(t => <TaskRow key={t.id} t={t} />)}
-                          
+                          <AnimatePresence mode="popLayout">
+                            {tasksByPriority.normal.map((t, index) => <TaskRow key={t.id} t={t} />)}
+                          </AnimatePresence>
                         </div>
                       </div>
                     )}
@@ -4174,7 +4183,7 @@ export default function App({ session, onLogout }) {
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, ease: "easeOut" }}
-                  className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20"
+                  className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 card-premium"
                 >
                   <div className="flex items-center justify-between">
                     <div
@@ -4215,7 +4224,7 @@ export default function App({ session, onLogout }) {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
-                  className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20"
+                  className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 card-premium"
                 >
                   <div className="space-y-4">
                     <div className="text-center mb-4">
@@ -4280,7 +4289,7 @@ export default function App({ session, onLogout }) {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
-                  className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20"
+                  className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 card-premium"
                 >
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -4341,7 +4350,7 @@ export default function App({ session, onLogout }) {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
-                className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20"
+                className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 card-premium"
               >
                 <div className="flex items-center gap-4">
                   <div className="p-3 sm:p-3 bg-gradient-to-br from-gray-600 to-gray-700 rounded-2xl shadow-lg">
@@ -4363,7 +4372,7 @@ export default function App({ session, onLogout }) {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.8 }}
-                className="glass-dark rounded-3xl p-6 min-h-96 neo-shadow border border-white/20"
+                className="glass-dark rounded-3xl p-6 min-h-96 neo-shadow border border-white/20 card-premium"
               >
                 {filteredNotes.length === 0 ? (
                   <div
@@ -4391,7 +4400,7 @@ export default function App({ session, onLogout }) {
                         initial={{ opacity: 0, y: 20, scale: 0.95 }} 
                         animate={{ opacity: 1, y: 0, scale: 1 }} 
                         exit={{ opacity: 0, y: -20, scale: 0.95 }}
-                        className="group relative overflow-hidden rounded-xl border border-gray-700/50 bg-gray-700/90 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300"
+                        className="group relative overflow-hidden rounded-xl border border-gray-700/50 bg-gray-700/90 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 card-premium"
                       >
                         <div className="p-6">
                           <div className="flex items-start justify-between gap-4 mb-3">
@@ -4447,7 +4456,7 @@ export default function App({ session, onLogout }) {
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.2, type: "spring", bounce: 0.3 }}
-                className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 mx-auto max-w-sm"
+                className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 mx-auto max-w-sm card-premium"
               >
                 <div className="text-center space-y-4">
                   <div
@@ -4499,7 +4508,7 @@ export default function App({ session, onLogout }) {
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
-                className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20"
+                className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 card-premium"
               >
                 <div className="flex items-center justify-between">
                   <div
@@ -4533,7 +4542,7 @@ export default function App({ session, onLogout }) {
             </div>
 
             {/* Zone d'ajout d'article */}
-            <div className="bg-gray-800 rounded-xl p-6 space-y-4">
+            <div className="bg-gray-800 rounded-xl p-6 space-y-4 card-premium">
               <div className="space-y-3">
                 <Input 
                   value={itemName} 
@@ -4605,7 +4614,7 @@ export default function App({ session, onLogout }) {
             </div>
 
             {/* Zone d'affichage des courses */}
-            <div className="bg-gray-800 rounded-xl p-6 min-h-96">
+            <div className="bg-gray-800 rounded-xl p-6 min-h-96 card-premium">
               {filteredShoppingItems.length === 0 ? (
                 <div className="text-center text-gray-400 py-16">
                   <div className="text-2xl mb-4">🛒</div>
@@ -4630,7 +4639,7 @@ export default function App({ session, onLogout }) {
                               initial={{ opacity: 0, y: 20, scale: 0.95 }} 
                               animate={{ opacity: 1, y: 0, scale: 1 }} 
                               exit={{ opacity: 0, y: -20, scale: 0.95 }}
-                              className="group relative overflow-hidden rounded-xl border border-gray-700/50 bg-gray-700/90 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300"
+                              className="group relative overflow-hidden rounded-xl border border-gray-700/50 bg-gray-700/90 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 card-premium"
                             >
                               <div className="relative flex items-center gap-4 p-6">
                                 <Button 
@@ -4683,7 +4692,7 @@ export default function App({ session, onLogout }) {
                               initial={{ opacity: 0, y: 20, scale: 0.95 }} 
                               animate={{ opacity: 1, y: 0, scale: 1 }} 
                               exit={{ opacity: 0, y: -20, scale: 0.95 }}
-                              className="group relative overflow-hidden rounded-xl border border-gray-700/50 bg-gray-700/90 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300"
+                              className="group relative overflow-hidden rounded-xl border border-gray-700/50 bg-gray-700/90 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 card-premium"
                             >
                               <div className="relative flex items-center gap-4 p-6">
                                 <Button 
@@ -4736,7 +4745,7 @@ export default function App({ session, onLogout }) {
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.2, type: "spring", bounce: 0.3 }}
-                className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 mx-auto max-w-sm"
+                className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 mx-auto max-w-sm card-premium"
               >
                 <div className="text-center space-y-4">
                   <div
@@ -4777,7 +4786,7 @@ export default function App({ session, onLogout }) {
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
-                className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20"
+                className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 card-premium"
               >
                 <div className="flex items-center justify-between">
                   <div
@@ -4803,7 +4812,7 @@ export default function App({ session, onLogout }) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20"
+              className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 card-premium"
             >
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-2xl font-bold text-white">Gestion des Données</h3>
@@ -5286,7 +5295,7 @@ export default function App({ session, onLogout }) {
               <div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50 shadow-xl mb-6"
+                className="bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50 shadow-xl mb-6 card-premium"
               >
                 <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
                   <BarChart3 className="w-5 h-5 text-blue-400" />
@@ -5553,7 +5562,7 @@ export default function App({ session, onLogout }) {
             <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
               <div 
                 whileHover={{ scale: 1.05, y: -5 }}
-                className="relative overflow-hidden bg-gradient-to-br from-green-500/20 to-emerald-600/20 rounded-xl p-4 border border-green-500/30 backdrop-blur-sm group cursor-pointer min-h-[100px]"
+                className="relative overflow-hidden bg-gradient-to-br from-green-500/20 to-emerald-600/20 rounded-xl p-4 border border-green-500/30 backdrop-blur-sm group cursor-pointer min-h-[100px] card-premium"
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-green-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <div className="relative h-full flex flex-col justify-center">
@@ -5577,7 +5586,7 @@ export default function App({ session, onLogout }) {
 
               <div 
                 whileHover={{ scale: 1.05, y: -5 }}
-                className="relative overflow-hidden bg-gradient-to-br from-red-500/20 to-red-600/20 rounded-xl p-4 border border-red-500/30 backdrop-blur-sm group cursor-pointer min-h-[100px]"
+                className="relative overflow-hidden bg-gradient-to-br from-red-500/20 to-red-600/20 rounded-xl p-4 border border-red-500/30 backdrop-blur-sm group cursor-pointer min-h-[100px] card-premium"
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-red-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <div className="relative h-full flex flex-col justify-center">
@@ -5601,7 +5610,7 @@ export default function App({ session, onLogout }) {
 
               <div 
                 whileHover={{ scale: 1.05, y: -5 }}
-                className="relative overflow-hidden bg-gradient-to-br from-orange-500/20 to-orange-600/20 rounded-xl p-4 border border-orange-500/30 backdrop-blur-sm group cursor-pointer min-h-[100px]"
+                className="relative overflow-hidden bg-gradient-to-br from-orange-500/20 to-orange-600/20 rounded-xl p-4 border border-orange-500/30 backdrop-blur-sm group cursor-pointer min-h-[100px] card-premium"
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-orange-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <div className="relative h-full flex flex-col justify-center">
@@ -5625,7 +5634,7 @@ export default function App({ session, onLogout }) {
 
               <div 
                 whileHover={{ scale: 1.05, y: -5 }}
-                className="relative overflow-hidden bg-gradient-to-br from-blue-500/20 to-blue-600/20 rounded-xl p-4 border border-blue-500/30 backdrop-blur-sm group cursor-pointer min-h-[100px]"
+                className="relative overflow-hidden bg-gradient-to-br from-blue-500/20 to-blue-600/20 rounded-xl p-4 border border-blue-500/30 backdrop-blur-sm group cursor-pointer min-h-[100px] card-premium"
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <div className="relative h-full flex flex-col justify-center">
@@ -5649,7 +5658,7 @@ export default function App({ session, onLogout }) {
 
               <div
                 whileHover={{ scale: 1.05, y: -5 }}
-                className="relative overflow-hidden bg-gradient-to-br from-red-500/20 to-red-600/20 rounded-xl p-4 border border-red-500/30 backdrop-blur-sm group cursor-pointer min-h-[100px]"
+                className="relative overflow-hidden bg-gradient-to-br from-red-500/20 to-red-600/20 rounded-xl p-4 border border-red-500/30 backdrop-blur-sm group cursor-pointer min-h-[100px] card-premium"
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-red-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <div className="relative h-full flex flex-col justify-center">
@@ -5754,7 +5763,7 @@ export default function App({ session, onLogout }) {
               <div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 border border-gray-700/50 shadow-2xl"
+                className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 border border-gray-700/50 shadow-2xl card-premium"
               >
                 <h3 className="text-lg font-semibold text-white mb-4">Opérations récentes</h3>
                 
@@ -5776,7 +5785,7 @@ export default function App({ session, onLogout }) {
                           animate={{ opacity: 1, y: 0, scale: 1 }} 
                           exit={{ opacity: 0, y: -20, scale: 0.95 }}
                           whileHover={{ scale: 1.02, y: -2 }}
-                          className="group relative overflow-hidden rounded-xl border border-gray-700/50 bg-gray-700/90 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300"
+                          className="group relative overflow-hidden rounded-xl border border-gray-700/50 bg-gray-700/90 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 card-premium"
                         >
                           {/* Effet de brillance au hover */}
                           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
@@ -5857,7 +5866,7 @@ export default function App({ session, onLogout }) {
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.2, type: "spring", bounce: 0.3 }}
-                className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 mx-auto max-w-sm"
+                className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 mx-auto max-w-sm card-premium"
               >
                 <div className="text-center space-y-4">
                   <div
@@ -5909,7 +5918,7 @@ export default function App({ session, onLogout }) {
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
-                className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20"
+                className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 card-premium"
               >
                 <div className="flex items-center justify-between">
                   <div
@@ -5947,7 +5956,7 @@ export default function App({ session, onLogout }) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20"
+              className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 card-premium"
             >
               <div className="flex items-center gap-3 mb-6">
                 <div className="p-3 bg-gradient-to-br from-red-600 to-red-700 rounded-2xl shadow-lg">
@@ -6125,7 +6134,7 @@ export default function App({ session, onLogout }) {
             </div>
 
             {/* Liste des médias */}
-            <div className="bg-gray-800 rounded-xl p-6 min-h-96">
+            <div className="bg-gray-800 rounded-xl p-6 min-h-96 card-premium">
               {filteredMedia.length === 0 ? (
                 <div className="text-center text-gray-400 py-16">
                   <div className="text-2xl mb-4">🎬</div>
@@ -6145,7 +6154,7 @@ export default function App({ session, onLogout }) {
                         className="group relative"
                       >
                         {/* Carte minimaliste */}
-                        <div className="bg-gray-800/60 backdrop-blur-sm rounded-2xl border border-gray-700/50 overflow-hidden hover:border-red-500/40 transition-all duration-300 shadow-lg hover:shadow-xl">
+                        <div className="bg-gray-800/60 backdrop-blur-sm rounded-2xl border border-gray-700/50 overflow-hidden hover:border-red-500/40 transition-all duration-300 shadow-lg hover:shadow-xl card-premium">
 
                           {/* Layout responsive : mobile-first */}
                           <div className="flex flex-col">
