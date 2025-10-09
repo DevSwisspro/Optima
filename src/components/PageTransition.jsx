@@ -36,7 +36,7 @@ const PageTransition = ({ children, pageKey }) => {
         initial="initial"
         animate="animate"
         exit="exit"
-        className="w-full"
+        className="w-full page-transition"
       >
         {children}
       </motion.div>

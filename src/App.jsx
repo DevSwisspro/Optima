@@ -8,10 +8,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Header from "@/components/Header";
+import Sidebar from "@/components/Sidebar";
 import { formatCurrency } from "@/lib/utils";
 import LogoDevSwiss from "@/components/LogoDevSwiss";
 import { supabase } from "@/lib/supabase";
-import FloatingMenu from "@/components/FloatingMenu";
 import PageTransition from "@/components/PageTransition";
 import LoaderPremium from "@/components/LoaderPremium";
 
@@ -2047,80 +2047,17 @@ export default function App({ session, onLogout }) {
   return (
     <div className="min-h-screen gradient-dark text-white relative overflow-hidden">
       {/* Header Premium moderne */}
-      <Header />
+      <Header session={session} onLogout={onLogout} />
 
-      <div className="max-w-7xl mx-auto space-y-4 md:space-y-6 pb-24 md:pb-8 px-4 sm:px-6 lg:px-8">
+      {/* Sidebar Navigation */}
+      <Sidebar
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        session={session}
+        onLogout={onLogout}
+      />
 
-        {/* Navigation Desktop - Version cachée sur mobile */}
-        <div className="hidden md:flex space-x-2 mb-12">
-          <button
-            onClick={() => setActiveTab("dashboard")}
-            className={`btn-responsive hover-lift ultra-smooth flex items-center gap-2 rounded-lg font-medium transition-all duration-300 ${
-              activeTab === "dashboard"
-                ? "bg-red-600 text-white shadow-lg"
-                : "text-gray-300 hover:text-white"
-            }`}
-          >
-            <BarChart3 className="icon-responsive-sm" />
-            <span className="text-responsive-sm">Dashboard</span>
-          </button>
-          <button
-            onClick={() => setActiveTab("tasks")}
-            className={`btn-responsive hover-lift ultra-smooth flex items-center gap-2 rounded-lg font-medium transition-all duration-300 ${
-              activeTab === "tasks"
-                ? "bg-red-600 text-white shadow-lg"
-                : "text-gray-300 hover:text-white"
-            }`}
-          >
-            <List className="icon-responsive-sm" />
-            <span className="text-responsive-sm">Tâches</span>
-          </button>
-          <button
-            onClick={() => setActiveTab("notes")}
-            className={`btn-responsive hover-lift ultra-smooth flex items-center gap-2 rounded-lg font-medium transition-all duration-300 ${
-              activeTab === "notes"
-                ? "bg-red-600 text-white shadow-lg"
-                : "text-gray-300 hover:text-white"
-            }`}
-          >
-            <FileText className={`icon-responsive-sm ${activeTab === "notes" ? "text-red-400" : ""}`} />
-            <span className="text-responsive-sm">Notes</span>
-          </button>
-          <button
-            onClick={() => setActiveTab("shopping")}
-            className={`btn-responsive hover-lift ultra-smooth flex items-center gap-2 rounded-lg font-medium transition-all duration-300 ${
-              activeTab === "shopping"
-                ? "bg-red-600 text-white shadow-lg"
-                : "text-gray-300 hover:text-white"
-            }`}
-          >
-            <ShoppingCart className={`icon-responsive-sm ${activeTab === "shopping" ? "text-red-400" : ""}`} />
-            <span className="text-responsive-sm">Courses</span>
-          </button>
-          <button
-            onClick={() => setActiveTab("budget")}
-            className={`btn-responsive hover-lift ultra-smooth flex items-center gap-2 rounded-lg font-medium transition-all duration-300 ${
-              activeTab === "budget"
-                ? "bg-red-600 text-white shadow-lg"
-                : "text-gray-300 hover:text-white"
-            }`}
-          >
-            <Wallet className={`icon-responsive-sm ${activeTab === "budget" ? "text-red-400" : ""}`} />
-            <span className="text-responsive-sm">Budget</span>
-          </button>
-          <button
-            onClick={() => setActiveTab("media")}
-            className={`btn-responsive hover-lift ultra-smooth flex items-center gap-2 rounded-lg font-medium transition-all duration-300 ${
-              activeTab === "media"
-                ? "bg-red-600 text-white shadow-lg"
-                : "text-gray-300 hover:text-white"
-            }`}
-          >
-            <Play className={`icon-responsive-sm ${activeTab === "media" ? "text-red-400" : ""}`} />
-            <span className="text-responsive-sm">Médias</span>
-          </button>
-        </div>
-
+      <div className="max-w-7xl mx-auto space-y-4 md:space-y-6 pb-24 md:pb-8 px-4 sm:px-6 lg:px-8 md:ml-20">
         {/* Contenu Principal avec Transitions Fluides */}
         
           {activeTab === "dashboard" && (
@@ -2190,7 +2127,7 @@ export default function App({ session, onLogout }) {
                       whileTap={{ scale: 0.98 }}
                       whileHover={{ scale: 1.02 }}
                       onClick={() => setActiveTab("budget-dashboard")}
-                      className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white py-4 sm:py-3 px-6 sm:px-8 rounded-2xl text-base sm:text-lg font-bold shadow-lg shadow-red-500/25 transition-all duration-300 flex items-center justify-center gap-3 min-h-[48px]"
+                      className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white py-4 sm:py-3 px-6 sm:px-8 rounded-2xl text-base sm:text-lg font-bold shadow-lg shadow-red-500/25 transition-all duration-300 flex items-center justify-center gap-3 min-h-[48px] btn-premium-mobile"
                     >
                       <TrendingUp className="w-5 h-5 sm:w-5 sm:h-5" />
                       Budget Avancé
@@ -6285,87 +6222,6 @@ export default function App({ session, onLogout }) {
           </PageTransition>
         )}
 
-
-        {/* Navigation Mobile Premium - Glassmorphism */}
-        <motion.nav
-          className="md:hidden fixed bottom-0 left-0 right-0 z-50 glass-strong border-t border-white/10 safe-area-inset no-print"
-          initial={{ y: 100, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ type: "spring", stiffness: 100, damping: 20, delay: 0.3 }}
-        >
-          <div className="flex items-center justify-around max-w-lg mx-auto px-2 py-3">
-            {[
-              { id: "dashboard", icon: BarChart3, label: "Stats" },
-              { id: "tasks", icon: List, label: "Tâches" },
-              { id: "notes", icon: FileText, label: "Notes" },
-              { id: "shopping", icon: ShoppingCart, label: "Courses" },
-              { id: "budget", icon: Wallet, label: "Budget" },
-              { id: "media", icon: Play, label: "Médias" }
-            ].map((tab, index) => (
-              <motion.button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`relative flex flex-col items-center justify-center px-3 py-2 rounded-xl transition-all duration-300 ${
-                  activeTab === tab.id
-                    ? "text-primary"
-                    : "text-gray-400 hover:text-white"
-                }`}
-                whileTap={{ scale: 0.9 }}
-                whileHover={{ scale: 1.05 }}
-                initial={{ y: 50, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.4 + index * 0.05 }}
-              >
-                {/* Background actif avec glow */}
-                {activeTab === tab.id && (
-                  <motion.div
-                    className="absolute inset-0 bg-primary/20 rounded-xl shadow-glow-primary"
-                    layoutId="activeTab"
-                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                  />
-                )}
-
-                {/* Icône */}
-                <motion.div
-                  animate={{
-                    scale: activeTab === tab.id ? 1.1 : 1,
-                    y: activeTab === tab.id ? -2 : 0
-                  }}
-                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                  className="relative z-10"
-                >
-                  <tab.icon className="w-6 h-6 mb-1" strokeWidth={activeTab === tab.id ? 2.5 : 2} />
-                </motion.div>
-
-                {/* Label */}
-                <span className={`text-xs font-medium relative z-10 ${
-                  activeTab === tab.id ? "font-semibold" : ""
-                }`}>
-                  {tab.label}
-                </span>
-
-                {/* Indicateur dot pour l'onglet actif */}
-                {activeTab === tab.id && (
-                  <motion.div
-                    className="absolute -top-1 w-1.5 h-1.5 bg-primary rounded-full"
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                  />
-                )}
-              </motion.button>
-            ))}
-          </div>
-
-          {/* Barre de progression subtile en haut */}
-          <motion.div
-            className="absolute top-0 left-0 h-0.5 bg-gradient-to-r from-primary via-primary-light to-primary"
-            initial={{ width: "0%" }}
-            animate={{ width: "100%" }}
-            transition={{ duration: 0.8, delay: 0.5 }}
-          />
-        </motion.nav>
-
         {/* Footer responsive */}
         <footer className="text-center mobile-compact border-t border-gray-800 md:mb-0 p-responsive-md pb-safe">
           <div className="flex flex-col items-center justify-center mobile-spacing">
@@ -6421,12 +6277,6 @@ export default function App({ session, onLogout }) {
           </motion.div>
         </motion.div>
       )}
-
-      {/* Menu Flottant Premium */}
-      <FloatingMenu
-        onLogout={onLogout}
-        user={session?.user}
-      />
     </div>
   );
 }

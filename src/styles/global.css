@@ -237,7 +237,14 @@ h1, h2, h3, h4, h5, h6 {
 /* Mobile optimizations */
 @media (max-width: 640px) {
   html {
-    font-size: 14px;
+    font-size: clamp(13px, 1.6vw, 15px);
+  }
+
+  /* Safe area pour notch iPhone + gradient radial subtil */
+  body {
+    padding-top: env(safe-area-inset-top);
+    background: radial-gradient(ellipse at center top, rgba(229, 57, 53, 0.08) 0%, transparent 50%),
+                linear-gradient(135deg, var(--dark-900) 0%, var(--dark-800) 100%);
   }
 
   /* Amélioration du touch feedback */
@@ -245,6 +252,13 @@ h1, h2, h3, h4, h5, h6 {
     -webkit-user-select: none;
     user-select: none;
     touch-action: manipulation;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  button:active, a:active {
+    transform: scale(0.97);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   }
 
   /* Optimisation du scroll sur mobile */
@@ -256,6 +270,70 @@ h1, h2, h3, h4, h5, h6 {
   .touch-target {
     min-width: 44px;
     min-height: 44px;
+  }
+
+  /* Cards avec profondeur premium */
+  .card-premium {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25),
+                0 0 1px rgba(255, 255, 255, 0.1) inset;
+  }
+
+  .card-premium:active {
+    transform: scale(0.98) translateY(1px);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Titres principaux plus lumineux */
+  h1, h2, h3 {
+    color: #fff;
+    font-weight: 600;
+  }
+
+  /* Sous-titres doux */
+  .subtitle, p.text-sm, p.text-xs {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  /* Boutons d'action saturés */
+  .btn-primary, .gradient-primary {
+    filter: saturate(1.2);
+  }
+
+  /* Effet glow sur boutons actifs */
+  button.active, .active {
+    box-shadow: 0 0 12px rgba(229, 57, 53, 0.4);
+  }
+
+  /* Micro-glow rouge sur boutons premium au toucher */
+  .btn-premium-mobile:active {
+    box-shadow: 0 0 16px rgba(229, 57, 53, 0.6),
+                0 4px 12px rgba(229, 57, 53, 0.4);
+    filter: saturate(1.3) brightness(1.05);
+  }
+
+  /* Espacements verticaux Dashboard */
+  .dashboard-section {
+    margin-bottom: 1.75rem;
+  }
+
+  .dashboard-section:last-child {
+    margin-bottom: 6rem; /* Espace pour le bottom bar */
+  }
+
+  /* Transitions de page fluides */
+  .page-transition {
+    animation: fadeSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @keyframes fadeSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 }
 
