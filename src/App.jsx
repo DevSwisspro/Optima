@@ -2226,21 +2226,23 @@ export default function App({ session, onLogout }) {
                         <select
                           value={dashboardFilter.year}
                           onChange={(e) => setDashboardFilter(prev => ({ ...prev, year: parseInt(e.target.value) }))}
-                          className="glass-dark text-white px-6 py-3 rounded-xl border border-white/20 focus:border-red-500 focus:ring-2 focus:ring-red-500/30 text-base font-semibold hover-lift h-12"
+                          className="glass-dark text-gray-900 px-6 py-3 rounded-xl border border-white/20 focus:border-red-500 focus:ring-2 focus:ring-red-500/30 text-base font-semibold hover-lift h-12 caret-gray-900"
+                          style={{ colorScheme: 'light' }}
                         >
                           {getAvailableYears(budgetItems).length > 0 ? getAvailableYears(budgetItems).map(year => (
-                            <option key={year} value={year} className="bg-gray-800">{year}</option>
-                          )) : <option value={new Date().getFullYear()} className="bg-gray-800">{new Date().getFullYear()}</option>}
+                            <option key={year} value={year} className="bg-gray-800 text-white">{year}</option>
+                          )) : <option value={new Date().getFullYear()} className="bg-gray-800 text-white">{new Date().getFullYear()}</option>}
                         </select>
 
                         <select
                           value={dashboardFilter.month}
                           onChange={(e) => setDashboardFilter(prev => ({ ...prev, month: e.target.value }))}
-                          className="glass-dark text-white px-6 py-3 rounded-xl border border-white/20 focus:border-red-500 focus:ring-2 focus:ring-red-500/30 text-base font-semibold hover-lift h-12"
+                          className="glass-dark text-gray-900 px-6 py-3 rounded-xl border border-white/20 focus:border-red-500 focus:ring-2 focus:ring-red-500/30 text-base font-semibold hover-lift h-12 caret-gray-900"
+                          style={{ colorScheme: 'light' }}
                         >
-                          <option value="all" className="bg-gray-800">Toute l'année</option>
+                          <option value="all" className="bg-gray-800 text-white">Toute l'année</option>
                           {Array.from({ length: 12 }, (_, i) => (
-                            <option key={i + 1} value={i + 1} className="bg-gray-800">
+                            <option key={i + 1} value={i + 1} className="bg-gray-800 text-white">
                               {new Date(2024, i).toLocaleDateString('fr-FR', { month: 'long' })}
                             </option>
                           ))}
