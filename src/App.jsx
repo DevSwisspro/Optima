@@ -2064,7 +2064,7 @@ export default function App({ session, onLogout }) {
         onLogout={onLogout}
       />
 
-      <div className="max-w-7xl mx-auto space-y-4 md:space-y-6 pb-24 md:pb-8 px-4 sm:px-6 lg:px-8 md:ml-20 pt-16 md:pt-0">
+      <div className="max-w-7xl mx-auto space-y-4 md:space-y-6 pb-24 md:pb-8 px-4 sm:px-6 lg:px-8 md:ml-20 pt-[4.5rem] md:pt-0">
         {/* Contenu Principal avec Transitions Fluides */}
         
           {activeTab === "dashboard" && (

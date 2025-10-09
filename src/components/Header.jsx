@@ -9,7 +9,7 @@ export default function Header({ session, onLogout }) {
   return (
     <>
       <motion.div
-        className="flex items-center justify-end px-6 py-4 glass-strong sticky top-0 z-30 border-b border-white/5"
+        className="hidden md:flex items-center justify-end px-6 py-4 glass-strong sticky top-0 z-30 border-b border-white/5"
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ type: "spring", stiffness: 100, damping: 20 }}
