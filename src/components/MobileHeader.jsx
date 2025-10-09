@@ -6,87 +6,56 @@ export default function MobileHeader({ onSettingsClick }) {
   return (
     <motion.header
       className="md:hidden fixed top-0 left-0 right-0 z-40 glass-strong border-b border-white/5"
-      initial={{ y: -100, opacity: 0 }}
+      initial={{ y: -50, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{
-        type: 'spring',
-        stiffness: 300,
-        damping: 30,
+        duration: 0.35,
+        ease: [0.22, 1, 0.36, 1],
         delay: 0.1
       }}
       style={{
-        paddingTop: 'max(env(safe-area-inset-top), 0.5rem)'
+        paddingTop: 'max(env(safe-area-inset-top), 0.75rem)'
       }}
     >
-      <div className="relative flex items-center justify-center px-4 py-3">
-        {/* Titre OPTIMA centré */}
+      <div className="relative flex items-center justify-center px-4 py-3.5">
+        {/* Titre OPTIMA centré avec rouge signature */}
         <motion.h1
-          className="text-[19px] font-semibold tracking-wide text-white relative"
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
+          className="text-[20px] font-bold tracking-[1px] uppercase relative"
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{
-            duration: 0.4,
-            delay: 0.3,
-            ease: [0.22, 1, 0.36, 1]
+            duration: 0.3,
+            delay: 0.25,
+            ease: 'easeOut'
           }}
           style={{
-            textShadow: '0 0 20px rgba(255, 255, 255, 0.2), 0 0 40px rgba(229, 57, 53, 0.15)'
+            background: 'linear-gradient(180deg, #FF4D4D 0%, #E53935 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            textShadow: '0 0 8px rgba(255, 59, 48, 0.6)',
+            filter: 'drop-shadow(0 0 8px rgba(255, 59, 48, 0.6))'
           }}
         >
           OPTIMA
-
-          {/* Subtle glow effect */}
-          <motion.span
-            className="absolute inset-0 blur-sm"
-            style={{
-              background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(229, 57, 53, 0.2))',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text'
-            }}
-            animate={{
-              opacity: [0.3, 0.6, 0.3]
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: 'easeInOut'
-            }}
-          >
-            OPTIMA
-          </motion.span>
         </motion.h1>
 
         {/* Bouton Paramètres à droite */}
         <motion.button
           onClick={onSettingsClick}
-          className="absolute right-4 p-2 rounded-xl hover:bg-white/10 active:bg-white/15 transition-colors"
+          className="absolute right-4 p-2.5 rounded-xl hover:bg-white/10 active:bg-white/15 transition-all duration-200"
           whileTap={{ scale: 0.92 }}
-          initial={{ opacity: 0, scale: 0 }}
-          animate={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0, x: 10 }}
+          animate={{ opacity: 1, x: 0 }}
           transition={{
-            type: 'spring',
-            stiffness: 400,
-            damping: 25,
-            delay: 0.4
+            duration: 0.3,
+            delay: 0.35,
+            ease: [0.22, 1, 0.36, 1]
           }}
         >
-          <Settings className="w-5 h-5 text-gray-300" strokeWidth={2} />
+          <Settings className="w-5 h-5 text-gray-300" strokeWidth={2.2} />
         </motion.button>
       </div>
-
-      {/* Shimmer effect subtil */}
-      <motion.div
-        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent pointer-events-none"
-        initial={{ x: '-100%' }}
-        animate={{ x: '100%' }}
-        transition={{
-          duration: 2.5,
-          repeat: Infinity,
-          repeatDelay: 5,
-          ease: 'easeInOut'
-        }}
-      />
     </motion.header>
   );
 }
