@@ -12,7 +12,9 @@ import {
   Camera,
   ChevronRight,
   Shield,
-  Settings
+  Settings,
+  Zap,
+  Cog
 } from 'lucide-react';
 
 export default function SettingsPanel({ isOpen, onClose, user, onLogout }) {
@@ -165,7 +167,7 @@ export default function SettingsPanel({ isOpen, onClose, user, onLogout }) {
             <div className="flex items-center justify-between p-6 border-b border-white/10">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-gradient-to-br from-red-500 to-red-600 rounded-xl">
-                  <Settings className="w-6 h-6 text-white" />
+                  <Cog className="w-6 h-6 text-white" />
                 </div>
                 <div>
                   <h2 className="text-2xl font-bold text-white">Paramètres</h2>
@@ -269,7 +271,7 @@ export default function SettingsPanel({ isOpen, onClose, user, onLogout }) {
                     badge="Bientôt"
                   />
                   <MenuItem
-                    icon={Sparkles}
+                    icon={Zap}
                     label="Animations"
                     onClick={() => alert('Fonctionnalité à venir')}
                   />
@@ -337,7 +339,7 @@ export default function SettingsPanel({ isOpen, onClose, user, onLogout }) {
             <div className="flex items-center justify-between px-6 pb-4 border-b border-white/10">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-gradient-to-br from-red-500 to-red-600 rounded-xl">
-                  <Settings className="w-5 h-5 text-white" />
+                  <Cog className="w-5 h-5 text-white" />
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-white">Paramètres</h2>
