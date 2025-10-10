@@ -48,6 +48,9 @@ body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Bloquer scroll bounce iOS */
+  overscroll-behavior-y: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Typographie premium */
@@ -238,6 +241,9 @@ h1, h2, h3, h4, h5, h6 {
 @media (max-width: 640px) {
   html {
     font-size: clamp(13px, 1.6vw, 15px);
+    /* Bloquer overscroll sur mobile */
+    overscroll-behavior: none;
+    height: 100%;
   }
 
   /* Safe area pour notch iPhone + gradient radial subtil */
@@ -245,6 +251,12 @@ h1, h2, h3, h4, h5, h6 {
     padding-top: env(safe-area-inset-top);
     background: radial-gradient(ellipse at center top, rgba(229, 57, 53, 0.08) 0%, transparent 50%),
                 linear-gradient(135deg, var(--dark-900) 0%, var(--dark-800) 100%);
+    /* Empêcher scroll bounce et espace vide */
+    overscroll-behavior-y: contain;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
   }
 
   /* Amélioration du touch feedback */

@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Header from "@/components/Header";
 import MobileHeader from "@/components/MobileHeader";
+import PullToRefresh from "@/components/PullToRefresh";
 import Sidebar from "@/components/Sidebar";
 import { formatCurrency } from "@/lib/utils";
 import LogoDevSwiss from "@/components/LogoDevSwiss";
@@ -2064,8 +2065,14 @@ export default function App({ session, onLogout }) {
         onLogout={onLogout}
       />
 
-      <div className="max-w-7xl mx-auto space-y-4 md:space-y-6 pb-24 md:pb-8 px-4 sm:px-6 lg:px-8 md:ml-20 pt-[5.5rem] md:pt-0">
-        {/* Contenu Principal avec Transitions Fluides */}
+      {/* Pull to Refresh (mobile only) */}
+      <PullToRefresh onRefresh={async () => {
+        // Simuler un refresh (recharger les données du localStorage)
+        await new Promise(resolve => setTimeout(resolve, 800));
+        window.location.reload();
+      }}>
+        <div className="max-w-7xl mx-auto space-y-4 md:space-y-6 pb-24 md:pb-8 px-4 sm:px-6 lg:px-8 md:ml-20 pt-[5.5rem] md:pt-0">
+          {/* Contenu Principal avec Transitions Fluides */}
         
           {activeTab === "dashboard" && (
             <PageTransition pageKey="dashboard">
@@ -6245,6 +6252,7 @@ export default function App({ session, onLogout }) {
           </div>
         </footer>
       </div>
+      </PullToRefresh>
 
       {/* Menu priorité fixed - affiché au-dessus de tous les éléments */}
       {showPriorityMenu && (
