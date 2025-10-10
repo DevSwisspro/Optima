@@ -5,7 +5,7 @@ import { Settings } from 'lucide-react';
 export default function MobileHeader({ onSettingsClick }) {
   return (
     <motion.header
-      className="md:hidden fixed top-0 left-0 right-0 z-40"
+      className="md:hidden fixed top-0 left-0 right-0 z-40 backdrop-blur-xl border-b border-white/10"
       initial={{ y: -50, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{
@@ -14,11 +14,12 @@ export default function MobileHeader({ onSettingsClick }) {
         delay: 0.1
       }}
       style={{
-        paddingTop: 'max(env(safe-area-inset-top), 0.5rem)',
-        background: 'transparent'
+        paddingTop: 'max(env(safe-area-inset-top), 0.75rem)',
+        background: 'linear-gradient(180deg, rgba(10, 10, 15, 0.95) 0%, rgba(30, 30, 47, 0.9) 100%)',
+        boxShadow: '0 4px 24px rgba(0, 0, 0, 0.25)'
       }}
     >
-      <div className="relative flex items-center justify-center px-4 py-3">
+      <div className="relative flex items-center justify-center px-4 py-4 pb-3">
         {/* Titre OPTIMA centré avec rouge signature */}
         <motion.h1
           className="text-[20px] font-bold tracking-[1px] uppercase relative"
