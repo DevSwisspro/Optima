@@ -101,26 +101,156 @@
   100% { transform: translateX(100%); }
 }
 
-/* Améliorations visuelles pour PWA */
+/* Animation de glow subtil pour cartes premium */
+@keyframes subtleGlow {
+  0%, 100% {
+    box-shadow:
+      0 8px 32px -8px rgba(0, 0, 0, 0.3),
+      0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+  }
+  50% {
+    box-shadow:
+      0 8px 32px -8px rgba(0, 0, 0, 0.3),
+      0 0 0 1px rgba(229, 57, 53, 0.08) inset,
+      0 0 16px rgba(229, 57, 53, 0.03);
+  }
+}
+
+/* Animation de fade-in élégante */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animation de scale doux */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ====== SYSTÈME DE DESIGN PREMIUM ====== */
+
+/* Glassmorphism moderne avec profondeur */
 .glass-effect {
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .glass-dark {
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  background: linear-gradient(135deg,
+    rgba(26, 26, 30, 0.95) 0%,
+    rgba(17, 17, 20, 0.97) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+/* Ombres premium multi-couches */
 .neo-shadow {
   box-shadow:
-    0 4px 16px rgba(0, 0, 0, 0.12),
-    0 1px 4px rgba(0, 0, 0, 0.08),
+    0 2px 8px -2px rgba(0, 0, 0, 0.15),
+    0 6px 20px -3px rgba(0, 0, 0, 0.12),
+    0 1px 3px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+/* Ombre rouge signature pour éléments importants */
+.shadow-red-premium {
+  box-shadow:
+    0 4px 20px rgba(229, 57, 53, 0.15),
+    0 2px 8px rgba(229, 57, 53, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* Dégradé rouge signature élégant */
+.gradient-red-elegant {
+  background: linear-gradient(135deg,
+    rgba(229, 57, 53, 0.12) 0%,
+    rgba(198, 40, 40, 0.08) 50%,
+    rgba(183, 28, 28, 0.06) 100%
+  );
+}
+
+/* Carte premium avec effet de profondeur */
+.card-premium-enhanced {
+  position: relative;
+  background: linear-gradient(135deg,
+    rgba(30, 30, 35, 0.98) 0%,
+    rgba(20, 20, 25, 0.99) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 8px 32px -8px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+  transition: all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.card-premium-enhanced:hover {
+  transform: translateY(-2px);
+  border-color: rgba(229, 57, 53, 0.2);
+  box-shadow:
+    0 12px 48px -12px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(229, 57, 53, 0.1) inset,
+    0 0 20px rgba(229, 57, 53, 0.05);
+}
+
+/* Bouton premium avec shimmer effect */
+.btn-premium-shimmer {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg,
+    #E53935 0%,
+    #C62828 50%,
+    #B71C1C 100%
+  );
+  box-shadow:
+    0 4px 16px rgba(229, 57, 53, 0.3),
+    0 2px 8px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-premium-shimmer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s;
+}
+
+.btn-premium-shimmer:hover::before {
+  left: 100%;
+}
+
+.btn-premium-shimmer:hover {
+  transform: translateY(-1px) scale(1.01);
+  box-shadow:
+    0 6px 24px rgba(229, 57, 53, 0.4),
+    0 3px 12px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 /* Amélioration des transitions pour une expérience fluide */

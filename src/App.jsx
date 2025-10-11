@@ -2087,18 +2087,22 @@ export default function App({ session, onLogout }) {
                 {/* Mobile Header - Centré et épuré */}
                 <div className="md:hidden">
                   <motion.div
-                    initial={{ scale: 0.9, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 0.2, type: "spring", bounce: 0.3 }}
-                    className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 mx-auto max-w-sm card-premium"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+                    className="card-premium-enhanced rounded-3xl p-6 mx-auto max-w-sm relative overflow-hidden"
                   >
-                    <div className="flex flex-col items-center gap-4">
-                      <div className="p-4 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl shadow-xl">
-                        <BarChart3 className="w-8 h-8 text-white" />
+                    {/* Subtle gradient overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-transparent pointer-events-none" />
+
+                    <div className="relative flex flex-col items-center gap-4">
+                      <div className="p-4 bg-gradient-to-br from-red-500 to-red-700 rounded-2xl shadow-red-premium relative overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
+                        <BarChart3 className="w-8 h-8 text-white relative z-10" />
                       </div>
-                      <div>
-                        <h2 className="text-2xl font-bold text-white mb-1">Dashboard</h2>
-                        <p className="text-sm text-gray-300">Vue d'ensemble</p>
+                      <div className="text-center">
+                        <h2 className="text-2xl font-bold text-white mb-1 tracking-tight">Dashboard</h2>
+                        <p className="text-sm text-gray-400 font-medium">Vue d'ensemble</p>
                       </div>
                     </div>
                   </motion.div>
@@ -2111,7 +2115,7 @@ export default function App({ session, onLogout }) {
                       transition={{ duration: 0.35, delay: 0.15, ease: [0.25, 0.1, 0.25, 1] }}
                       value={dashboardFilter.year}
                       onChange={(e) => setDashboardFilter(prev => ({ ...prev, year: parseInt(e.target.value) }))}
-                      className="w-full glass-dark text-white text-center py-4 px-6 rounded-2xl border border-white/20 focus:border-red-500 focus:ring-2 focus:ring-red-500/30 text-lg font-semibold transition-all duration-300"
+                      className="w-full card-premium-enhanced text-white text-center py-4 px-6 rounded-2xl focus:border-red-500/40 focus:ring-2 focus:ring-red-500/20 text-lg font-semibold transition-all duration-300 cursor-pointer hover:border-red-500/30"
                     >
                       {getAvailableYears(budgetItems).length > 0 ? getAvailableYears(budgetItems).map(year => (
                         <option key={year} value={year} className="bg-gray-800">{year}</option>
@@ -2124,7 +2128,7 @@ export default function App({ session, onLogout }) {
                       transition={{ duration: 0.35, delay: 0.22, ease: [0.25, 0.1, 0.25, 1] }}
                       value={dashboardFilter.month}
                       onChange={(e) => setDashboardFilter(prev => ({ ...prev, month: e.target.value }))}
-                      className="w-full glass-dark text-white text-center py-4 px-6 rounded-2xl border border-white/20 focus:border-red-500 focus:ring-2 focus:ring-red-500/30 text-lg font-semibold transition-all duration-300"
+                      className="w-full card-premium-enhanced text-white text-center py-4 px-6 rounded-2xl focus:border-red-500/40 focus:ring-2 focus:ring-red-500/20 text-lg font-semibold transition-all duration-300 cursor-pointer hover:border-red-500/30"
                     >
                       <option value="all" className="bg-gray-800">Toute l'année</option>
                       {Array.from({ length: 12 }, (_, i) => (
@@ -2138,10 +2142,10 @@ export default function App({ session, onLogout }) {
                       initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.35, delay: 0.29, ease: [0.25, 0.1, 0.25, 1] }}
-                      whileTap={{ scale: 0.98 }}
-                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.97 }}
+                      whileHover={{ scale: 1.01 }}
                       onClick={() => setActiveTab("budget-dashboard")}
-                      className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white py-4 sm:py-3 px-6 sm:px-8 rounded-2xl text-base sm:text-lg font-bold shadow-lg shadow-red-500/25 transition-all duration-300 flex items-center justify-center gap-3 min-h-[48px] btn-premium-mobile"
+                      className="w-full btn-premium-shimmer text-white py-4 sm:py-3 px-6 sm:px-8 rounded-2xl text-base sm:text-lg font-bold flex items-center justify-center gap-3 min-h-[48px]"
                     >
                       <TrendingUp className="w-5 h-5 sm:w-5 sm:h-5" />
                       Budget Avancé
@@ -2255,12 +2259,13 @@ export default function App({ session, onLogout }) {
                               ease: [0.25, 0.1, 0.25, 1]
                             }}
                             whileTap={{ scale: 0.98 }}
-                            className={`glass-dark rounded-3xl p-6 border border-white/20 neo-shadow bg-gradient-to-br ${config.bgColor} card-premium w-full max-w-sm mx-auto`}
+                            whileHover={{ scale: 1.01, y: -2 }}
+                            className={`card-premium-enhanced rounded-3xl p-6 ${config.bgColor} w-full max-w-sm mx-auto overflow-hidden group`}
                           >
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-4">
-                                <div className={`p-3 bg-gradient-to-br from-gray-600 to-gray-700 rounded-2xl`}>
-                                  <Icon className={`w-6 h-6 ${config.color}`} />
+                                <div className={`p-3.5 bg-gradient-to-br from-gray-700/50 to-gray-800/50 rounded-2xl backdrop-blur-sm border border-white/5 group-hover:border-${config.color.replace('text-', '')}/30 transition-all duration-300`}>
+                                  <Icon className={`w-6 h-6 ${config.color} group-hover:scale-110 transition-transform duration-300`} />
                                 </div>
                                 <div>
                                   <div className={`text-sm font-semibold ${config.color} mb-1`}>
