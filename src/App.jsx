@@ -2076,7 +2076,7 @@ export default function App({ session, onLogout }) {
         
           {activeTab === "dashboard" && (
             <PageTransition pageKey="dashboard">
-              <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 space-y-8">
+              <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-10 space-y-8 md:space-y-12">
               {/* Header Dashboard - Mobile vs Desktop */}
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
@@ -2084,25 +2084,46 @@ export default function App({ session, onLogout }) {
                 transition={{ duration: 0.5 }}
                 className="text-center"
               >
-                {/* Mobile Header - Centré et épuré */}
+                {/* Mobile Header - Premium centré */}
                 <div className="md:hidden">
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
-                    className="card-premium-enhanced rounded-3xl p-6 mx-auto max-w-sm relative overflow-hidden"
+                    transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+                    className="relative"
                   >
-                    {/* Subtle gradient overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-transparent pointer-events-none" />
+                    {/* Hero Header Card */}
+                    <div className="card-premium-level-2 rounded-3xl p-8 mx-auto max-w-md relative overflow-hidden">
+                      {/* Animated gradient background */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-red-500/8 via-red-600/4 to-transparent pointer-events-none" />
 
-                    <div className="relative flex flex-col items-center gap-4">
-                      <div className="p-4 bg-gradient-to-br from-red-500 to-red-700 rounded-2xl shadow-red-premium relative overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
-                        <BarChart3 className="w-8 h-8 text-white relative z-10" />
-                      </div>
-                      <div className="text-center">
-                        <h2 className="text-2xl font-bold text-white mb-1 tracking-tight">Dashboard</h2>
-                        <p className="text-sm text-gray-400 font-medium">Vue d'ensemble</p>
+                      {/* Radial glow effect */}
+                      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-red-500/10 blur-3xl rounded-full" />
+
+                      <div className="relative flex flex-col items-center gap-5 text-center">
+                        {/* Icon badge */}
+                        <motion.div
+                          initial={{ scale: 0.8, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ duration: 0.5, delay: 0.1, type: "spring", bounce: 0.4 }}
+                          className="relative"
+                        >
+                          <div className="absolute inset-0 bg-red-500/20 blur-xl rounded-full animate-pulse" />
+                          <div className="relative p-5 bg-gradient-to-br from-red-500 via-red-600 to-red-700 rounded-2xl shadow-red-premium">
+                            <div className="absolute inset-0 bg-gradient-to-br from-white/15 to-transparent rounded-2xl" />
+                            <BarChart3 className="w-9 h-9 text-white relative z-10" />
+                          </div>
+                        </motion.div>
+
+                        {/* Title */}
+                        <motion.div
+                          initial={{ opacity: 0, y: 5 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.4, delay: 0.2 }}
+                        >
+                          <h1 className="text-display-lg text-white mb-2">Dashboard</h1>
+                          <p className="text-body-md text-gray-400">Vue d'ensemble de vos finances</p>
+                        </motion.div>
                       </div>
                     </div>
                   </motion.div>
@@ -2153,22 +2174,39 @@ export default function App({ session, onLogout }) {
                   </div>
                 </div>
 
-                {/* Desktop Header - Style traditionnel amélioré */}
+                {/* Desktop Header - Premium élégant */}
                 <div className="hidden md:block">
-                  <div className="glass-dark rounded-3xl p-8 border border-white/10 card-premium">
-                    <div className="flex flex-row justify-between items-center">
+                  <div className="card-premium-level-2 rounded-3xl p-10 relative overflow-hidden">
+                    {/* Background effects */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-red-500/6 via-transparent to-blue-500/4 pointer-events-none" />
+                    <div className="absolute top-0 left-1/4 w-96 h-48 bg-red-500/8 blur-3xl rounded-full" />
+                    <div className="absolute bottom-0 right-1/4 w-96 h-48 bg-blue-500/6 blur-3xl rounded-full" />
+
+                    <div className="relative flex flex-row justify-between items-center">
                       <motion.div
                         initial={{ x: -30, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
-                        transition={{ delay: 0.2 }}
-                        className="flex items-center gap-6"
+                        transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
+                        className="flex items-center gap-8"
                       >
-                        <div className="p-4 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl shadow-xl">
-                          <BarChart3 className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
-                        </div>
+                        {/* Icon badge premium */}
+                        <motion.div
+                          initial={{ scale: 0.8, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ duration: 0.5, delay: 0.1, type: "spring", bounce: 0.3 }}
+                          className="relative"
+                        >
+                          <div className="absolute inset-0 bg-red-500/20 blur-xl rounded-full" />
+                          <div className="relative p-6 bg-gradient-to-br from-red-500 via-red-600 to-red-700 rounded-2xl shadow-red-premium">
+                            <div className="absolute inset-0 bg-gradient-to-br from-white/15 to-transparent rounded-2xl" />
+                            <BarChart3 className="w-10 h-10 text-white relative z-10" />
+                          </div>
+                        </motion.div>
+
+                        {/* Title section */}
                         <div className="text-left">
-                          <h2 className="text-4xl font-bold text-white mb-2">Dashboard Global</h2>
-                          <p className="text-xl text-gray-300">Analyse complète de vos finances</p>
+                          <h1 className="text-display-xl text-white mb-2 tracking-tight">Dashboard Global</h1>
+                          <p className="text-body-lg text-gray-400">Analyse complète de vos finances</p>
                         </div>
                       </motion.div>
 
@@ -2251,38 +2289,65 @@ export default function App({ session, onLogout }) {
                         return (
                           <motion.div
                             key={type}
-                            initial={{ opacity: 0, y: 12 }}
-                            animate={{ opacity: 1, y: 0 }}
+                            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
                             transition={{
-                              duration: 0.4,
-                              delay: 0.1 + index * 0.08,
+                              duration: 0.5,
+                              delay: 0.15 + index * 0.1,
                               ease: [0.25, 0.1, 0.25, 1]
                             }}
-                            whileTap={{ scale: 0.98 }}
-                            whileHover={{ scale: 1.01, y: -2 }}
-                            className={`card-premium-enhanced rounded-3xl p-6 ${config.bgColor} w-full max-w-sm mx-auto overflow-hidden group`}
+                            whileTap={{ scale: 0.97 }}
+                            className="w-full max-w-sm mx-auto"
                           >
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-4">
-                                <div className={`p-3.5 bg-gradient-to-br from-gray-700/50 to-gray-800/50 rounded-2xl backdrop-blur-sm border border-white/5 group-hover:border-${config.color.replace('text-', '')}/30 transition-all duration-300`}>
-                                  <Icon className={`w-6 h-6 ${config.color} group-hover:scale-110 transition-transform duration-300`} />
-                                </div>
-                                <div>
-                                  <div className={`text-sm font-semibold ${config.color} mb-1`}>
-                                    {config.label}
+                            <div className={`card-premium-level-1 hover-lift-lg rounded-3xl p-7 ${config.bgColor} relative overflow-hidden group cursor-pointer`}>
+                              {/* Gradient overlay */}
+                              <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+                              <div className="relative flex items-center justify-between">
+                                <div className="flex items-center gap-5 flex-1">
+                                  {/* Icon badge */}
+                                  <motion.div
+                                    whileHover={{ scale: 1.1, rotate: 5 }}
+                                    transition={{ type: "spring", stiffness: 300 }}
+                                    className={`p-4 bg-gradient-to-br from-gray-700/60 to-gray-800/60 rounded-2xl backdrop-blur-sm border border-white/10 group-hover:border-white/20 group-hover:shadow-lg transition-all duration-300 relative`}
+                                  >
+                                    <div className={`absolute inset-0 bg-gradient-to-br ${config.bgColor} opacity-20 rounded-2xl`} />
+                                    <Icon className={`w-6 h-6 ${config.color} relative z-10`} />
+                                  </motion.div>
+
+                                  {/* Content */}
+                                  <div className="flex-1">
+                                    <div className={`text-label-lg ${config.color} mb-2`}>
+                                      {config.label}
+                                    </div>
+                                    <motion.div
+                                      className="text-heading-lg text-white tabular-nums"
+                                      initial={{ opacity: 0 }}
+                                      animate={{ opacity: 1 }}
+                                      transition={{ delay: 0.3 + index * 0.1 }}
+                                    >
+                                      {type === 'revenus' || type === 'epargne' || type === 'investissements' ? '+' : '-'}{formatCurrency(total).replace(' CHF', '')}
+                                      <span className="text-body-sm text-gray-400 ml-2">CHF</span>
+                                    </motion.div>
                                   </div>
-                                  <div className="text-2xl font-bold text-white">
-                                    {type === 'revenus' || type === 'epargne' || type === 'investissements' ? '+' : '-'}{formatCurrency(total).replace(' CHF', '')} CHF
-                                  </div>
                                 </div>
+
+                                {/* Emoji indicator */}
+                                <motion.div
+                                  animate={{
+                                    rotate: [0, 5, -5, 0],
+                                    scale: [1, 1.05, 1]
+                                  }}
+                                  transition={{
+                                    duration: 3,
+                                    repeat: Infinity,
+                                    ease: "easeInOut"
+                                  }}
+                                  className="text-3xl opacity-20 group-hover:opacity-30 transition-opacity"
+                                >
+                                  {type === 'revenus' ? '📈' : type === 'epargne' ? '💰' : type === 'investissements' ? '📊' : '💸'}
+                                </motion.div>
                               </div>
-                              <motion.div
-                                animate={{ rotate: [0, 5, -5, 0] }}
-                                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                                className="text-2xl opacity-20"
-                              >
-                                {type === 'revenus' ? '📈' : type === 'epargne' ? '💰' : type === 'investissements' ? '📊' : '💸'}
-                              </motion.div>
                             </div>
                           </motion.div>
                         );
