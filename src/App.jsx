@@ -2556,10 +2556,10 @@ export default function App({ session, onLogout }) {
                       initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.4, delay: 0.36, ease: [0.25, 0.1, 0.25, 1] }}
-                      className="space-y-6"
+                      className="flex flex-col"
                     >
                       {/* Titre section centré premium avec mise en valeur */}
-                      <div className="text-center px-4">
+                      <div className="text-center mb-6">
                         <motion.h3
                           className="text-heading-xl md:text-display-md text-white font-semibold tracking-tight"
                           initial={{ opacity: 0, y: -8 }}
@@ -2580,10 +2580,10 @@ export default function App({ session, onLogout }) {
                       {/* Carte graphique avec ref */}
                       <div
                         ref={barChartRef}
-                        className="card-premium-level-1 rounded-3xl p-6 hover-lift-lg touch-none"
+                        className="card-premium-level-1 rounded-3xl p-6 hover-lift-lg touch-none flex-1"
                         style={{ touchAction: 'pan-y' }}
                       >
-                      <div className="w-full" style={{ height: window.innerWidth < 768 ? '280px' : '320px' }}>
+                      <div className="w-full h-full" style={{ minHeight: window.innerWidth < 768 ? '280px' : '320px' }}>
                         <ResponsiveContainer width="100%" height="100%">
                           <BarChart data={processMonthlyData(budgetItems, dashboardFilter.year)}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
@@ -2604,7 +2604,9 @@ export default function App({ session, onLogout }) {
                               content={<CustomTooltip />}
                               cursor={{ fill: 'rgba(255, 255, 255, 0.1)' }}
                               trigger={window.innerWidth < 768 ? 'click' : 'hover'}
-                              allowEscapeViewBox={{ x: false, y: true }}
+                              allowEscapeViewBox={{ x: true, y: true }}
+                              wrapperStyle={{ zIndex: 1000, outline: 'none' }}
+                              position={{ y: 0 }}
                             />
                             <Legend
                               wrapperStyle={{ fontSize: window.innerWidth < 768 ? '11px' : '12px' }}
@@ -2625,10 +2627,10 @@ export default function App({ session, onLogout }) {
                       initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.4, delay: 0.43, ease: [0.25, 0.1, 0.25, 1] }}
-                      className="space-y-6"
+                      className="flex flex-col"
                     >
                       {/* Titre section centré premium avec mise en valeur */}
-                      <div className="text-center px-4">
+                      <div className="text-center mb-6">
                         <motion.h3
                           className="text-heading-xl md:text-display-md text-white font-semibold tracking-tight"
                           initial={{ opacity: 0, y: -8 }}
@@ -2649,10 +2651,10 @@ export default function App({ session, onLogout }) {
                       {/* Carte graphique avec ref */}
                       <div
                         ref={pieChartRef}
-                        className="card-premium-level-1 rounded-3xl p-6 hover-lift-lg touch-none"
+                        className="card-premium-level-1 rounded-3xl p-6 hover-lift-lg touch-none flex-1"
                         style={{ touchAction: 'pan-y' }}
                       >
-                      <div className="w-full" style={{ height: window.innerWidth < 768 ? '280px' : '320px' }}>
+                      <div className="w-full h-full" style={{ minHeight: window.innerWidth < 768 ? '280px' : '320px' }}>
                         <ResponsiveContainer width="100%" height="100%">
                           <PieChart>
                             <Pie
@@ -2720,6 +2722,7 @@ export default function App({ session, onLogout }) {
                             <Tooltip
                               content={<CustomTooltip />}
                               trigger={window.innerWidth < 768 ? 'click' : 'hover'}
+                              wrapperStyle={{ zIndex: 1000, outline: 'none' }}
                             />
                             <Legend
                               verticalAlign="bottom"
