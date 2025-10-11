@@ -2520,15 +2520,25 @@ export default function App({ session, onLogout }) {
                   )}
 
                   {/* Graphiques mensuels */}
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="space-y-10">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {/* Graphique en barres mensuelles */}
                     <motion.div
                       initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.4, delay: 0.36, ease: [0.25, 0.1, 0.25, 1] }}
-                      className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm card-responsive border border-gray-700/30 hover-lift ultra-smooth card-premium"
+                      className="space-y-6"
                     >
-                      <h3 className="text-xl font-bold text-white mb-4">Évolution mensuelle {dashboardFilter.year}</h3>
+                      {/* Titre section centré premium */}
+                      <div className="text-center">
+                        <h3 className="text-heading-xl text-white">Évolution mensuelle {dashboardFilter.year}</h3>
+                        <div className="mt-2 divider-subtle mx-auto w-24"></div>
+                      </div>
+
+                      {/* Carte graphique */}
+                      <div className="card-premium-level-1 rounded-3xl p-6 hover-lift-lg touch-none"
+                        style={{ touchAction: 'pan-y' }}
+                      >
                       <div className="w-full" style={{ height: window.innerWidth < 768 ? '280px' : '320px' }}>
                         <ResponsiveContainer width="100%" height="100%">
                           <BarChart data={processMonthlyData(budgetItems, dashboardFilter.year)}>
@@ -2546,7 +2556,12 @@ export default function App({ session, onLogout }) {
                               stroke="#9ca3af"
                               style={{ fontSize: window.innerWidth < 768 ? '11px' : '12px' }}
                             />
-                            <Tooltip content={<CustomTooltip />} />
+                            <Tooltip
+                              content={<CustomTooltip />}
+                              cursor={{ fill: 'rgba(255, 255, 255, 0.1)' }}
+                              trigger={window.innerWidth < 768 ? 'click' : 'hover'}
+                              allowEscapeViewBox={{ x: false, y: true }}
+                            />
                             <Legend
                               wrapperStyle={{ fontSize: window.innerWidth < 768 ? '11px' : '12px' }}
                             />
@@ -2558,6 +2573,7 @@ export default function App({ session, onLogout }) {
                           </BarChart>
                         </ResponsiveContainer>
                       </div>
+                      </div>
                     </motion.div>
 
                     {/* Graphique camembert répartition annuelle */}
@@ -2565,9 +2581,18 @@ export default function App({ session, onLogout }) {
                       initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.4, delay: 0.43, ease: [0.25, 0.1, 0.25, 1] }}
-                      className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm card-responsive border border-gray-700/30 hover-lift ultra-smooth card-premium"
+                      className="space-y-6"
                     >
-                      <h3 className="text-xl font-bold text-white mb-4">Répartition {dashboardFilter.month === 'all' ? dashboardFilter.year : `${new Date(dashboardFilter.year, dashboardFilter.month - 1).toLocaleDateString('fr-FR', { month: 'long' })} ${dashboardFilter.year}`}</h3>
+                      {/* Titre section centré premium */}
+                      <div className="text-center">
+                        <h3 className="text-heading-xl text-white">Répartition {dashboardFilter.month === 'all' ? dashboardFilter.year : `${new Date(dashboardFilter.year, dashboardFilter.month - 1).toLocaleDateString('fr-FR', { month: 'long' })} ${dashboardFilter.year}`}</h3>
+                        <div className="mt-2 divider-subtle mx-auto w-24"></div>
+                      </div>
+
+                      {/* Carte graphique */}
+                      <div className="card-premium-level-1 rounded-3xl p-6 hover-lift-lg touch-none"
+                        style={{ touchAction: 'pan-y' }}
+                      >
                       <div className="w-full" style={{ height: window.innerWidth < 768 ? '280px' : '320px' }}>
                         <ResponsiveContainer width="100%" height="100%">
                           <PieChart>
@@ -2633,7 +2658,10 @@ export default function App({ session, onLogout }) {
                               dataKey="value"
                             >
                             </Pie>
-                            <Tooltip content={<CustomTooltip />} />
+                            <Tooltip
+                              content={<CustomTooltip />}
+                              trigger={window.innerWidth < 768 ? 'click' : 'hover'}
+                            />
                             <Legend
                               verticalAlign="bottom"
                               height={36}
@@ -2642,7 +2670,9 @@ export default function App({ session, onLogout }) {
                           </PieChart>
                         </ResponsiveContainer>
                       </div>
+                      </div>
                     </motion.div>
+                  </div>
                   </div>
 
                   {/* Graphiques annuels */}
