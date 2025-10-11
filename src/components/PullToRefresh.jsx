@@ -32,12 +32,12 @@ export default function PullToRefresh({ onRefresh, children }) {
       currentY = e.touches[0].clientY;
       const distance = Math.min(currentY - startY, MAX_PULL);
 
-      if (distance > 0) {
+      // Seulement empêcher le scroll si on tire vers le bas (pull-to-refresh)
+      // Ne pas bloquer le scroll normal vers le bas
+      if (distance > 0 && distance > 10) {
         setPullDistance(distance);
-        // Empêcher le scroll natif pendant le pull
-        if (distance > 10) {
-          e.preventDefault();
-        }
+        // Seulement empêcher le défilement par défaut si on est vraiment en train de tirer
+        e.preventDefault();
       }
     };
 

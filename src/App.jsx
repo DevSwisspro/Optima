@@ -2047,7 +2047,7 @@ export default function App({ session, onLogout }) {
   );
 
   return (
-    <div className="min-h-screen gradient-dark text-white relative overflow-hidden">
+    <div className="min-h-screen gradient-dark text-white relative overflow-x-hidden">
       {/* Header Desktop Premium */}
       <Header session={session} onLogout={onLogout} />
 
