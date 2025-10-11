@@ -119,7 +119,7 @@ const getCategoryColor = (category, index) => {
   return categoryColors[index % categoryColors.length];
 };
 
-// CustomTooltip responsive avec couleurs des catégories
+// CustomTooltip responsive avec couleurs des catégories et transition douce
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload || !payload.length) return null;
 
@@ -136,7 +136,10 @@ const CustomTooltip = ({ active, payload, label }) => {
         backdropFilter: 'blur(10px)',
         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
         maxWidth: isMobile ? '220px' : '280px',
-        fontSize: isMobile ? '13px' : '14px'
+        fontSize: isMobile ? '13px' : '14px',
+        opacity: active ? 1 : 0,
+        transform: active ? 'scale(1)' : 'scale(0.95)',
+        transition: 'opacity 250ms cubic-bezier(0.4, 0, 0.2, 1), transform 250ms cubic-bezier(0.4, 0, 0.2, 1)'
       }}
     >
       {label && (
@@ -794,7 +797,12 @@ export default function App({ session, onLogout }) {
   // États pour vues Mensuel et Catégories
   const [monthlyViewYear, setMonthlyViewYear] = useState(new Date().getFullYear());
   const [categoriesViewYear, setCategoriesViewYear] = useState(new Date().getFullYear());
-  
+
+  // États pour les graphiques - gestion tooltips
+  const [activeTooltip, setActiveTooltip] = useState(null);
+  const barChartRef = useRef(null);
+  const pieChartRef = useRef(null);
+
   // États pour les paramètres
   const [showSettings, setShowSettings] = useState(false);
   const [recurringExpenses, setRecurringExpenses] = useState([]);
@@ -914,6 +922,27 @@ export default function App({ session, onLogout }) {
   const [budgetFilter, setBudgetFilter] = useState({});
 
   // Charger les tâches depuis Supabase
+  // Gestionnaire de clic global pour fermer les tooltips des graphiques
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      // Vérifier si le clic est en dehors des graphiques
+      const isOutsideBarChart = barChartRef.current && !barChartRef.current.contains(event.target);
+      const isOutsidePieChart = pieChartRef.current && !pieChartRef.current.contains(event.target);
+
+      if (isOutsideBarChart && isOutsidePieChart) {
+        setActiveTooltip(null);
+      }
+    };
+
+    // Ajouter l'écouteur sur le document
+    document.addEventListener('click', handleClickOutside);
+
+    // Cleanup
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
+
   useEffect(() => {
     if (!userId) return;
 
@@ -2529,14 +2558,29 @@ export default function App({ session, onLogout }) {
                       transition={{ duration: 0.4, delay: 0.36, ease: [0.25, 0.1, 0.25, 1] }}
                       className="space-y-6"
                     >
-                      {/* Titre section centré premium */}
-                      <div className="text-center">
-                        <h3 className="text-heading-xl text-white">Évolution mensuelle {dashboardFilter.year}</h3>
-                        <div className="mt-2 divider-subtle mx-auto w-24"></div>
+                      {/* Titre section centré premium avec mise en valeur */}
+                      <div className="text-center px-4">
+                        <motion.h3
+                          className="text-heading-xl md:text-display-md text-white font-semibold tracking-tight"
+                          initial={{ opacity: 0, y: -8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.5, delay: 0.4 }}
+                        >
+                          Évolution mensuelle {dashboardFilter.year}
+                        </motion.h3>
+                        <motion.div
+                          className="mt-3 h-0.5 bg-gradient-to-r from-transparent via-red-500/60 to-transparent mx-auto"
+                          style={{ width: '120px' }}
+                          initial={{ scaleX: 0, opacity: 0 }}
+                          animate={{ scaleX: 1, opacity: 1 }}
+                          transition={{ duration: 0.6, delay: 0.5 }}
+                        ></motion.div>
                       </div>
 
-                      {/* Carte graphique */}
-                      <div className="card-premium-level-1 rounded-3xl p-6 hover-lift-lg touch-none"
+                      {/* Carte graphique avec ref */}
+                      <div
+                        ref={barChartRef}
+                        className="card-premium-level-1 rounded-3xl p-6 hover-lift-lg touch-none"
                         style={{ touchAction: 'pan-y' }}
                       >
                       <div className="w-full" style={{ height: window.innerWidth < 768 ? '280px' : '320px' }}>
@@ -2583,14 +2627,29 @@ export default function App({ session, onLogout }) {
                       transition={{ duration: 0.4, delay: 0.43, ease: [0.25, 0.1, 0.25, 1] }}
                       className="space-y-6"
                     >
-                      {/* Titre section centré premium */}
-                      <div className="text-center">
-                        <h3 className="text-heading-xl text-white">Répartition {dashboardFilter.month === 'all' ? dashboardFilter.year : `${new Date(dashboardFilter.year, dashboardFilter.month - 1).toLocaleDateString('fr-FR', { month: 'long' })} ${dashboardFilter.year}`}</h3>
-                        <div className="mt-2 divider-subtle mx-auto w-24"></div>
+                      {/* Titre section centré premium avec mise en valeur */}
+                      <div className="text-center px-4">
+                        <motion.h3
+                          className="text-heading-xl md:text-display-md text-white font-semibold tracking-tight"
+                          initial={{ opacity: 0, y: -8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.5, delay: 0.47 }}
+                        >
+                          Répartition {dashboardFilter.month === 'all' ? dashboardFilter.year : `${new Date(dashboardFilter.year, dashboardFilter.month - 1).toLocaleDateString('fr-FR', { month: 'long' })} ${dashboardFilter.year}`}
+                        </motion.h3>
+                        <motion.div
+                          className="mt-3 h-0.5 bg-gradient-to-r from-transparent via-red-500/60 to-transparent mx-auto"
+                          style={{ width: '120px' }}
+                          initial={{ scaleX: 0, opacity: 0 }}
+                          animate={{ scaleX: 1, opacity: 1 }}
+                          transition={{ duration: 0.6, delay: 0.57 }}
+                        ></motion.div>
                       </div>
 
-                      {/* Carte graphique */}
-                      <div className="card-premium-level-1 rounded-3xl p-6 hover-lift-lg touch-none"
+                      {/* Carte graphique avec ref */}
+                      <div
+                        ref={pieChartRef}
+                        className="card-premium-level-1 rounded-3xl p-6 hover-lift-lg touch-none"
                         style={{ touchAction: 'pan-y' }}
                       >
                       <div className="w-full" style={{ height: window.innerWidth < 768 ? '280px' : '320px' }}>
