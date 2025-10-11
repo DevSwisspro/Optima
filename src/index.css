@@ -118,9 +118,9 @@
 
 .neo-shadow {
   box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.12),
-    0 2px 6px rgba(0, 0, 0, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    0 4px 16px rgba(0, 0, 0, 0.12),
+    0 1px 4px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 /* Amélioration des transitions pour une expérience fluide */
@@ -156,6 +156,7 @@
 .smooth-scroll {
   -webkit-overflow-scrolling: touch;
   overflow-scrolling: touch;
+  scroll-behavior: smooth;
 }
 
 /* Fixes pour les safe areas iPhone */
@@ -215,7 +216,7 @@
 .card-responsive {
   padding: clamp(1rem, 4vw, 1.5rem);
   margin-bottom: clamp(0.75rem, 3vw, 1rem);
-  border-radius: clamp(0.75rem, 2vw, 1rem);
+  border-radius: clamp(1rem, 2.5vw, 1.5rem);
 }
 
 /* Navigation mobile native */

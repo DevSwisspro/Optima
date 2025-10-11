@@ -2106,9 +2106,9 @@ export default function App({ session, onLogout }) {
                   {/* Filtres Mobile - Style Cards */}
                   <div className="mt-6 space-y-3 max-w-sm mx-auto">
                     <motion.select
-                      initial={{ x: -50, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      transition={{ delay: 0.3 }}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.35, delay: 0.15, ease: [0.25, 0.1, 0.25, 1] }}
                       value={dashboardFilter.year}
                       onChange={(e) => setDashboardFilter(prev => ({ ...prev, year: parseInt(e.target.value) }))}
                       className="w-full glass-dark text-white text-center py-4 px-6 rounded-2xl border border-white/20 focus:border-red-500 focus:ring-2 focus:ring-red-500/30 text-lg font-semibold transition-all duration-300"
@@ -2119,9 +2119,9 @@ export default function App({ session, onLogout }) {
                     </motion.select>
 
                     <motion.select
-                      initial={{ x: 50, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      transition={{ delay: 0.4 }}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.35, delay: 0.22, ease: [0.25, 0.1, 0.25, 1] }}
                       value={dashboardFilter.month}
                       onChange={(e) => setDashboardFilter(prev => ({ ...prev, month: e.target.value }))}
                       className="w-full glass-dark text-white text-center py-4 px-6 rounded-2xl border border-white/20 focus:border-red-500 focus:ring-2 focus:ring-red-500/30 text-lg font-semibold transition-all duration-300"
@@ -2135,9 +2135,9 @@ export default function App({ session, onLogout }) {
                     </motion.select>
 
                     <motion.button
-                      initial={{ y: 50, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      transition={{ delay: 0.5 }}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.35, delay: 0.29, ease: [0.25, 0.1, 0.25, 1] }}
                       whileTap={{ scale: 0.98 }}
                       whileHover={{ scale: 1.02 }}
                       onClick={() => setActiveTab("budget-dashboard")}
@@ -2247,9 +2247,13 @@ export default function App({ session, onLogout }) {
                         return (
                           <motion.div
                             key={type}
-                            initial={{ x: index % 2 === 0 ? -100 : 100, opacity: 0 }}
-                            animate={{ x: 0, opacity: 1 }}
-                            transition={{ delay: 0.7 + index * 0.1, type: "spring", bounce: 0.3 }}
+                            initial={{ opacity: 0, y: 12 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{
+                              duration: 0.4,
+                              delay: 0.1 + index * 0.08,
+                              ease: [0.25, 0.1, 0.25, 1]
+                            }}
                             whileTap={{ scale: 0.98 }}
                             className={`glass-dark rounded-3xl p-6 border border-white/20 neo-shadow bg-gradient-to-br ${config.bgColor} card-premium w-full max-w-sm mx-auto`}
                           >
@@ -2449,9 +2453,9 @@ export default function App({ session, onLogout }) {
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Graphique en barres mensuelles */}
                     <motion.div
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.5, delay: 0.2 }}
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4, delay: 0.36, ease: [0.25, 0.1, 0.25, 1] }}
                       className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm card-responsive border border-gray-700/30 hover-lift ultra-smooth card-premium"
                     >
                       <h3 className="text-xl font-bold text-white mb-4">Évolution mensuelle {dashboardFilter.year}</h3>
@@ -2488,9 +2492,9 @@ export default function App({ session, onLogout }) {
 
                     {/* Graphique camembert répartition annuelle */}
                     <motion.div
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.5, delay: 0.3 }}
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4, delay: 0.43, ease: [0.25, 0.1, 0.25, 1] }}
                       className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm card-responsive border border-gray-700/30 hover-lift ultra-smooth card-premium"
                     >
                       <h3 className="text-xl font-bold text-white mb-4">Répartition {dashboardFilter.month === 'all' ? dashboardFilter.year : `${new Date(dashboardFilter.year, dashboardFilter.month - 1).toLocaleDateString('fr-FR', { month: 'long' })} ${dashboardFilter.year}`}</h3>
