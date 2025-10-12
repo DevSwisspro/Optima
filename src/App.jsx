@@ -2591,12 +2591,46 @@ export default function App({ session, onLogout }) {
                       <div
                         ref={barChartRef}
                         className="card-premium-level-1 rounded-3xl p-4 md:p-6 hover-lift-lg touch-none outline-none focus:outline-none"
-                        style={{ touchAction: 'pan-y', outline: 'none' }}
+                        style={{
+                          touchAction: 'pan-y',
+                          outline: 'none',
+                          outlineWidth: '0',
+                          outlineStyle: 'none',
+                          outlineColor: 'transparent',
+                          border: 'none',
+                          boxShadow: 'none',
+                          WebkitTapHighlightColor: 'transparent'
+                        }}
                         tabIndex={-1}
+                        onFocus={(e) => e.preventDefault()}
+                        onMouseDown={(e) => e.preventDefault()}
                       >
-                      <div className="w-full" style={{ height: window.innerWidth < 768 ? '300px' : '340px' }}>
-                        <ResponsiveContainer width="100%" height="100%">
-                          <BarChart key={`bar-${chartKey}`} data={processMonthlyData(budgetItems, dashboardFilter.year)}>
+                      <div
+                        className="w-full"
+                        style={{
+                          height: window.innerWidth < 768 ? '300px' : '340px',
+                          outline: 'none',
+                          border: 'none',
+                          WebkitTapHighlightColor: 'transparent'
+                        }}
+                      >
+                        <ResponsiveContainer
+                          width="100%"
+                          height="100%"
+                          style={{
+                            outline: 'none',
+                            border: 'none'
+                          }}
+                        >
+                          <BarChart
+                            key={`bar-${chartKey}`}
+                            data={processMonthlyData(budgetItems, dashboardFilter.year)}
+                            style={{
+                              outline: 'none',
+                              border: 'none'
+                            }}
+                            tabIndex={-1}
+                          >
                             <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                             <XAxis
                               dataKey="name"
@@ -2668,12 +2702,45 @@ export default function App({ session, onLogout }) {
                       <div
                         ref={pieChartRef}
                         className="card-premium-level-1 rounded-3xl p-4 md:p-6 hover-lift-lg touch-none outline-none focus:outline-none"
-                        style={{ touchAction: 'pan-y', outline: 'none' }}
+                        style={{
+                          touchAction: 'pan-y',
+                          outline: 'none',
+                          outlineWidth: '0',
+                          outlineStyle: 'none',
+                          outlineColor: 'transparent',
+                          border: 'none',
+                          boxShadow: 'none',
+                          WebkitTapHighlightColor: 'transparent'
+                        }}
                         tabIndex={-1}
+                        onFocus={(e) => e.preventDefault()}
+                        onMouseDown={(e) => e.preventDefault()}
                       >
-                      <div className="w-full" style={{ height: window.innerWidth < 768 ? '300px' : '340px' }}>
-                        <ResponsiveContainer width="100%" height="100%">
-                          <PieChart key={`pie-${chartKey}`}>
+                      <div
+                        className="w-full"
+                        style={{
+                          height: window.innerWidth < 768 ? '300px' : '340px',
+                          outline: 'none',
+                          border: 'none',
+                          WebkitTapHighlightColor: 'transparent'
+                        }}
+                      >
+                        <ResponsiveContainer
+                          width="100%"
+                          height="100%"
+                          style={{
+                            outline: 'none',
+                            border: 'none'
+                          }}
+                        >
+                          <PieChart
+                            key={`pie-${chartKey}`}
+                            style={{
+                              outline: 'none',
+                              border: 'none'
+                            }}
+                            tabIndex={-1}
+                          >
                             <Pie
                               data={[
                                 {

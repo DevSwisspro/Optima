@@ -1139,54 +1139,177 @@
   }
 }
 
-/* ====== SUPPRESSION TOTALE CONTOUR BLEU GRAPHIQUES ====== */
-/* Approche ultra-agressive pour éliminer tout contour/focus */
-* {
-  -webkit-tap-highlight-color: transparent !important;
-}
+/* ====== SUPPRESSION TOTALE CONTOUR BLEU GRAPHIQUES - ULTRA RADICAL ====== */
+/* Approche maximale pour éliminer ABSOLUMENT tout contour/focus/border */
 
-.recharts-wrapper *,
-.recharts-surface *,
-.recharts-layer *,
-.recharts-bar *,
-.recharts-bars *,
-.recharts-bar-rectangle *,
-.recharts-rectangle *,
-.recharts-sector *,
-.recharts-pie *,
-.recharts-pie-sector *,
-svg,
-svg *,
-.card-premium-level-1,
-.card-premium-level-1 *,
-.card-premium-level-2,
-.card-premium-level-2 * {
+/* Global - Tous les éléments */
+*,
+*::before,
+*::after,
+*:focus,
+*:active,
+*:focus-visible,
+*:focus-within {
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
   outline: none !important;
   outline-width: 0 !important;
   outline-style: none !important;
   outline-color: transparent !important;
+  outline-offset: 0 !important;
+  -webkit-focus-ring-color: transparent !important;
+  -moz-outline-style: none !important;
+  -moz-outline-width: 0 !important;
+  -moz-outline-color: transparent !important;
+}
+
+/* Tous les SVG et éléments Recharts - Approche exhaustive */
+svg,
+svg *,
+svg > *,
+path,
+rect,
+circle,
+ellipse,
+line,
+polyline,
+polygon,
+text,
+g,
+defs,
+clipPath,
+.recharts-wrapper,
+.recharts-wrapper *,
+.recharts-wrapper > *,
+.recharts-responsive-container,
+.recharts-responsive-container *,
+.recharts-surface,
+.recharts-surface *,
+.recharts-surface > *,
+.recharts-layer,
+.recharts-layer *,
+.recharts-bar,
+.recharts-bar *,
+.recharts-bars,
+.recharts-bars *,
+.recharts-bar-rectangle,
+.recharts-bar-rectangle *,
+.recharts-rectangle,
+.recharts-rectangle *,
+.recharts-sector,
+.recharts-sector *,
+.recharts-pie,
+.recharts-pie *,
+.recharts-pie-sector,
+.recharts-pie-sector *,
+.recharts-legend-wrapper,
+.recharts-legend-wrapper *,
+.recharts-cartesian-grid,
+.recharts-cartesian-grid *,
+.recharts-xAxis,
+.recharts-yAxis,
+.recharts-xAxis *,
+.recharts-yAxis *,
+.card-premium-level-1,
+.card-premium-level-1 *,
+.card-premium-level-1 > *,
+.card-premium-level-2,
+.card-premium-level-2 *,
+.card-premium-level-2 > * {
+  outline: none !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  outline-color: transparent !important;
+  outline-offset: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
   -webkit-tap-highlight-color: transparent !important;
   -webkit-focus-ring-color: transparent !important;
   -moz-outline-style: none !important;
+  -moz-outline-width: 0 !important;
+  -moz-outline-color: transparent !important;
+  -webkit-touch-callout: none !important;
 }
 
-/* Tous les états focus/active/hover */
-.recharts-wrapper *:focus,
-.recharts-wrapper *:active,
-.recharts-surface *:focus,
-.recharts-surface *:active,
+/* Tous les états possibles - focus, active, hover, visited */
 svg:focus,
 svg:active,
+svg:hover,
 svg *:focus,
 svg *:active,
+svg *:hover,
+path:focus,
+path:active,
+rect:focus,
+rect:active,
+.recharts-wrapper:focus,
+.recharts-wrapper:active,
+.recharts-wrapper:hover,
+.recharts-wrapper *:focus,
+.recharts-wrapper *:active,
+.recharts-wrapper *:hover,
+.recharts-surface:focus,
+.recharts-surface:active,
+.recharts-surface:hover,
+.recharts-surface *:focus,
+.recharts-surface *:active,
+.recharts-surface *:hover,
+.recharts-layer:focus,
+.recharts-layer:active,
+.recharts-bar:focus,
+.recharts-bar:active,
+.recharts-bar-rectangle:focus,
+.recharts-bar-rectangle:active,
+.recharts-rectangle:focus,
+.recharts-rectangle:active,
+.recharts-sector:focus,
+.recharts-sector:active,
+.recharts-pie:focus,
+.recharts-pie:active,
 .card-premium-level-1:focus,
 .card-premium-level-1:active,
+.card-premium-level-1:hover,
+.card-premium-level-1 *:focus,
+.card-premium-level-1 *:active,
+.card-premium-level-1 *:hover,
 .card-premium-level-2:focus,
-.card-premium-level-2:active {
+.card-premium-level-2:active,
+.card-premium-level-2:hover,
+.card-premium-level-2 *:focus,
+.card-premium-level-2 *:active,
+.card-premium-level-2 *:hover {
   outline: none !important;
   outline-width: 0 !important;
+  outline-style: none !important;
+  outline-color: transparent !important;
+  outline-offset: 0 !important;
   box-shadow: none !important;
   border: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-focus-ring-color: transparent !important;
+}
+
+/* Spécifique mobile - Suppression du focus-visible */
+@media (max-width: 768px) {
+  *:focus-visible,
+  *:focus,
+  svg:focus-visible,
+  svg *:focus-visible,
+  .recharts-wrapper:focus-visible,
+  .recharts-wrapper *:focus-visible,
+  .recharts-surface:focus-visible,
+  .recharts-surface *:focus-visible {
+    outline: none !important;
+    outline-width: 0 !important;
+    outline-style: none !important;
+    outline-color: transparent !important;
+    outline-offset: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+  }
 }
 
 /* ====== OPTIMISATION PERFORMANCE GRAPHIQUES MOBILE ====== */
