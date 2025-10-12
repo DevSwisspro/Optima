@@ -929,8 +929,10 @@ export default function App({ session, onLogout }) {
   const [editingBudgetItem, setEditingBudgetItem] = useState(null);
   const [budgetFilter, setBudgetFilter] = useState({});
 
-  // Gestionnaire de clic global pour fermer les tooltips des graphiques - OPTIMISÉ
+  // Gestionnaire de clic global pour fermer les tooltips - CORRIGÉ
   useEffect(() => {
+    let closeTimeoutId = null;
+
     const handleClickOutside = (event) => {
       // Vérifier si les refs sont disponibles
       if (!barChartRef.current || !pieChartRef.current) return;
@@ -939,41 +941,56 @@ export default function App({ session, onLogout }) {
       const isOutsideBarChart = !barChartRef.current.contains(event.target);
       const isOutsidePieChart = !pieChartRef.current.contains(event.target);
 
-      // Vérifier aussi que ce n'est pas un tooltip Recharts
+      // Vérifier que ce n'est pas un tooltip ou un élément du graphique
       const isTooltip = event.target.closest('.recharts-tooltip-wrapper') ||
                        event.target.closest('.recharts-default-tooltip') ||
                        event.target.closest('.recharts-custom-tooltip');
 
-      // Si on clique en dehors des graphiques ET que ce n'est pas un tooltip
-      if (isOutsideBarChart && isOutsidePieChart && !isTooltip) {
-        // Fermeture instantanée via state + re-render forcé
-        setActiveTooltip(null);
-        setChartKey(prev => prev + 1);
+      // Vérifier que ce n'est pas un élément interactif du graphique
+      const isChartElement = event.target.closest('.recharts-bar-rectangle') ||
+                            event.target.closest('.recharts-sector') ||
+                            event.target.closest('.recharts-bar') ||
+                            event.target.closest('.recharts-pie') ||
+                            event.target.closest('path') ||
+                            event.target.closest('rect');
 
-        // Force aussi la suppression des tooltips DOM résiduels
-        setTimeout(() => {
-          const tooltips = document.querySelectorAll('.recharts-tooltip-wrapper');
-          tooltips.forEach(tooltip => {
-            if (tooltip.style) {
-              tooltip.style.opacity = '0';
-              tooltip.style.pointerEvents = 'none';
-              tooltip.style.visibility = 'hidden';
-            }
-          });
-        }, 0);
+      // SEULEMENT fermer si vraiment en dehors ET pas sur un élément du graphique
+      if (isOutsideBarChart && isOutsidePieChart && !isTooltip && !isChartElement) {
+        // Clear any pending close timeout
+        if (closeTimeoutId) clearTimeout(closeTimeoutId);
+
+        // Fermeture via state
+        setActiveTooltip(null);
+
+        // Délai minimal pour laisser Recharts gérer son état AVANT le re-render forcé
+        closeTimeoutId = setTimeout(() => {
+          setChartKey(prev => prev + 1);
+
+          // Nettoyage DOM après le re-render
+          setTimeout(() => {
+            const tooltips = document.querySelectorAll('.recharts-tooltip-wrapper');
+            tooltips.forEach(tooltip => {
+              if (tooltip.style && tooltip.style.opacity === '0') {
+                tooltip.style.visibility = 'hidden';
+                tooltip.style.display = 'none';
+              }
+            });
+          }, 100);
+        }, 50);
       }
     };
 
-    // Ajouter l'écouteur immédiatement sans délai (mobile nécessite réactivité instantanée)
-    document.addEventListener('click', handleClickOutside, { capture: true, passive: false });
+    // Ajouter l'écouteur avec phase capture pour intercepter AVANT les handlers Recharts
+    document.addEventListener('click', handleClickOutside, { capture: false, passive: true });
 
     // Support touch pour mobile
-    document.addEventListener('touchend', handleClickOutside, { capture: true, passive: false });
+    document.addEventListener('touchend', handleClickOutside, { capture: false, passive: true });
 
     // Cleanup
     return () => {
-      document.removeEventListener('click', handleClickOutside, { capture: true });
-      document.removeEventListener('touchend', handleClickOutside, { capture: true });
+      if (closeTimeoutId) clearTimeout(closeTimeoutId);
+      document.removeEventListener('click', handleClickOutside);
+      document.removeEventListener('touchend', handleClickOutside);
     };
   }, []);
 
