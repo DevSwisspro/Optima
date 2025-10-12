@@ -119,7 +119,7 @@ const getCategoryColor = (category, index) => {
   return categoryColors[index % categoryColors.length];
 };
 
-// CustomTooltip optimisé mobile - léger et ultra-réactif
+// CustomTooltip optimisé mobile - fermeture instantanée sur click-outside
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload || !payload.length) return null;
 
@@ -138,9 +138,12 @@ const CustomTooltip = ({ active, payload, label }) => {
         maxWidth: isMobile ? '180px' : '260px',
         fontSize: isMobile ? '12px' : '13px',
         opacity: active ? 1 : 0,
-        transform: active ? 'scale(1) translateY(0)' : 'scale(0.96) translateY(-2px)',
-        transition: 'opacity 100ms ease-out, transform 100ms ease-out',
-        willChange: 'opacity, transform',
+        visibility: active ? 'visible' : 'hidden',
+        transform: active ? 'scale(1) translateY(0)' : 'scale(0.97) translateY(-1px)',
+        transition: isMobile
+          ? 'opacity 60ms ease-out, transform 60ms ease-out, visibility 0ms linear 60ms'
+          : 'opacity 80ms ease-out, transform 80ms ease-out, visibility 0ms linear 80ms',
+        willChange: 'opacity, transform, visibility',
         pointerEvents: 'none',
         WebkitFontSmoothing: 'antialiased',
         MozOsxFontSmoothing: 'grayscale'
@@ -926,30 +929,51 @@ export default function App({ session, onLogout }) {
   const [editingBudgetItem, setEditingBudgetItem] = useState(null);
   const [budgetFilter, setBudgetFilter] = useState({});
 
-  // Charger les tâches depuis Supabase
-  // Gestionnaire de clic global pour fermer les tooltips des graphiques
+  // Gestionnaire de clic global pour fermer les tooltips des graphiques - OPTIMISÉ
   useEffect(() => {
     const handleClickOutside = (event) => {
-      // Vérifier si le clic est en dehors des graphiques
-      const isOutsideBarChart = barChartRef.current && !barChartRef.current.contains(event.target);
-      const isOutsidePieChart = pieChartRef.current && !pieChartRef.current.contains(event.target);
+      // Vérifier si les refs sont disponibles
+      if (!barChartRef.current || !pieChartRef.current) return;
 
-      // Si on clique en dehors des deux graphiques, on force le re-render pour fermer tooltips
-      if (isOutsideBarChart && isOutsidePieChart) {
+      // Vérifier si le clic est en dehors des graphiques
+      const isOutsideBarChart = !barChartRef.current.contains(event.target);
+      const isOutsidePieChart = !pieChartRef.current.contains(event.target);
+
+      // Vérifier aussi que ce n'est pas un tooltip Recharts
+      const isTooltip = event.target.closest('.recharts-tooltip-wrapper') ||
+                       event.target.closest('.recharts-default-tooltip') ||
+                       event.target.closest('.recharts-custom-tooltip');
+
+      // Si on clique en dehors des graphiques ET que ce n'est pas un tooltip
+      if (isOutsideBarChart && isOutsidePieChart && !isTooltip) {
+        // Fermeture instantanée via state + re-render forcé
         setActiveTooltip(null);
-        setChartKey(prev => prev + 1); // Force re-render des graphiques
+        setChartKey(prev => prev + 1);
+
+        // Force aussi la suppression des tooltips DOM résiduels
+        setTimeout(() => {
+          const tooltips = document.querySelectorAll('.recharts-tooltip-wrapper');
+          tooltips.forEach(tooltip => {
+            if (tooltip.style) {
+              tooltip.style.opacity = '0';
+              tooltip.style.pointerEvents = 'none';
+              tooltip.style.visibility = 'hidden';
+            }
+          });
+        }, 0);
       }
     };
 
-    // Ajouter l'écouteur sur le document avec timeout pour éviter conflit avec clic sur graphique
-    const timeoutId = setTimeout(() => {
-      document.addEventListener('click', handleClickOutside, true);
-    }, 100);
+    // Ajouter l'écouteur immédiatement sans délai (mobile nécessite réactivité instantanée)
+    document.addEventListener('click', handleClickOutside, { capture: true, passive: false });
+
+    // Support touch pour mobile
+    document.addEventListener('touchend', handleClickOutside, { capture: true, passive: false });
 
     // Cleanup
     return () => {
-      clearTimeout(timeoutId);
-      document.removeEventListener('click', handleClickOutside, true);
+      document.removeEventListener('click', handleClickOutside, { capture: true });
+      document.removeEventListener('touchend', handleClickOutside, { capture: true });
     };
   }, []);
 
