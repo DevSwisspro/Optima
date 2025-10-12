@@ -800,6 +800,7 @@ export default function App({ session, onLogout }) {
 
   // États pour les graphiques - gestion tooltips
   const [activeTooltip, setActiveTooltip] = useState(null);
+  const [chartKey, setChartKey] = useState(0); // Pour forcer re-render et fermer tooltips
   const barChartRef = useRef(null);
   const pieChartRef = useRef(null);
 
@@ -929,17 +930,22 @@ export default function App({ session, onLogout }) {
       const isOutsideBarChart = barChartRef.current && !barChartRef.current.contains(event.target);
       const isOutsidePieChart = pieChartRef.current && !pieChartRef.current.contains(event.target);
 
+      // Si on clique en dehors des deux graphiques, on force le re-render pour fermer tooltips
       if (isOutsideBarChart && isOutsidePieChart) {
         setActiveTooltip(null);
+        setChartKey(prev => prev + 1); // Force re-render des graphiques
       }
     };
 
-    // Ajouter l'écouteur sur le document
-    document.addEventListener('click', handleClickOutside);
+    // Ajouter l'écouteur sur le document avec timeout pour éviter conflit avec clic sur graphique
+    const timeoutId = setTimeout(() => {
+      document.addEventListener('click', handleClickOutside, true);
+    }, 100);
 
     // Cleanup
     return () => {
-      document.removeEventListener('click', handleClickOutside);
+      clearTimeout(timeoutId);
+      document.removeEventListener('click', handleClickOutside, true);
     };
   }, []);
 
@@ -2549,19 +2555,19 @@ export default function App({ session, onLogout }) {
                   )}
 
                   {/* Graphiques mensuels */}
-                  <div className="space-y-10">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  <div className="space-y-8 md:space-y-12">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
                     {/* Graphique en barres mensuelles */}
                     <motion.div
                       initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.4, delay: 0.36, ease: [0.25, 0.1, 0.25, 1] }}
-                      className="flex flex-col"
+                      className="flex flex-col space-y-4"
                     >
                       {/* Titre section centré premium avec mise en valeur */}
-                      <div className="text-center mb-6">
+                      <div className="text-center">
                         <motion.h3
-                          className="text-heading-xl md:text-display-md text-white font-semibold tracking-tight"
+                          className="text-heading-lg md:text-heading-xl text-white font-semibold tracking-tight"
                           initial={{ opacity: 0, y: -8 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.5, delay: 0.4 }}
@@ -2569,8 +2575,8 @@ export default function App({ session, onLogout }) {
                           Évolution mensuelle {dashboardFilter.year}
                         </motion.h3>
                         <motion.div
-                          className="mt-3 h-0.5 bg-gradient-to-r from-transparent via-red-500/60 to-transparent mx-auto"
-                          style={{ width: '120px' }}
+                          className="mt-2 h-0.5 bg-gradient-to-r from-transparent via-red-500/60 to-transparent mx-auto"
+                          style={{ width: '100px' }}
                           initial={{ scaleX: 0, opacity: 0 }}
                           animate={{ scaleX: 1, opacity: 1 }}
                           transition={{ duration: 0.6, delay: 0.5 }}
@@ -2580,12 +2586,12 @@ export default function App({ session, onLogout }) {
                       {/* Carte graphique avec ref */}
                       <div
                         ref={barChartRef}
-                        className="card-premium-level-1 rounded-3xl p-6 hover-lift-lg touch-none flex-1"
+                        className="card-premium-level-1 rounded-3xl p-4 md:p-6 hover-lift-lg touch-none"
                         style={{ touchAction: 'pan-y' }}
                       >
-                      <div className="w-full h-full" style={{ minHeight: window.innerWidth < 768 ? '280px' : '320px' }}>
+                      <div className="w-full" style={{ height: window.innerWidth < 768 ? '300px' : '340px' }}>
                         <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={processMonthlyData(budgetItems, dashboardFilter.year)}>
+                          <BarChart key={`bar-${chartKey}`} data={processMonthlyData(budgetItems, dashboardFilter.year)}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                             <XAxis
                               dataKey="name"
@@ -2627,12 +2633,12 @@ export default function App({ session, onLogout }) {
                       initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.4, delay: 0.43, ease: [0.25, 0.1, 0.25, 1] }}
-                      className="flex flex-col"
+                      className="flex flex-col space-y-4"
                     >
                       {/* Titre section centré premium avec mise en valeur */}
-                      <div className="text-center mb-6">
+                      <div className="text-center">
                         <motion.h3
-                          className="text-heading-xl md:text-display-md text-white font-semibold tracking-tight"
+                          className="text-heading-lg md:text-heading-xl text-white font-semibold tracking-tight"
                           initial={{ opacity: 0, y: -8 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.5, delay: 0.47 }}
@@ -2640,8 +2646,8 @@ export default function App({ session, onLogout }) {
                           Répartition {dashboardFilter.month === 'all' ? dashboardFilter.year : `${new Date(dashboardFilter.year, dashboardFilter.month - 1).toLocaleDateString('fr-FR', { month: 'long' })} ${dashboardFilter.year}`}
                         </motion.h3>
                         <motion.div
-                          className="mt-3 h-0.5 bg-gradient-to-r from-transparent via-red-500/60 to-transparent mx-auto"
-                          style={{ width: '120px' }}
+                          className="mt-2 h-0.5 bg-gradient-to-r from-transparent via-red-500/60 to-transparent mx-auto"
+                          style={{ width: '100px' }}
                           initial={{ scaleX: 0, opacity: 0 }}
                           animate={{ scaleX: 1, opacity: 1 }}
                           transition={{ duration: 0.6, delay: 0.57 }}
@@ -2651,12 +2657,12 @@ export default function App({ session, onLogout }) {
                       {/* Carte graphique avec ref */}
                       <div
                         ref={pieChartRef}
-                        className="card-premium-level-1 rounded-3xl p-6 hover-lift-lg touch-none flex-1"
+                        className="card-premium-level-1 rounded-3xl p-4 md:p-6 hover-lift-lg touch-none"
                         style={{ touchAction: 'pan-y' }}
                       >
-                      <div className="w-full h-full" style={{ minHeight: window.innerWidth < 768 ? '280px' : '320px' }}>
+                      <div className="w-full" style={{ height: window.innerWidth < 768 ? '300px' : '340px' }}>
                         <ResponsiveContainer width="100%" height="100%">
-                          <PieChart>
+                          <PieChart key={`pie-${chartKey}`}>
                             <Pie
                               data={[
                                 {
