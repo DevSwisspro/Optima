@@ -2586,8 +2586,9 @@ export default function App({ session, onLogout }) {
                       {/* Carte graphique avec ref */}
                       <div
                         ref={barChartRef}
-                        className="card-premium-level-1 rounded-3xl p-4 md:p-6 hover-lift-lg touch-none"
-                        style={{ touchAction: 'pan-y' }}
+                        className="card-premium-level-1 rounded-3xl p-4 md:p-6 hover-lift-lg touch-none outline-none focus:outline-none"
+                        style={{ touchAction: 'pan-y', outline: 'none' }}
+                        tabIndex={-1}
                       >
                       <div className="w-full" style={{ height: window.innerWidth < 768 ? '300px' : '340px' }}>
                         <ResponsiveContainer width="100%" height="100%">
@@ -2610,9 +2611,14 @@ export default function App({ session, onLogout }) {
                               content={<CustomTooltip />}
                               cursor={{ fill: 'rgba(255, 255, 255, 0.1)' }}
                               trigger={window.innerWidth < 768 ? 'click' : 'hover'}
-                              allowEscapeViewBox={{ x: true, y: true }}
-                              wrapperStyle={{ zIndex: 1000, outline: 'none' }}
-                              position={{ y: 0 }}
+                              allowEscapeViewBox={{ x: false, y: false }}
+                              wrapperStyle={{
+                                zIndex: 1000,
+                                outline: 'none',
+                                pointerEvents: 'none'
+                              }}
+                              offset={10}
+                              isAnimationActive={false}
                             />
                             <Legend
                               wrapperStyle={{ fontSize: window.innerWidth < 768 ? '11px' : '12px' }}
@@ -2657,8 +2663,9 @@ export default function App({ session, onLogout }) {
                       {/* Carte graphique avec ref */}
                       <div
                         ref={pieChartRef}
-                        className="card-premium-level-1 rounded-3xl p-4 md:p-6 hover-lift-lg touch-none"
-                        style={{ touchAction: 'pan-y' }}
+                        className="card-premium-level-1 rounded-3xl p-4 md:p-6 hover-lift-lg touch-none outline-none focus:outline-none"
+                        style={{ touchAction: 'pan-y', outline: 'none' }}
+                        tabIndex={-1}
                       >
                       <div className="w-full" style={{ height: window.innerWidth < 768 ? '300px' : '340px' }}>
                         <ResponsiveContainer width="100%" height="100%">
@@ -2728,7 +2735,13 @@ export default function App({ session, onLogout }) {
                             <Tooltip
                               content={<CustomTooltip />}
                               trigger={window.innerWidth < 768 ? 'click' : 'hover'}
-                              wrapperStyle={{ zIndex: 1000, outline: 'none' }}
+                              wrapperStyle={{
+                                zIndex: 1000,
+                                outline: 'none',
+                                pointerEvents: 'none'
+                              }}
+                              offset={10}
+                              isAnimationActive={false}
                             />
                             <Legend
                               verticalAlign="bottom"
