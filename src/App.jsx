@@ -119,7 +119,7 @@ const getCategoryColor = (category, index) => {
   return categoryColors[index % categoryColors.length];
 };
 
-// CustomTooltip responsive avec couleurs des catégories et transition douce
+// CustomTooltip responsive avec couleurs des catégories et transition ultra-fluide
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload || !payload.length) return null;
 
@@ -138,8 +138,10 @@ const CustomTooltip = ({ active, payload, label }) => {
         maxWidth: isMobile ? '220px' : '280px',
         fontSize: isMobile ? '13px' : '14px',
         opacity: active ? 1 : 0,
-        transform: active ? 'scale(1)' : 'scale(0.95)',
-        transition: 'opacity 250ms cubic-bezier(0.4, 0, 0.2, 1), transform 250ms cubic-bezier(0.4, 0, 0.2, 1)'
+        transform: active ? 'scale(1) translateY(0)' : 'scale(0.95) translateY(-4px)',
+        transition: 'opacity 120ms cubic-bezier(0.4, 0, 0.2, 1), transform 120ms cubic-bezier(0.4, 0, 0.2, 1)',
+        willChange: 'opacity, transform',
+        pointerEvents: 'none'
       }}
     >
       {label && (
