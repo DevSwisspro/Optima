@@ -2760,7 +2760,7 @@ export default function App({ session, onLogout }) {
                       <div
                         className="w-full"
                         style={{
-                          height: window.innerWidth < 768 ? '300px' : '340px',
+                          height: window.innerWidth < 768 ? '400px' : '340px',
                           outline: 'none',
                           border: 'none',
                           WebkitTapHighlightColor: 'transparent'
@@ -2836,10 +2836,11 @@ export default function App({ session, onLogout }) {
                                 }
                               ].filter(item => item.value > 0)}
                               cx="50%"
-                              cy="50%"
+                              cy={window.innerWidth < 768 ? "55%" : "50%"}
                               labelLine={window.innerWidth >= 768}
                               label={window.innerWidth >= 768 ? ({ percent }) => `${(percent * 100).toFixed(1)}%` : false}
-                              outerRadius={window.innerWidth < 768 ? 80 : 100}
+                              outerRadius={window.innerWidth < 768 ? 120 : 100}
+                              innerRadius={window.innerWidth < 768 ? 0 : 0}
                               fill="#8884d8"
                               dataKey="value"
                               isAnimationActive={window.innerWidth >= 768}
@@ -2848,12 +2849,13 @@ export default function App({ session, onLogout }) {
                             <Tooltip
                               content={<CustomTooltip />}
                               trigger={window.innerWidth < 768 ? 'click' : 'hover'}
+                              position={window.innerWidth < 768 ? { x: 'auto', y: 20 } : undefined}
                               wrapperStyle={{
                                 zIndex: 1000,
                                 outline: 'none',
                                 pointerEvents: 'none'
                               }}
-                              offset={10}
+                              offset={window.innerWidth < 768 ? -30 : 10}
                               isAnimationActive={false}
                             />
                             <Legend
