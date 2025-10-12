@@ -1139,55 +1139,94 @@
   }
 }
 
-/* ====== SUPPRESSION CONTOUR BLEU GRAPHIQUES ====== */
-/* Supprime tous les outlines sur les éléments de graphiques Recharts */
-.recharts-wrapper,
-.recharts-surface,
-.recharts-layer,
-.recharts-bar-rectangle,
-.recharts-rectangle,
-.recharts-sector,
-.recharts-pie-sector,
-svg,
-svg *,
-.card-premium-level-1,
-.card-premium-level-2 {
-  outline: none !important;
+/* ====== SUPPRESSION TOTALE CONTOUR BLEU GRAPHIQUES ====== */
+/* Approche ultra-agressive pour éliminer tout contour/focus */
+* {
   -webkit-tap-highlight-color: transparent !important;
 }
 
-.recharts-wrapper:focus,
-.recharts-surface:focus,
-.recharts-layer:focus,
-.recharts-bar-rectangle:focus,
-.recharts-rectangle:focus,
-.recharts-sector:focus,
-.recharts-pie-sector:focus,
-svg:focus,
-svg *:focus,
-.card-premium-level-1:focus,
-.card-premium-level-2:focus {
+.recharts-wrapper *,
+.recharts-surface *,
+.recharts-layer *,
+.recharts-bar *,
+.recharts-bars *,
+.recharts-bar-rectangle *,
+.recharts-rectangle *,
+.recharts-sector *,
+.recharts-pie *,
+.recharts-pie-sector *,
+svg,
+svg *,
+.card-premium-level-1,
+.card-premium-level-1 *,
+.card-premium-level-2,
+.card-premium-level-2 * {
   outline: none !important;
-  box-shadow: none !important;
+  outline-width: 0 !important;
+  outline-style: none !important;
+  outline-color: transparent !important;
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-focus-ring-color: transparent !important;
+  -moz-outline-style: none !important;
 }
 
-/* ====== OPTIMISATION TRANSITIONS TOOLTIPS ====== */
-/* Transitions fluides et instantanées pour tooltips */
+/* Tous les états focus/active/hover */
+.recharts-wrapper *:focus,
+.recharts-wrapper *:active,
+.recharts-surface *:focus,
+.recharts-surface *:active,
+svg:focus,
+svg:active,
+svg *:focus,
+svg *:active,
+.card-premium-level-1:focus,
+.card-premium-level-1:active,
+.card-premium-level-2:focus,
+.card-premium-level-2:active {
+  outline: none !important;
+  outline-width: 0 !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* ====== OPTIMISATION PERFORMANCE GRAPHIQUES MOBILE ====== */
+/* Désactive animations lourdes sur mobile */
+@media (max-width: 768px) {
+  .recharts-bar-rectangles,
+  .recharts-bar,
+  .recharts-sector {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Force rendu optimisé GPU */
+.recharts-wrapper,
+.recharts-surface {
+  transform: translate3d(0, 0, 0);
+  will-change: auto;
+  -webkit-transform: translate3d(0, 0, 0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* ====== OPTIMISATION TOOLTIPS ULTRA-FLUIDES ====== */
+/* Tooltips légers et réactifs mobile */
 .recharts-tooltip-wrapper {
-  transition: opacity 150ms cubic-bezier(0.4, 0, 0.2, 1),
-              transform 150ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transition: opacity 100ms ease-out, transform 100ms ease-out !important;
   will-change: opacity, transform;
+  pointer-events: none !important;
 }
 
 .recharts-default-tooltip {
-  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1) !important;
-  animation: tooltipFadeIn 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 100ms ease-out !important;
+  animation: tooltipFadeIn 100ms ease-out;
 }
 
 @keyframes tooltipFadeIn {
   from {
     opacity: 0;
-    transform: scale(0.95) translateY(-4px);
+    transform: scale(0.96) translateY(-2px);
   }
   to {
     opacity: 1;
@@ -1195,15 +1234,21 @@ svg *:focus,
   }
 }
 
-/* Supprime tout délai et lag */
-.recharts-tooltip-wrapper * {
+/* Supprime tout délai */
+.recharts-tooltip-wrapper *,
+.recharts-default-tooltip * {
   transition-delay: 0ms !important;
+  animation-delay: 0ms !important;
 }
 
-/* Force accélération hardware pour fluidité */
+/* Accélération hardware GPU */
 .recharts-tooltip-wrapper,
-.recharts-default-tooltip {
+.recharts-default-tooltip,
+.recharts-custom-tooltip {
   transform: translateZ(0);
+  -webkit-transform: translateZ(0);
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   perspective: 1000px;
+  -webkit-perspective: 1000px;
 }

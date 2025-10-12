@@ -119,7 +119,7 @@ const getCategoryColor = (category, index) => {
   return categoryColors[index % categoryColors.length];
 };
 
-// CustomTooltip responsive avec couleurs des catégories et transition ultra-fluide
+// CustomTooltip optimisé mobile - léger et ultra-réactif
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload || !payload.length) return null;
 
@@ -129,19 +129,21 @@ const CustomTooltip = ({ active, payload, label }) => {
     <div
       className="recharts-custom-tooltip"
       style={{
-        backgroundColor: 'rgba(0, 0, 0, 0.95)',
-        padding: isMobile ? '8px 12px' : '12px 16px',
-        borderRadius: '12px',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
-        backdropFilter: 'blur(10px)',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
-        maxWidth: isMobile ? '220px' : '280px',
-        fontSize: isMobile ? '13px' : '14px',
+        backgroundColor: 'rgba(0, 0, 0, 0.92)',
+        padding: isMobile ? '6px 10px' : '10px 14px',
+        borderRadius: isMobile ? '10px' : '12px',
+        border: '1px solid rgba(255, 255, 255, 0.08)',
+        backdropFilter: 'blur(8px)',
+        boxShadow: isMobile ? '0 4px 16px rgba(0, 0, 0, 0.3)' : '0 8px 32px rgba(0, 0, 0, 0.4)',
+        maxWidth: isMobile ? '180px' : '260px',
+        fontSize: isMobile ? '12px' : '13px',
         opacity: active ? 1 : 0,
-        transform: active ? 'scale(1) translateY(0)' : 'scale(0.95) translateY(-4px)',
-        transition: 'opacity 120ms cubic-bezier(0.4, 0, 0.2, 1), transform 120ms cubic-bezier(0.4, 0, 0.2, 1)',
+        transform: active ? 'scale(1) translateY(0)' : 'scale(0.96) translateY(-2px)',
+        transition: 'opacity 100ms ease-out, transform 100ms ease-out',
         willChange: 'opacity, transform',
-        pointerEvents: 'none'
+        pointerEvents: 'none',
+        WebkitFontSmoothing: 'antialiased',
+        MozOsxFontSmoothing: 'grayscale'
       }}
     >
       {label && (
@@ -2625,11 +2627,11 @@ export default function App({ session, onLogout }) {
                             <Legend
                               wrapperStyle={{ fontSize: window.innerWidth < 768 ? '11px' : '12px' }}
                             />
-                            <Bar dataKey="revenus" fill={colors.revenus} name="Revenus" />
-                            <Bar dataKey="depenses_fixes" fill={colors.depenses_fixes} name="Dépenses fixes" />
-                            <Bar dataKey="depenses_variables" fill={colors.depenses_variables} name="Dépenses variables" />
-                            <Bar dataKey="epargne" fill={colors.epargne} name="Épargne" />
-                            <Bar dataKey="investissements" fill={colors.investissements} name="Investissements" />
+                            <Bar dataKey="revenus" fill={colors.revenus} name="Revenus" isAnimationActive={window.innerWidth >= 768} />
+                            <Bar dataKey="depenses_fixes" fill={colors.depenses_fixes} name="Dépenses fixes" isAnimationActive={window.innerWidth >= 768} />
+                            <Bar dataKey="depenses_variables" fill={colors.depenses_variables} name="Dépenses variables" isAnimationActive={window.innerWidth >= 768} />
+                            <Bar dataKey="epargne" fill={colors.epargne} name="Épargne" isAnimationActive={window.innerWidth >= 768} />
+                            <Bar dataKey="investissements" fill={colors.investissements} name="Investissements" isAnimationActive={window.innerWidth >= 768} />
                           </BarChart>
                         </ResponsiveContainer>
                       </div>
@@ -2732,6 +2734,7 @@ export default function App({ session, onLogout }) {
                               outerRadius={window.innerWidth < 768 ? 80 : 100}
                               fill="#8884d8"
                               dataKey="value"
+                              isAnimationActive={window.innerWidth >= 768}
                             >
                             </Pie>
                             <Tooltip
