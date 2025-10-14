@@ -2229,8 +2229,24 @@ export default function App({ session, onLogout }) {
                     }}
                   >
                     <select
+                      ref={(el) => {
+                        if (el) {
+                          el.dataset.selectType = 'year';
+                        }
+                      }}
                       value={dashboardFilter.year}
-                      onChange={(e) => setDashboardFilter(prev => ({ ...prev, year: parseInt(e.target.value) }))}
+                      onChange={(e) => {
+                        setDashboardFilter(prev => ({ ...prev, year: parseInt(e.target.value) }));
+                        // Force blur immédiat après changement
+                        e.target.blur();
+                      }}
+                      onFocus={(e) => {
+                        // Force blur de l'autre select si ouvert
+                        const monthSelect = document.querySelector('[data-select-type="month"]');
+                        if (monthSelect && document.activeElement === monthSelect) {
+                          monthSelect.blur();
+                        }
+                      }}
                       className="w-full card-premium-enhanced text-gray-900 text-center py-4 px-6 rounded-2xl text-lg font-semibold transition-none cursor-pointer hover:border-red-500/30"
                       style={{
                         WebkitTapHighlightColor: 'transparent',
@@ -2247,8 +2263,24 @@ export default function App({ session, onLogout }) {
                     </select>
 
                     <select
+                      ref={(el) => {
+                        if (el) {
+                          el.dataset.selectType = 'month';
+                        }
+                      }}
                       value={dashboardFilter.month}
-                      onChange={(e) => setDashboardFilter(prev => ({ ...prev, month: e.target.value }))}
+                      onChange={(e) => {
+                        setDashboardFilter(prev => ({ ...prev, month: e.target.value }));
+                        // Force blur immédiat après changement
+                        e.target.blur();
+                      }}
+                      onFocus={(e) => {
+                        // Force blur de l'autre select si ouvert
+                        const yearSelect = document.querySelector('[data-select-type="year"]');
+                        if (yearSelect && document.activeElement === yearSelect) {
+                          yearSelect.blur();
+                        }
+                      }}
                       className="w-full card-premium-enhanced text-gray-900 text-center py-4 px-6 rounded-2xl text-lg font-semibold transition-none cursor-pointer hover:border-red-500/30"
                       style={{
                         WebkitTapHighlightColor: 'transparent',
