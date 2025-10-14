@@ -239,9 +239,9 @@ export default function Sidebar({ activeTab, setActiveTab, session, onLogout }) 
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
           >
-            {/* Icône grille 3x3 avec accent rouge */}
+            {/* Icône grille 3x3 */}
             <svg
-              className="w-6 h-6 text-primary relative z-10 drop-shadow-glow"
+              className="w-6 h-6 text-gray-400 relative z-10"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -254,7 +254,7 @@ export default function Sidebar({ activeTab, setActiveTab, session, onLogout }) 
               <rect x="14" y="14" width="7" height="7" />
               <rect x="3" y="14" width="7" height="7" />
             </svg>
-            <span className="text-[10px] font-semibold text-white leading-tight relative z-10">
+            <span className="text-[10px] font-semibold text-gray-500 leading-tight relative z-10">
               Menu
             </span>
           </motion.button>

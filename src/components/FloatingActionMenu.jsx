@@ -25,16 +25,27 @@ export default function FloatingActionMenu({ isOpen, onClose, onAction }) {
         root.classList.add('menu-open');
       }
 
-      // Empêcher le scroll avec preventDefault sur touch
+      // Empêcher complètement le scroll et slide sur tout sauf le menu
       const preventScroll = (e) => {
         // Ne bloquer que si le touch n'est pas sur le conteneur du menu
         if (!e.target.closest('.floating-menu-scroll')) {
           e.preventDefault();
+          e.stopPropagation();
         }
       };
 
-      document.addEventListener('touchmove', preventScroll, { passive: false });
-      document.addEventListener('wheel', preventScroll, { passive: false });
+      const preventTouch = (e) => {
+        if (!e.target.closest('.floating-menu-scroll')) {
+          e.stopPropagation();
+        }
+      };
+
+      // Bloquer tous les types d'événements
+      document.addEventListener('touchstart', preventTouch, { passive: false, capture: true });
+      document.addEventListener('touchmove', preventScroll, { passive: false, capture: true });
+      document.addEventListener('touchend', preventTouch, { passive: false, capture: true });
+      document.addEventListener('wheel', preventScroll, { passive: false, capture: true });
+      document.addEventListener('scroll', preventScroll, { passive: false, capture: true });
 
       return () => {
         // Retirer les classes
@@ -45,9 +56,12 @@ export default function FloatingActionMenu({ isOpen, onClose, onAction }) {
           root.classList.remove('menu-open');
         }
 
-        // Retirer les event listeners
+        // Retirer tous les event listeners
+        document.removeEventListener('touchstart', preventTouch);
         document.removeEventListener('touchmove', preventScroll);
+        document.removeEventListener('touchend', preventTouch);
         document.removeEventListener('wheel', preventScroll);
+        document.removeEventListener('scroll', preventScroll);
 
         // Restaurer la position de scroll
         window.scrollTo(0, scrollY);
@@ -176,7 +190,23 @@ export default function FloatingActionMenu({ isOpen, onClose, onAction }) {
           />
 
           {/* Conteneur centré avec safe-area pour mobile */}
-          <div className="fixed inset-0 z-[201] flex items-center justify-center p-4 pb-24 pointer-events-none">
+          <div
+            className="fixed inset-0 z-[201] flex items-center justify-center p-4 pb-24 pointer-events-none"
+            style={{
+              overscrollBehavior: 'none',
+              touchAction: 'none'
+            }}
+            onTouchStart={(e) => {
+              if (!e.target.closest('.floating-menu-scroll')) {
+                e.preventDefault();
+              }
+            }}
+            onTouchMove={(e) => {
+              if (!e.target.closest('.floating-menu-scroll')) {
+                e.preventDefault();
+              }
+            }}
+          >
             <motion.div
               variants={menuContainerVariants}
               initial="hidden"
