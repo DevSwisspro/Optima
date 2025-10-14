@@ -2631,9 +2631,9 @@ export default function App({ session, onLogout }) {
                       {/* Carte graphique avec ref */}
                       <div
                         ref={barChartRef}
-                        className="card-premium-level-1 rounded-3xl p-4 md:p-6 hover-lift-lg touch-none outline-none focus:outline-none"
+                        className="card-premium-level-1 rounded-3xl p-4 md:p-6 hover-lift-lg outline-none focus:outline-none"
                         style={{
-                          touchAction: 'pan-y',
+                          touchAction: window.innerWidth < 768 ? 'auto' : 'pan-y',
                           outline: 'none',
                           outlineWidth: '0',
                           outlineStyle: 'none',
@@ -2644,7 +2644,6 @@ export default function App({ session, onLogout }) {
                         }}
                         tabIndex={-1}
                         onFocus={(e) => e.preventDefault()}
-                        onMouseDown={(e) => e.preventDefault()}
                       >
                       <div
                         className="w-full overflow-x-auto md:overflow-x-visible"
@@ -2691,15 +2690,16 @@ export default function App({ session, onLogout }) {
                             <Tooltip
                               content={<CustomTooltip />}
                               cursor={{ fill: 'rgba(255, 255, 255, 0.1)' }}
-                              trigger={window.innerWidth < 768 ? 'click' : 'hover'}
-                              allowEscapeViewBox={{ x: false, y: false }}
+                              allowEscapeViewBox={{ x: false, y: true }}
                               wrapperStyle={{
                                 zIndex: 1000,
                                 outline: 'none',
                                 pointerEvents: 'none'
                               }}
-                              offset={10}
-                              isAnimationActive={false}
+                              position={window.innerWidth < 768 ? { y: 40 } : undefined}
+                              offset={window.innerWidth < 768 ? -80 : 10}
+                              animationDuration={window.innerWidth < 768 ? 150 : 400}
+                              isAnimationActive={true}
                             />
                             <Legend
                               wrapperStyle={{ fontSize: window.innerWidth < 768 ? '11px' : '12px' }}
