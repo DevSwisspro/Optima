@@ -12,39 +12,49 @@ import {
 export default function FloatingActionMenu({ isOpen, onClose, onAction }) {
   // Gérer le bouton retour système (Android/iOS) et touche Échap (desktop)
   useEffect(() => {
-    if (isOpen) {
-      // Ajouter une entrée dans l'historique pour intercepter le retour
+    if (!isOpen) return;
+
+    let historyPushed = false;
+
+    // Ajouter une entrée dans l'historique pour intercepter le retour
+    try {
       window.history.pushState({ menuOpen: true }, '');
-
-      const handlePopState = (event) => {
-        // Si le menu est ouvert et qu'on détecte un retour, fermer le menu
-        if (isOpen) {
-          event.preventDefault();
-          onClose();
-          // Ne pas laisser le navigateur revenir en arrière
-          window.history.pushState({ menuOpen: false }, '');
-        }
-      };
-
-      const handleKeyDown = (event) => {
-        // Fermer avec la touche Échap
-        if (event.key === 'Escape' && isOpen) {
-          onClose();
-        }
-      };
-
-      window.addEventListener('popstate', handlePopState);
-      window.addEventListener('keydown', handleKeyDown);
-
-      return () => {
-        window.removeEventListener('popstate', handlePopState);
-        window.removeEventListener('keydown', handleKeyDown);
-        // Nettoyer l'historique si le menu se ferme autrement
-        if (window.history.state?.menuOpen) {
-          window.history.back();
-        }
-      };
+      historyPushed = true;
+    } catch (e) {
+      console.warn('Could not push history state:', e);
     }
+
+    const handlePopState = () => {
+      // Fermer le menu sans condition
+      onClose();
+    };
+
+    const handleKeyDown = (event) => {
+      // Fermer avec la touche Échap
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('keydown', handleKeyDown);
+
+      // Nettoyer l'historique si on l'a modifié
+      if (historyPushed) {
+        try {
+          // Vérifier si l'état actuel est celui qu'on a ajouté
+          if (window.history.state?.menuOpen === true) {
+            window.history.back();
+          }
+        } catch (e) {
+          console.warn('Could not clean history state:', e);
+        }
+      }
+    };
   }, [isOpen, onClose]);
 
   // Bloquer ABSOLUMENT tout le scroll et touch sur le viewport quand le menu est ouvert
@@ -62,14 +72,17 @@ export default function FloatingActionMenu({ isOpen, onClose, onAction }) {
         root.classList.add('menu-open');
       }
 
-      // SOLUTION RADICALE : Bloquer TOUT par défaut
+      // SOLUTION RADICALE : Bloquer TOUT par défaut sauf interactions menu
       const blockEverything = (e) => {
-        // Autoriser uniquement si c'est dans le menu scrollable
-        const menuScroll = document.querySelector('.floating-menu-scroll');
-        if (menuScroll && menuScroll.contains(e.target)) {
-          // Laisser passer uniquement pour le scroll vertical dans le menu
+        // Autoriser les clics/touches dans le menu complet (pas juste le scroll)
+        const menuContainer = e.target.closest('.floating-menu-container');
+        const backdrop = e.target.closest('.menu-backdrop');
+
+        if (menuContainer || backdrop) {
+          // Laisser passer les interactions dans le menu ou sur le backdrop
           return;
         }
+
         // TOUT le reste est bloqué
         e.preventDefault();
         e.stopImmediatePropagation();
@@ -225,9 +238,9 @@ export default function FloatingActionMenu({ isOpen, onClose, onAction }) {
             animate="visible"
             exit="exit"
             onClick={onClose}
-            className="fixed inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/80 backdrop-blur-xl z-[200]"
+            className="menu-backdrop fixed inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/80 backdrop-blur-xl z-[200]"
             style={{
-              touchAction: 'none',
+              touchAction: 'auto',
               overscrollBehavior: 'none'
             }}
           />
@@ -245,7 +258,7 @@ export default function FloatingActionMenu({ isOpen, onClose, onAction }) {
               initial="hidden"
               animate="visible"
               exit="exit"
-              className="w-full max-w-md pointer-events-auto"
+              className="floating-menu-container w-full max-w-md pointer-events-auto"
               style={{ overscrollBehavior: 'contain' }}
             >
               {/* Carte principale avec effet verre premium */}
