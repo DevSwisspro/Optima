@@ -58,7 +58,7 @@ const FloatingActionMenu = React.memo(function FloatingActionMenu({ isOpen, onCl
     // Sauvegarder la position actuelle du scroll
     const scrollY = window.scrollY;
 
-    // Ajouter les classes de blocage
+    // Ajouter les classes de blocage IMMÉDIATEMENT
     document.body.classList.add('menu-open');
     document.body.style.top = `-${scrollY}px`;
 
@@ -67,67 +67,48 @@ const FloatingActionMenu = React.memo(function FloatingActionMenu({ isOpen, onCl
       root.classList.add('menu-open');
     }
 
-    // DÉLAI pour laisser le menu s'afficher AVANT de bloquer les événements
-    // Sinon le clic d'ouverture peut être capturé et provoquer une fermeture immédiate
-    const setupDelay = setTimeout(() => {
-      // SOLUTION RADICALE : Bloquer TOUT par défaut sauf interactions menu
-      const blockEverything = (e) => {
-        // Autoriser les clics/touches dans le menu complet (pas juste le scroll)
-        const menuContainer = e.target.closest('.floating-menu-container');
-        const backdrop = e.target.closest('.menu-backdrop');
+    // Bloquer TOUT par défaut sauf interactions menu
+    const blockEverything = (e) => {
+      // Autoriser les clics/touches dans le menu complet (pas juste le scroll)
+      const menuContainer = e.target.closest('.floating-menu-container');
+      const backdrop = e.target.closest('.menu-backdrop');
 
-        if (menuContainer || backdrop) {
-          // Laisser passer les interactions dans le menu ou sur le backdrop
-          return;
-        }
+      if (menuContainer || backdrop) {
+        // Laisser passer les interactions dans le menu ou sur le backdrop
+        return;
+      }
 
-        // TOUT le reste est bloqué
-        e.preventDefault();
-        e.stopImmediatePropagation();
-        return false;
-      };
+      // TOUT le reste est bloqué
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      return false;
+    };
 
-      // Bloquer window scroll directement
-      const blockWindowScroll = () => {
-        window.scrollTo(0, scrollY);
-      };
+    // Bloquer window scroll directement
+    const blockWindowScroll = () => {
+      window.scrollTo(0, scrollY);
+    };
 
-      // Ajouter les event listeners avec la priorité maximale
-      window.addEventListener('touchstart', blockEverything, { passive: false, capture: true });
-      window.addEventListener('touchmove', blockEverything, { passive: false, capture: true });
-      window.addEventListener('touchend', blockEverything, { passive: false, capture: true });
-      window.addEventListener('wheel', blockEverything, { passive: false, capture: true });
-      window.addEventListener('scroll', blockWindowScroll, { passive: false, capture: true });
-      document.addEventListener('touchstart', blockEverything, { passive: false, capture: true });
-      document.addEventListener('touchmove', blockEverything, { passive: false, capture: true });
-      document.addEventListener('touchend', blockEverything, { passive: false, capture: true });
-
-      // Stocker les références pour le cleanup
-      window.__menuBlockers = {
-        blockEverything,
-        blockWindowScroll
-      };
-    }, 100); // 100ms de délai pour laisser le clic d'ouverture se terminer
+    // Ajouter les event listeners IMMÉDIATEMENT avec la priorité maximale
+    window.addEventListener('touchstart', blockEverything, { passive: false, capture: true });
+    window.addEventListener('touchmove', blockEverything, { passive: false, capture: true });
+    window.addEventListener('touchend', blockEverything, { passive: false, capture: true });
+    window.addEventListener('wheel', blockEverything, { passive: false, capture: true });
+    window.addEventListener('scroll', blockWindowScroll, { passive: false, capture: true });
+    document.addEventListener('touchstart', blockEverything, { passive: false, capture: true });
+    document.addEventListener('touchmove', blockEverything, { passive: false, capture: true });
+    document.addEventListener('touchend', blockEverything, { passive: false, capture: true });
 
     return () => {
-      // Nettoyer le timeout si le menu se ferme avant
-      clearTimeout(setupDelay);
-
-      // Retirer les event listeners s'ils ont été ajoutés
-      if (window.__menuBlockers) {
-        const { blockEverything, blockWindowScroll } = window.__menuBlockers;
-
-        window.removeEventListener('touchstart', blockEverything, { capture: true });
-        window.removeEventListener('touchmove', blockEverything, { capture: true });
-        window.removeEventListener('touchend', blockEverything, { capture: true });
-        window.removeEventListener('wheel', blockEverything, { capture: true });
-        window.removeEventListener('scroll', blockWindowScroll, { capture: true });
-        document.removeEventListener('touchstart', blockEverything, { capture: true });
-        document.removeEventListener('touchmove', blockEverything, { capture: true });
-        document.removeEventListener('touchend', blockEverything, { capture: true });
-
-        delete window.__menuBlockers;
-      }
+      // Retirer tous les event listeners
+      window.removeEventListener('touchstart', blockEverything, { capture: true });
+      window.removeEventListener('touchmove', blockEverything, { capture: true });
+      window.removeEventListener('touchend', blockEverything, { capture: true });
+      window.removeEventListener('wheel', blockEverything, { capture: true });
+      window.removeEventListener('scroll', blockWindowScroll, { capture: true });
+      document.removeEventListener('touchstart', blockEverything, { capture: true });
+      document.removeEventListener('touchmove', blockEverything, { capture: true });
+      document.removeEventListener('touchend', blockEverything, { capture: true });
 
       // Retirer les classes
       document.body.classList.remove('menu-open');
@@ -182,13 +163,33 @@ const FloatingActionMenu = React.memo(function FloatingActionMenu({ isOpen, onCl
     onClose();
   }, [onAction, onClose]);
 
+  // State pour tracker si l'animation d'entrée est terminée
+  const [isAnimationComplete, setIsAnimationComplete] = React.useState(false);
+
+  // Activer le backdrop après l'animation d'entrée (300ms)
+  useEffect(() => {
+    if (isOpen) {
+      setIsAnimationComplete(false);
+      const timer = setTimeout(() => {
+        setIsAnimationComplete(true);
+      }, 350); // Légèrement après la fin de l'animation (300ms)
+
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
   // Handler pour le backdrop avec protection contre les clics immédiats
   const handleBackdropClick = useCallback((e) => {
+    // Ne pas fermer si l'animation n'est pas terminée
+    if (!isAnimationComplete) {
+      return;
+    }
+
     // Vérifier que le clic vient bien du backdrop, pas d'un enfant
     if (e.target === e.currentTarget) {
       onClose();
     }
-  }, [onClose]);
+  }, [onClose, isAnimationComplete]);
 
   // Mémoïser les variants d'animation pour éviter re-création
   const backdropVariants = useMemo(() => ({

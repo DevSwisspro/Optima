@@ -183,27 +183,25 @@ export default function Sidebar({ activeTab, setActiveTab, session, onLogout }) 
       </motion.aside>
 
       {/* Navigation Mobile (3 boutons: Dashboard | Menu | Paramètres) */}
-      <motion.nav
+      <nav
         className="md:hidden fixed bottom-0 left-0 right-0 z-50 glass-strong border-t border-white/10 safe-area-bottom"
-        initial={{ y: 100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ type: "spring", stiffness: 100, damping: 20, delay: 0.3 }}
       >
-        <div className="relative flex items-center justify-around max-w-lg mx-auto px-4 py-2 pb-safe">
+        <div className="relative grid grid-cols-3 gap-0 max-w-lg mx-auto px-2 py-2 pb-safe">
           {/* Dashboard */}
           <button
             onClick={() => setActiveTab('dashboard')}
-            className={`relative flex flex-col items-center justify-center gap-1 px-4 py-2.5 rounded-xl min-w-[70px] active:scale-95 transition-all duration-150 ${
+            className={`relative flex flex-col items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl transition-all duration-150 ${
               activeTab === 'dashboard' ? 'bg-primary/20' : 'active:bg-white/5'
             }`}
+            style={{ minHeight: '64px' }}
           >
             <LayoutDashboard
-              className={`w-6 h-6 transition-colors ${
+              className={`w-6 h-6 transition-colors flex-shrink-0 ${
                 activeTab === 'dashboard' ? 'text-primary' : 'text-gray-400'
               }`}
             />
             <span
-              className={`text-[10px] font-semibold transition-colors leading-tight ${
+              className={`text-[10px] font-semibold transition-colors leading-tight whitespace-nowrap ${
                 activeTab === 'dashboard' ? 'text-white' : 'text-gray-500'
               }`}
             >
@@ -214,11 +212,12 @@ export default function Sidebar({ activeTab, setActiveTab, session, onLogout }) 
           {/* Menu Central */}
           <button
             onClick={() => setIsActionMenuOpen(true)}
-            className="relative flex flex-col items-center justify-center gap-1 px-4 py-2.5 rounded-xl min-w-[70px] active:scale-95 active:bg-white/5 transition-all duration-150"
+            className="relative flex flex-col items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl active:bg-white/5 transition-all duration-150"
+            style={{ minHeight: '64px' }}
           >
             {/* Icône grille 3x3 */}
             <svg
-              className="w-6 h-6 text-gray-400"
+              className="w-6 h-6 text-gray-400 flex-shrink-0"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -231,7 +230,7 @@ export default function Sidebar({ activeTab, setActiveTab, session, onLogout }) 
               <rect x="14" y="14" width="7" height="7" />
               <rect x="3" y="14" width="7" height="7" />
             </svg>
-            <span className="text-[10px] font-semibold text-gray-500 leading-tight">
+            <span className="text-[10px] font-semibold text-gray-500 leading-tight whitespace-nowrap">
               Menu
             </span>
           </button>
@@ -240,15 +239,16 @@ export default function Sidebar({ activeTab, setActiveTab, session, onLogout }) 
           <button
             onClick={() => setIsSettingsOpen(true)}
             data-mobile-settings-btn
-            className="relative flex flex-col items-center justify-center gap-1 px-4 py-2.5 rounded-xl min-w-[70px] active:scale-95 active:bg-white/5 transition-all duration-150"
+            className="relative flex flex-col items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl active:bg-white/5 transition-all duration-150"
+            style={{ minHeight: '64px' }}
           >
-            <Settings className="w-6 h-6 text-gray-400" />
-            <span className="text-[10px] font-semibold text-gray-500 leading-tight">
+            <Settings className="w-6 h-6 text-gray-400 flex-shrink-0" />
+            <span className="text-[10px] font-semibold text-gray-500 leading-tight whitespace-nowrap">
               Paramètres
             </span>
           </button>
         </div>
-      </motion.nav>
+      </nav>
 
       {/* Menu flottant d'actions */}
       <FloatingActionMenu
