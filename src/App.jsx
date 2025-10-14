@@ -2156,7 +2156,17 @@ export default function App({ session, onLogout }) {
         
           {activeTab === "dashboard" && (
             <PageTransition pageKey="dashboard">
-              <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-10 space-y-8 md:space-y-12">
+              <div
+                className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-10 space-y-8 md:space-y-12"
+                style={{
+                  willChange: 'auto',
+                  transform: 'translateZ(0)',
+                  backfaceVisibility: 'hidden',
+                  WebkitBackfaceVisibility: 'hidden',
+                  perspective: '1000px',
+                  WebkitPerspective: '1000px'
+                }}
+              >
               {/* Header Dashboard - Mobile vs Desktop */}
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
@@ -2221,51 +2231,14 @@ export default function App({ session, onLogout }) {
                     <select
                       value={dashboardFilter.year}
                       onChange={(e) => setDashboardFilter(prev => ({ ...prev, year: parseInt(e.target.value) }))}
-                      onFocus={(e) => {
-                        e.preventDefault();
-                        const scrollY = window.scrollY;
-                        const root = document.getElementById('root');
-
-                        // Verrouille body ET root
-                        document.body.style.position = 'fixed';
-                        document.body.style.top = `-${scrollY}px`;
-                        document.body.style.width = '100%';
-                        document.body.style.overflow = 'hidden';
-
-                        if (root) {
-                          root.style.position = 'fixed';
-                          root.style.top = `-${scrollY}px`;
-                          root.style.width = '100%';
-                          root.style.overflow = 'hidden';
-                        }
-                      }}
-                      onBlur={() => {
-                        const scrollY = document.body.style.top;
-                        const root = document.getElementById('root');
-
-                        // Déverrouille tout
-                        document.body.style.position = '';
-                        document.body.style.top = '';
-                        document.body.style.width = '';
-                        document.body.style.overflow = '';
-
-                        if (root) {
-                          root.style.position = '';
-                          root.style.top = '';
-                          root.style.width = '';
-                          root.style.overflow = '';
-                        }
-
-                        window.scrollTo(0, parseInt(scrollY || '0') * -1);
-                      }}
                       className="w-full card-premium-enhanced text-gray-900 text-center py-4 px-6 rounded-2xl text-lg font-semibold transition-none cursor-pointer hover:border-red-500/30"
                       style={{
                         WebkitTapHighlightColor: 'transparent',
                         touchAction: 'manipulation',
-                        position: 'relative',
-                        zIndex: 10,
                         outline: 'none',
-                        boxShadow: 'none'
+                        boxShadow: 'none',
+                        transform: 'translateZ(0)',
+                        WebkitTransform: 'translateZ(0)'
                       }}
                     >
                       {getAvailableYears(budgetItems).length > 0 ? getAvailableYears(budgetItems).map(year => (
@@ -2276,51 +2249,14 @@ export default function App({ session, onLogout }) {
                     <select
                       value={dashboardFilter.month}
                       onChange={(e) => setDashboardFilter(prev => ({ ...prev, month: e.target.value }))}
-                      onFocus={(e) => {
-                        e.preventDefault();
-                        const scrollY = window.scrollY;
-                        const root = document.getElementById('root');
-
-                        // Verrouille body ET root
-                        document.body.style.position = 'fixed';
-                        document.body.style.top = `-${scrollY}px`;
-                        document.body.style.width = '100%';
-                        document.body.style.overflow = 'hidden';
-
-                        if (root) {
-                          root.style.position = 'fixed';
-                          root.style.top = `-${scrollY}px`;
-                          root.style.width = '100%';
-                          root.style.overflow = 'hidden';
-                        }
-                      }}
-                      onBlur={() => {
-                        const scrollY = document.body.style.top;
-                        const root = document.getElementById('root');
-
-                        // Déverrouille tout
-                        document.body.style.position = '';
-                        document.body.style.top = '';
-                        document.body.style.width = '';
-                        document.body.style.overflow = '';
-
-                        if (root) {
-                          root.style.position = '';
-                          root.style.top = '';
-                          root.style.width = '';
-                          root.style.overflow = '';
-                        }
-
-                        window.scrollTo(0, parseInt(scrollY || '0') * -1);
-                      }}
                       className="w-full card-premium-enhanced text-gray-900 text-center py-4 px-6 rounded-2xl text-lg font-semibold transition-none cursor-pointer hover:border-red-500/30"
                       style={{
                         WebkitTapHighlightColor: 'transparent',
                         touchAction: 'manipulation',
-                        position: 'relative',
-                        zIndex: 10,
                         outline: 'none',
-                        boxShadow: 'none'
+                        boxShadow: 'none',
+                        transform: 'translateZ(0)',
+                        WebkitTransform: 'translateZ(0)'
                       }}
                     >
                       <option value="all" className="bg-gray-800">Toute l'année</option>
