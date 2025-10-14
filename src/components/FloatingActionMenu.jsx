@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   CheckSquare,
@@ -9,7 +9,7 @@ import {
   X
 } from 'lucide-react';
 
-export default function FloatingActionMenu({ isOpen, onClose, onAction }) {
+const FloatingActionMenu = React.memo(function FloatingActionMenu({ isOpen, onClose, onAction }) {
   // Gérer le bouton retour système (Android/iOS) et touche Échap (desktop)
   useEffect(() => {
     if (!isOpen) return;
@@ -129,91 +129,93 @@ export default function FloatingActionMenu({ isOpen, onClose, onAction }) {
     }
   }, [isOpen]);
 
-  const actions = [
+  // Mémoïser les actions pour éviter re-création à chaque render
+  const actions = useMemo(() => [
     {
       id: 'tasks',
       label: 'Tâches',
       icon: CheckSquare,
-      color: 'from-blue-500 to-blue-600',
-      action: () => onAction('tasks')
+      color: 'from-blue-500 to-blue-600'
     },
     {
       id: 'notes',
       label: 'Notes',
       icon: FileText,
-      color: 'from-purple-500 to-purple-600',
-      action: () => onAction('notes')
+      color: 'from-purple-500 to-purple-600'
     },
     {
       id: 'shopping',
       label: 'Courses',
       icon: ShoppingCart,
-      color: 'from-orange-500 to-orange-600',
-      action: () => onAction('shopping')
+      color: 'from-orange-500 to-orange-600'
     },
     {
       id: 'budget',
       label: 'Budget',
       icon: Wallet,
-      color: 'from-green-500 to-green-600',
-      action: () => onAction('budget')
+      color: 'from-green-500 to-green-600'
     },
     {
       id: 'media',
       label: 'Médias',
       icon: Play,
-      color: 'from-red-500 to-red-600',
-      action: () => onAction('media')
+      color: 'from-red-500 to-red-600'
     }
-  ];
+  ], []);
 
-  const backdropVariants = {
+  // Handler optimisé pour le clic sur action
+  const handleActionClick = useCallback((actionId) => {
+    onAction(actionId);
+    onClose();
+  }, [onAction, onClose]);
+
+  // Mémoïser les variants d'animation pour éviter re-création
+  const backdropVariants = useMemo(() => ({
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        duration: 0.35,
+        duration: 0.3,
         ease: [0.25, 0.1, 0.25, 1]
       }
     },
     exit: {
       opacity: 0,
       transition: {
-        duration: 0.25,
-        ease: [0.25, 0.1, 0.25, 1],
-        delay: 0.05
+        duration: 0.2,
+        ease: [0.25, 0.1, 0.25, 1]
       }
     }
-  };
+  }), []);
 
-  const menuContainerVariants = {
-    hidden: { opacity: 0, y: 20, scale: 0.95 },
+  const menuContainerVariants = useMemo(() => ({
+    hidden: { opacity: 0, y: 20, scale: 0.96 },
     visible: {
       opacity: 1,
       y: 0,
       scale: 1,
       transition: {
         type: 'spring',
-        stiffness: 350,
-        damping: 28,
-        mass: 0.7,
-        staggerChildren: 0.06,
-        delayChildren: 0.12
+        stiffness: 400,
+        damping: 30,
+        mass: 0.6,
+        staggerChildren: 0.05,
+        delayChildren: 0.1
       }
     },
     exit: {
       opacity: 0,
-      y: 20,
-      scale: 0.96,
+      y: 15,
+      scale: 0.97,
       transition: {
-        duration: 0.22,
+        duration: 0.2,
         ease: [0.32, 0.72, 0, 1]
       }
     }
-  };
+  }), []);
 
-  const actionItemVariants = {
-    hidden: { opacity: 0, scale: 0.85, y: 15 },
+  const actionItemVariants = useMemo(() => ({
+    hidden: { opacity: 0, scale: 0.9, y: 10 },
     visible: {
       opacity: 1,
       scale: 1,
@@ -221,14 +223,14 @@ export default function FloatingActionMenu({ isOpen, onClose, onAction }) {
       transition: {
         type: 'spring',
         stiffness: 500,
-        damping: 30,
-        mass: 0.6
+        damping: 32,
+        mass: 0.5
       }
     }
-  };
+  }), []);
 
   return (
-    <AnimatePresence>
+    <AnimatePresence mode="wait">
       {isOpen && (
         <>
           {/* Backdrop premium avec blur progressif */}
@@ -296,10 +298,7 @@ export default function FloatingActionMenu({ isOpen, onClose, onAction }) {
                         key={action.id}
                         variants={actionItemVariants}
                         whileTap={{ scale: 0.96 }}
-                        onClick={() => {
-                          action.action();
-                          onClose();
-                        }}
+                        onClick={() => handleActionClick(action.id)}
                         className="group relative flex flex-col items-center gap-3 p-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.06] active:bg-white/[0.08] border border-white/[0.08] hover:border-white/[0.12] transition-all duration-300 overflow-hidden min-h-[110px]"
                       >
                         {/* Gradient background subtil */}
@@ -354,4 +353,6 @@ export default function FloatingActionMenu({ isOpen, onClose, onAction }) {
       )}
     </AnimatePresence>
   );
-}
+});
+
+export default FloatingActionMenu;

@@ -1452,11 +1452,19 @@ rect:active,
 /* Optimisations GPU pour animations fluides */
 .floating-action-button,
 .floating-menu-container,
+.menu-backdrop,
 .mobile-nav-button {
   will-change: transform, opacity;
   transform: translateZ(0);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
+  -webkit-transform: translateZ(0);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Optimisation hardware acceleration pour Framer Motion */
+.floating-menu-container * {
+  transform: translateZ(0);
 }
 
 /* Touch feedback premium pour actions rapides */
@@ -1533,4 +1541,24 @@ body.menu-open > * {
 
 #root.menu-open > * {
   overflow: hidden !important;
+}
+
+/* Optimisations de rendu mobile */
+@media (max-width: 768px) {
+  /* Réduire le coût des backdrop-blur sur mobile */
+  .backdrop-blur-xl {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .backdrop-blur-2xl {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  /* Optimiser le rendu des cartes */
+  .floating-menu-container {
+    contain: layout style paint;
+    content-visibility: auto;
+  }
 }
