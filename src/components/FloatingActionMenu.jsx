@@ -65,41 +65,42 @@ export default function FloatingActionMenu({ isOpen, onClose, onAction }) {
     visible: {
       opacity: 1,
       transition: {
-        duration: 0.3,
-        ease: [0.22, 1, 0.36, 1]
+        duration: 0.35,
+        ease: [0.25, 0.1, 0.25, 1]
       }
     },
     exit: {
       opacity: 0,
       transition: {
         duration: 0.25,
-        ease: [0.22, 1, 0.36, 1]
+        ease: [0.25, 0.1, 0.25, 1],
+        delay: 0.05
       }
     }
   };
 
   const menuContainerVariants = {
-    hidden: { opacity: 0, y: 40, scale: 0.92 },
+    hidden: { opacity: 0, y: 20, scale: 0.95 },
     visible: {
       opacity: 1,
       y: 0,
       scale: 1,
       transition: {
         type: 'spring',
-        stiffness: 380,
-        damping: 30,
-        mass: 0.8,
-        staggerChildren: 0.05,
-        delayChildren: 0.1
+        stiffness: 350,
+        damping: 28,
+        mass: 0.7,
+        staggerChildren: 0.06,
+        delayChildren: 0.12
       }
     },
     exit: {
       opacity: 0,
-      y: 30,
-      scale: 0.94,
+      y: 20,
+      scale: 0.96,
       transition: {
-        duration: 0.25,
-        ease: [0.22, 1, 0.36, 1]
+        duration: 0.22,
+        ease: [0.32, 0.72, 0, 1]
       }
     }
   };
@@ -134,96 +135,98 @@ export default function FloatingActionMenu({ isOpen, onClose, onAction }) {
             style={{ touchAction: 'none' }}
           />
 
-          {/* Menu centré au-dessus du bouton avec design premium */}
-          <motion.div
-            variants={menuContainerVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            className="fixed left-1/2 -translate-x-1/2 bottom-28 z-[201] w-[92%] max-w-md"
-          >
-            {/* Carte principale avec effet verre premium */}
-            <div className="relative bg-gradient-to-br from-slate-900/98 via-slate-800/95 to-slate-900/98 backdrop-blur-2xl rounded-3xl shadow-[0_24px_80px_rgba(0,0,0,0.8),0_0_0_1px_rgba(255,255,255,0.1)] border border-white/[0.08] overflow-hidden">
-              {/* Glow subtil derrière la carte */}
-              <div className="absolute -inset-[1px] bg-gradient-to-br from-red-500/10 via-transparent to-purple-500/5 rounded-3xl -z-10 blur-xl" />
+          {/* Conteneur centré avec safe-area pour mobile */}
+          <div className="fixed inset-0 z-[201] flex items-center justify-center p-4 pb-24 pointer-events-none">
+            <motion.div
+              variants={menuContainerVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              className="w-full max-w-md pointer-events-auto"
+            >
+              {/* Carte principale avec effet verre premium */}
+              <div className="relative bg-gradient-to-br from-slate-900/98 via-slate-800/95 to-slate-900/98 backdrop-blur-2xl rounded-3xl shadow-[0_24px_80px_rgba(0,0,0,0.8),0_0_0_1px_rgba(255,255,255,0.1)] border border-white/[0.08] overflow-hidden">
+                {/* Glow subtil derrière la carte */}
+                <div className="absolute -inset-[1px] bg-gradient-to-br from-red-500/10 via-transparent to-purple-500/5 rounded-3xl -z-10 blur-xl" />
 
-              {/* Header premium avec dégradé subtil */}
-              <div className="relative flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
-                {/* Gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-r from-red-500/8 via-transparent to-transparent" />
+                {/* Header premium avec dégradé subtil */}
+                <div className="relative flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
+                  {/* Gradient overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-red-500/8 via-transparent to-transparent" />
 
-                <h3 className="relative text-lg font-bold text-white tracking-tight">Navigation</h3>
-                <motion.button
-                  onClick={onClose}
-                  whileTap={{ scale: 0.9 }}
-                  className="relative p-2 rounded-xl hover:bg-white/10 active:bg-white/15 transition-colors"
-                >
-                  <X className="w-5 h-5 text-gray-300" strokeWidth={2} />
-                </motion.button>
-              </div>
+                  <h3 className="relative text-lg font-bold text-white tracking-tight">Navigation</h3>
+                  <motion.button
+                    onClick={onClose}
+                    whileTap={{ scale: 0.9 }}
+                    className="relative p-2 rounded-xl hover:bg-white/10 active:bg-white/15 transition-colors"
+                  >
+                    <X className="w-5 h-5 text-gray-300" strokeWidth={2} />
+                  </motion.button>
+                </div>
 
-              {/* Grille de navigation premium en 2 colonnes */}
-              <div className="grid grid-cols-2 gap-3 p-5">
-                {actions.map((action, index) => {
-                  const Icon = action.icon;
-                  return (
-                    <motion.button
-                      key={action.id}
-                      variants={actionItemVariants}
-                      whileTap={{ scale: 0.96 }}
-                      onClick={() => {
-                        action.action();
-                        onClose();
-                      }}
-                      className="group relative flex flex-col items-center gap-3.5 p-5 rounded-2xl bg-white/[0.03] hover:bg-white/[0.06] active:bg-white/[0.08] border border-white/[0.08] hover:border-white/[0.12] transition-all duration-300 overflow-hidden min-h-[120px]"
-                    >
-                      {/* Gradient background subtil */}
-                      <div className={`absolute inset-0 bg-gradient-to-br ${action.color} opacity-0 group-hover:opacity-[0.06] group-active:opacity-10 transition-opacity duration-300`} />
-
-                      {/* Icon container avec design premium */}
-                      <motion.div
-                        className={`relative p-3.5 bg-gradient-to-br ${action.color} rounded-xl shadow-xl shadow-black/20`}
-                        initial={{ scale: 1 }}
-                        whileHover={{ scale: 1.05, rotate: [0, -3, 3, 0] }}
-                        transition={{
-                          scale: { type: 'spring', stiffness: 400, damping: 15 },
-                          rotate: { duration: 0.4, ease: 'easeInOut' }
+                {/* Grille de navigation premium - responsive et évolutive */}
+                <div className="grid grid-cols-2 sm:grid-cols-2 gap-3 p-5 max-h-[60vh] overflow-y-auto floating-menu-scroll">
+                  {actions.map((action, index) => {
+                    const Icon = action.icon;
+                    return (
+                      <motion.button
+                        key={action.id}
+                        variants={actionItemVariants}
+                        whileTap={{ scale: 0.96 }}
+                        onClick={() => {
+                          action.action();
+                          onClose();
                         }}
+                        className="group relative flex flex-col items-center gap-3 p-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.06] active:bg-white/[0.08] border border-white/[0.08] hover:border-white/[0.12] transition-all duration-300 overflow-hidden min-h-[110px]"
                       >
-                        <Icon className="w-7 h-7 text-white drop-shadow-lg" strokeWidth={2} />
-                      </motion.div>
+                        {/* Gradient background subtil */}
+                        <div className={`absolute inset-0 bg-gradient-to-br ${action.color} opacity-0 group-hover:opacity-[0.06] group-active:opacity-10 transition-opacity duration-300`} />
 
-                      {/* Label avec typographie premium */}
-                      <span className="relative text-sm font-bold text-white text-center leading-tight tracking-wide">
-                        {action.label}
-                      </span>
+                        {/* Icon container avec design premium */}
+                        <motion.div
+                          className={`relative p-3 bg-gradient-to-br ${action.color} rounded-xl shadow-xl shadow-black/20`}
+                          initial={{ scale: 1 }}
+                          whileHover={{ scale: 1.05, rotate: [0, -3, 3, 0] }}
+                          transition={{
+                            scale: { type: 'spring', stiffness: 400, damping: 15 },
+                            rotate: { duration: 0.4, ease: 'easeInOut' }
+                          }}
+                        >
+                          <Icon className="w-6 h-6 text-white drop-shadow-lg" strokeWidth={2.2} />
+                        </motion.div>
 
-                      {/* Shimmer effect premium */}
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.06] to-transparent"
-                        initial={{ x: '-100%' }}
-                        animate={{ x: '200%' }}
-                        transition={{
-                          duration: 3,
-                          repeat: Infinity,
-                          repeatDelay: 5,
-                          ease: 'easeInOut'
-                        }}
-                        style={{ pointerEvents: 'none' }}
-                      />
+                        {/* Label avec typographie premium */}
+                        <span className="relative text-sm font-bold text-white text-center leading-tight tracking-wide">
+                          {action.label}
+                        </span>
 
-                      {/* Border glow on hover */}
-                      <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
-                        background: `linear-gradient(135deg, ${action.color.replace('from-', 'rgba(').replace(' to-', ', 0.2), rgba(')})`,
-                        filter: 'blur(8px)',
-                        zIndex: -1
-                      }} />
-                    </motion.button>
-                  );
-                })}
+                        {/* Shimmer effect premium */}
+                        <motion.div
+                          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.06] to-transparent"
+                          initial={{ x: '-100%' }}
+                          animate={{ x: '200%' }}
+                          transition={{
+                            duration: 3,
+                            repeat: Infinity,
+                            repeatDelay: 5,
+                            ease: 'easeInOut'
+                          }}
+                          style={{ pointerEvents: 'none' }}
+                        />
+
+                        {/* Border glow on hover */}
+                        <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
+                          background: `linear-gradient(135deg, ${action.color.replace('from-', 'rgba(').replace(' to-', ', 0.2), rgba(')})`,
+                          filter: 'blur(8px)',
+                          zIndex: -1
+                        }} />
+                      </motion.button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </div>
         </>
       )}
     </AnimatePresence>
