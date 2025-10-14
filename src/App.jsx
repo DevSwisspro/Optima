@@ -2412,7 +2412,7 @@ export default function App({ session, onLogout }) {
                                   </div>
                                 </div>
 
-                                {/* Emoji indicator */}
+                                {/* Emoji indicator - Desktop only */}
                                 <motion.div
                                   animate={{
                                     rotate: [0, 5, -5, 0],
@@ -2423,7 +2423,7 @@ export default function App({ session, onLogout }) {
                                     repeat: Infinity,
                                     ease: "easeInOut"
                                   }}
-                                  className="text-3xl opacity-20 group-hover:opacity-30 transition-opacity"
+                                  className="hidden md:block text-3xl opacity-20 group-hover:opacity-30 transition-opacity"
                                 >
                                   {type === 'revenus' ? '📈' : type === 'epargne' ? '💰' : type === 'investissements' ? '📊' : '💸'}
                                 </motion.div>
@@ -2647,12 +2647,14 @@ export default function App({ session, onLogout }) {
                         onMouseDown={(e) => e.preventDefault()}
                       >
                       <div
-                        className="w-full"
+                        className="w-full overflow-x-auto md:overflow-x-visible"
                         style={{
                           height: window.innerWidth < 768 ? '300px' : '340px',
                           outline: 'none',
                           border: 'none',
-                          WebkitTapHighlightColor: 'transparent'
+                          WebkitTapHighlightColor: 'transparent',
+                          touchAction: window.innerWidth < 768 ? 'pan-x pan-y' : 'auto',
+                          WebkitOverflowScrolling: 'touch'
                         }}
                       >
                         <ResponsiveContainer

@@ -184,9 +184,10 @@ export default function Sidebar({ activeTab, setActiveTab, session, onLogout }) 
 
       {/* Navigation Mobile (3 boutons: Dashboard | Menu | Paramètres) */}
       <nav
-        className="md:hidden fixed bottom-0 left-0 right-0 z-50 glass-strong border-t border-white/10 safe-area-bottom"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-50 glass-strong border-t border-white/10"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
       >
-        <div className="relative grid grid-cols-3 gap-0 max-w-lg mx-auto px-2 py-2 pb-safe">
+        <div className="relative grid grid-cols-3 gap-0 max-w-lg mx-auto px-2 py-1.5">
           {/* Dashboard */}
           <button
             onClick={() => setActiveTab('dashboard')}
