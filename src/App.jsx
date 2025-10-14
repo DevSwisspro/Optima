@@ -2210,26 +2210,28 @@ export default function App({ session, onLogout }) {
 
                   {/* Filtres Mobile - Style Cards */}
                   <div className="mt-6 space-y-3 max-w-sm mx-auto">
-                    <motion.select
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.35, delay: 0.15, ease: [0.25, 0.1, 0.25, 1] }}
+                    <select
                       value={dashboardFilter.year}
                       onChange={(e) => setDashboardFilter(prev => ({ ...prev, year: parseInt(e.target.value) }))}
-                      className="w-full card-premium-enhanced text-gray-900 text-center py-4 px-6 rounded-2xl focus:border-red-500/40 focus:ring-2 focus:ring-red-500/20 text-lg font-semibold transition-all duration-300 cursor-pointer hover:border-red-500/30"
+                      className="w-full card-premium-enhanced text-gray-900 text-center py-4 px-6 rounded-2xl focus:border-red-500/40 focus:ring-2 focus:ring-red-500/20 text-lg font-semibold transition-all duration-150 cursor-pointer hover:border-red-500/30 active:scale-[0.98]"
+                      style={{
+                        WebkitTapHighlightColor: 'transparent',
+                        touchAction: 'manipulation'
+                      }}
                     >
                       {getAvailableYears(budgetItems).length > 0 ? getAvailableYears(budgetItems).map(year => (
                         <option key={year} value={year} className="bg-gray-800">{year}</option>
                       )) : <option value={new Date().getFullYear()} className="bg-gray-800">{new Date().getFullYear()}</option>}
-                    </motion.select>
+                    </select>
 
-                    <motion.select
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.35, delay: 0.22, ease: [0.25, 0.1, 0.25, 1] }}
+                    <select
                       value={dashboardFilter.month}
                       onChange={(e) => setDashboardFilter(prev => ({ ...prev, month: e.target.value }))}
-                      className="w-full card-premium-enhanced text-gray-900 text-center py-4 px-6 rounded-2xl focus:border-red-500/40 focus:ring-2 focus:ring-red-500/20 text-lg font-semibold transition-all duration-300 cursor-pointer hover:border-red-500/30"
+                      className="w-full card-premium-enhanced text-gray-900 text-center py-4 px-6 rounded-2xl focus:border-red-500/40 focus:ring-2 focus:ring-red-500/20 text-lg font-semibold transition-all duration-150 cursor-pointer hover:border-red-500/30 active:scale-[0.98]"
+                      style={{
+                        WebkitTapHighlightColor: 'transparent',
+                        touchAction: 'manipulation'
+                      }}
                     >
                       <option value="all" className="bg-gray-800">Toute l'année</option>
                       {Array.from({ length: 12 }, (_, i) => (
@@ -2237,7 +2239,7 @@ export default function App({ session, onLogout }) {
                           {new Date(2024, i).toLocaleDateString('fr-FR', { month: 'long' })}
                         </option>
                       ))}
-                    </motion.select>
+                    </select>
 
                     <motion.button
                       initial={{ opacity: 0, y: 8 }}
