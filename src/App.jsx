@@ -2209,14 +2209,38 @@ export default function App({ session, onLogout }) {
                   </motion.div>
 
                   {/* Filtres Mobile - Style Cards */}
-                  <div className="mt-6 space-y-3 max-w-sm mx-auto">
+                  <div
+                    className="mt-6 space-y-3 max-w-sm mx-auto"
+                    style={{
+                      position: 'relative',
+                      transform: 'translateZ(0)',
+                      backfaceVisibility: 'hidden',
+                      WebkitBackfaceVisibility: 'hidden'
+                    }}
+                  >
                     <select
                       value={dashboardFilter.year}
                       onChange={(e) => setDashboardFilter(prev => ({ ...prev, year: parseInt(e.target.value) }))}
+                      onFocus={(e) => {
+                        e.preventDefault();
+                        const scrollY = window.scrollY;
+                        document.body.style.position = 'fixed';
+                        document.body.style.top = `-${scrollY}px`;
+                        document.body.style.width = '100%';
+                      }}
+                      onBlur={() => {
+                        const scrollY = document.body.style.top;
+                        document.body.style.position = '';
+                        document.body.style.top = '';
+                        document.body.style.width = '';
+                        window.scrollTo(0, parseInt(scrollY || '0') * -1);
+                      }}
                       className="w-full card-premium-enhanced text-gray-900 text-center py-4 px-6 rounded-2xl focus:border-red-500/40 focus:ring-2 focus:ring-red-500/20 text-lg font-semibold transition-all duration-150 cursor-pointer hover:border-red-500/30 active:scale-[0.98]"
                       style={{
                         WebkitTapHighlightColor: 'transparent',
-                        touchAction: 'manipulation'
+                        touchAction: 'manipulation',
+                        position: 'relative',
+                        zIndex: 10
                       }}
                     >
                       {getAvailableYears(budgetItems).length > 0 ? getAvailableYears(budgetItems).map(year => (
@@ -2227,10 +2251,26 @@ export default function App({ session, onLogout }) {
                     <select
                       value={dashboardFilter.month}
                       onChange={(e) => setDashboardFilter(prev => ({ ...prev, month: e.target.value }))}
+                      onFocus={(e) => {
+                        e.preventDefault();
+                        const scrollY = window.scrollY;
+                        document.body.style.position = 'fixed';
+                        document.body.style.top = `-${scrollY}px`;
+                        document.body.style.width = '100%';
+                      }}
+                      onBlur={() => {
+                        const scrollY = document.body.style.top;
+                        document.body.style.position = '';
+                        document.body.style.top = '';
+                        document.body.style.width = '';
+                        window.scrollTo(0, parseInt(scrollY || '0') * -1);
+                      }}
                       className="w-full card-premium-enhanced text-gray-900 text-center py-4 px-6 rounded-2xl focus:border-red-500/40 focus:ring-2 focus:ring-red-500/20 text-lg font-semibold transition-all duration-150 cursor-pointer hover:border-red-500/30 active:scale-[0.98]"
                       style={{
                         WebkitTapHighlightColor: 'transparent',
-                        touchAction: 'manipulation'
+                        touchAction: 'manipulation',
+                        position: 'relative',
+                        zIndex: 10
                       }}
                     >
                       <option value="all" className="bg-gray-800">Toute l'année</option>
