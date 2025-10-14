@@ -230,67 +230,22 @@ export default function Sidebar({ activeTab, setActiveTab, session, onLogout }) 
             )}
           </motion.button>
 
-          {/* Bouton Menu Central */}
+          {/* Menu Central */}
           <motion.button
             onClick={() => setIsActionMenuOpen(true)}
-            className="relative flex items-center justify-center w-14 h-14 -mt-6 bg-gradient-to-br from-red-500 to-red-600 rounded-full shadow-2xl shadow-red-500/40"
-            whileTap={{ scale: 0.88 }}
-            whileHover={{ scale: 1.05 }}
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{
-              opacity: 1,
-              scale: 1,
-              boxShadow: [
-                '0 20px 50px rgba(239, 68, 68, 0.4)',
-                '0 20px 60px rgba(239, 68, 68, 0.5)',
-                '0 20px 50px rgba(239, 68, 68, 0.4)'
-              ]
-            }}
-            transition={{
-              scale: { type: "spring", stiffness: 400, damping: 20, delay: 0.15 },
-              opacity: { duration: 0.3, delay: 0.15 },
-              boxShadow: {
-                duration: 2.5,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }
-            }}
+            className="relative flex flex-col items-center justify-center gap-0.5 px-4 py-2.5 rounded-xl transition-all duration-200 min-w-[70px] active:bg-white/5"
+            whileTap={{ scale: 0.92 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
           >
-            {/* Pulse ring externe */}
-            <motion.div
-              className="absolute inset-0 rounded-full border-2 border-red-400"
-              animate={{
-                scale: [1, 1.4, 1],
-                opacity: [0.6, 0, 0.6]
-              }}
-              transition={{
-                duration: 2.5,
-                repeat: Infinity,
-                ease: "easeOut"
-              }}
-            />
-
-            {/* Glow effect */}
-            <motion.div
-              className="absolute inset-0 rounded-full bg-red-400 blur-xl"
-              animate={{
-                scale: [1, 1.15, 1],
-                opacity: [0.4, 0.6, 0.4]
-              }}
-              transition={{
-                duration: 2.5,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            />
-
-            {/* Icône grille 3x3 */}
+            {/* Icône grille 3x3 avec accent rouge */}
             <svg
-              className="w-6 h-6 text-white relative z-10"
+              className="w-6 h-6 text-primary relative z-10 drop-shadow-glow"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              strokeWidth="2.5"
+              strokeWidth="2.2"
               strokeLinecap="round"
               strokeLinejoin="round"
             >
@@ -299,6 +254,9 @@ export default function Sidebar({ activeTab, setActiveTab, session, onLogout }) 
               <rect x="14" y="14" width="7" height="7" />
               <rect x="3" y="14" width="7" height="7" />
             </svg>
+            <span className="text-[10px] font-semibold text-white leading-tight relative z-10">
+              Menu
+            </span>
           </motion.button>
 
           {/* Paramètres */}

@@ -61,59 +61,60 @@ export default function FloatingActionMenu({ isOpen, onClose, onAction }) {
   ];
 
   const backdropVariants = {
-    hidden: { opacity: 0, backdropFilter: 'blur(0px)' },
+    hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      backdropFilter: 'blur(12px)',
       transition: {
-        duration: 0.25,
+        duration: 0.3,
         ease: [0.22, 1, 0.36, 1]
       }
     },
     exit: {
       opacity: 0,
-      backdropFilter: 'blur(0px)',
       transition: {
-        duration: 0.2
+        duration: 0.25,
+        ease: [0.22, 1, 0.36, 1]
       }
     }
   };
 
   const menuContainerVariants = {
-    hidden: { opacity: 0, y: 30, scale: 0.9 },
+    hidden: { opacity: 0, y: 40, scale: 0.92 },
     visible: {
       opacity: 1,
       y: 0,
       scale: 1,
       transition: {
-        duration: 0.3,
-        ease: [0.22, 1, 0.36, 1],
-        staggerChildren: 0.04,
-        delayChildren: 0.08
+        type: 'spring',
+        stiffness: 380,
+        damping: 30,
+        mass: 0.8,
+        staggerChildren: 0.05,
+        delayChildren: 0.1
       }
     },
     exit: {
       opacity: 0,
       y: 30,
-      scale: 0.9,
+      scale: 0.94,
       transition: {
-        duration: 0.2,
+        duration: 0.25,
         ease: [0.22, 1, 0.36, 1]
       }
     }
   };
 
   const actionItemVariants = {
-    hidden: { opacity: 0, scale: 0.4, y: 20 },
+    hidden: { opacity: 0, scale: 0.85, y: 15 },
     visible: {
       opacity: 1,
       scale: 1,
       y: 0,
       transition: {
         type: 'spring',
-        stiffness: 600,
-        damping: 28,
-        mass: 0.8
+        stiffness: 500,
+        damping: 30,
+        mass: 0.6
       }
     }
   };
@@ -122,89 +123,101 @@ export default function FloatingActionMenu({ isOpen, onClose, onAction }) {
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop avec blur iOS-style */}
+          {/* Backdrop premium avec blur progressif */}
           <motion.div
             variants={backdropVariants}
             initial="hidden"
             animate="visible"
-            exit="hidden"
+            exit="exit"
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 backdrop-blur-md z-[200]"
+            className="fixed inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/80 backdrop-blur-xl z-[200]"
             style={{ touchAction: 'none' }}
           />
 
-          {/* Menu centré au-dessus du bouton */}
+          {/* Menu centré au-dessus du bouton avec design premium */}
           <motion.div
             variants={menuContainerVariants}
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="fixed left-1/2 -translate-x-1/2 bottom-28 z-[201] w-[90%] max-w-sm"
+            className="fixed left-1/2 -translate-x-1/2 bottom-28 z-[201] w-[92%] max-w-md"
           >
-            {/* Carte principale avec effet verre */}
-            <div className="bg-gray-900/95 backdrop-blur-xl rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.7)] border border-white/20 overflow-hidden">
-              {/* Header élégant */}
-              <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 bg-gradient-to-r from-red-500/10 to-transparent">
-                <h3 className="text-base font-semibold text-white">Navigation</h3>
+            {/* Carte principale avec effet verre premium */}
+            <div className="relative bg-gradient-to-br from-slate-900/98 via-slate-800/95 to-slate-900/98 backdrop-blur-2xl rounded-3xl shadow-[0_24px_80px_rgba(0,0,0,0.8),0_0_0_1px_rgba(255,255,255,0.1)] border border-white/[0.08] overflow-hidden">
+              {/* Glow subtil derrière la carte */}
+              <div className="absolute -inset-[1px] bg-gradient-to-br from-red-500/10 via-transparent to-purple-500/5 rounded-3xl -z-10 blur-xl" />
+
+              {/* Header premium avec dégradé subtil */}
+              <div className="relative flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
+                {/* Gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-r from-red-500/8 via-transparent to-transparent" />
+
+                <h3 className="relative text-lg font-bold text-white tracking-tight">Navigation</h3>
                 <motion.button
                   onClick={onClose}
                   whileTap={{ scale: 0.9 }}
-                  className="p-1.5 rounded-lg hover:bg-white/10 transition-colors"
+                  className="relative p-2 rounded-xl hover:bg-white/10 active:bg-white/15 transition-colors"
                 >
-                  <X className="w-4 h-4 text-gray-400" />
+                  <X className="w-5 h-5 text-gray-300" strokeWidth={2} />
                 </motion.button>
               </div>
 
-              {/* Grille de navigation en 2 colonnes */}
-              <div className="grid grid-cols-2 gap-3 p-4">
+              {/* Grille de navigation premium en 2 colonnes */}
+              <div className="grid grid-cols-2 gap-3 p-5">
                 {actions.map((action, index) => {
                   const Icon = action.icon;
                   return (
                     <motion.button
                       key={action.id}
                       variants={actionItemVariants}
-                      whileTap={{ scale: 0.95 }}
+                      whileTap={{ scale: 0.96 }}
                       onClick={() => {
                         action.action();
                         onClose();
                       }}
-                      className="relative flex flex-col items-center gap-3 p-5 rounded-xl bg-white/5 active:bg-white/[0.08] border border-white/10 transition-all duration-200 group overflow-hidden min-h-[110px]"
+                      className="group relative flex flex-col items-center gap-3.5 p-5 rounded-2xl bg-white/[0.03] hover:bg-white/[0.06] active:bg-white/[0.08] border border-white/[0.08] hover:border-white/[0.12] transition-all duration-300 overflow-hidden min-h-[120px]"
                     >
-                      {/* Gradient background on active */}
-                      <div className={`absolute inset-0 bg-gradient-to-br ${action.color} opacity-0 group-active:opacity-15 transition-opacity duration-150`} />
+                      {/* Gradient background subtil */}
+                      <div className={`absolute inset-0 bg-gradient-to-br ${action.color} opacity-0 group-hover:opacity-[0.06] group-active:opacity-10 transition-opacity duration-300`} />
 
-                      {/* Icon container */}
+                      {/* Icon container avec design premium */}
                       <motion.div
-                        className={`relative p-3 bg-gradient-to-br ${action.color} rounded-xl shadow-lg`}
+                        className={`relative p-3.5 bg-gradient-to-br ${action.color} rounded-xl shadow-xl shadow-black/20`}
                         initial={{ scale: 1 }}
-                        animate={{ scale: [1, 1.05, 1] }}
+                        whileHover={{ scale: 1.05, rotate: [0, -3, 3, 0] }}
                         transition={{
-                          duration: 0.5,
-                          delay: index * 0.06,
-                          ease: [0.22, 1, 0.36, 1]
+                          scale: { type: 'spring', stiffness: 400, damping: 15 },
+                          rotate: { duration: 0.4, ease: 'easeInOut' }
                         }}
                       >
-                        <Icon className="w-6 h-6 text-white" strokeWidth={2.2} />
+                        <Icon className="w-7 h-7 text-white drop-shadow-lg" strokeWidth={2} />
                       </motion.div>
 
-                      {/* Label */}
-                      <span className="relative text-sm font-semibold text-white text-center leading-tight">
+                      {/* Label avec typographie premium */}
+                      <span className="relative text-sm font-bold text-white text-center leading-tight tracking-wide">
                         {action.label}
                       </span>
 
-                      {/* Subtle shimmer effect */}
+                      {/* Shimmer effect premium */}
                       <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent"
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.06] to-transparent"
                         initial={{ x: '-100%' }}
-                        animate={{ x: '100%' }}
+                        animate={{ x: '200%' }}
                         transition={{
-                          duration: 2,
+                          duration: 3,
                           repeat: Infinity,
-                          repeatDelay: 6,
+                          repeatDelay: 5,
                           ease: 'easeInOut'
                         }}
                         style={{ pointerEvents: 'none' }}
                       />
+
+                      {/* Border glow on hover */}
+                      <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
+                        background: `linear-gradient(135deg, ${action.color.replace('from-', 'rgba(').replace(' to-', ', 0.2), rgba(')})`,
+                        filter: 'blur(8px)',
+                        zIndex: -1
+                      }} />
                     </motion.button>
                   );
                 })}
