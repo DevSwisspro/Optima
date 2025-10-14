@@ -24,36 +24,36 @@ export default function FloatingActionMenu({ isOpen, onClose, onAction }) {
 
   const actions = [
     {
-      id: 'task',
-      label: 'Ajouter une tâche',
+      id: 'tasks',
+      label: 'Tâches',
       icon: CheckSquare,
       color: 'from-blue-500 to-blue-600',
       action: () => onAction('tasks')
     },
     {
-      id: 'note',
-      label: 'Ajouter une note',
+      id: 'notes',
+      label: 'Notes',
       icon: FileText,
       color: 'from-purple-500 to-purple-600',
       action: () => onAction('notes')
     },
     {
       id: 'shopping',
-      label: 'Ajouter une course',
+      label: 'Courses',
       icon: ShoppingCart,
       color: 'from-orange-500 to-orange-600',
       action: () => onAction('shopping')
     },
     {
       id: 'budget',
-      label: 'Gérer budget',
+      label: 'Budget',
       icon: Wallet,
       color: 'from-green-500 to-green-600',
       action: () => onAction('budget')
     },
     {
       id: 'media',
-      label: 'Ajouter un média',
+      label: 'Médias',
       icon: Play,
       color: 'from-red-500 to-red-600',
       action: () => onAction('media')
@@ -80,22 +80,24 @@ export default function FloatingActionMenu({ isOpen, onClose, onAction }) {
   };
 
   const menuContainerVariants = {
-    hidden: { opacity: 0, x: 350 },
+    hidden: { opacity: 0, y: -20, scale: 0.95 },
     visible: {
       opacity: 1,
-      x: 0,
+      y: 0,
+      scale: 1,
       transition: {
-        duration: 0.35,
+        duration: 0.3,
         ease: [0.22, 1, 0.36, 1],
-        staggerChildren: 0.05,
-        delayChildren: 0.1
+        staggerChildren: 0.04,
+        delayChildren: 0.08
       }
     },
     exit: {
       opacity: 0,
-      x: 350,
+      y: -20,
+      scale: 0.95,
       transition: {
-        duration: 0.25,
+        duration: 0.2,
         ease: [0.22, 1, 0.36, 1]
       }
     }
@@ -131,19 +133,19 @@ export default function FloatingActionMenu({ isOpen, onClose, onAction }) {
             style={{ touchAction: 'none' }}
           />
 
-          {/* Menu latéral droit */}
+          {/* Menu déroulant depuis le haut */}
           <motion.div
             variants={menuContainerVariants}
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="fixed right-3 bottom-24 z-[201] w-[85%] max-w-xs"
+            className="fixed top-20 right-4 z-[201] w-[90%] max-w-sm"
           >
-            {/* Carte principale */}
-            <div className="bg-gradient-to-b from-[#1A1A1A] to-[#101010] backdrop-blur-xl rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.6)] border border-white/10 overflow-hidden">
-              {/* Header compact */}
-              <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
-                <h3 className="text-base font-semibold text-white">Actions rapides</h3>
+            {/* Carte principale avec effet verre */}
+            <div className="bg-gray-900/95 backdrop-blur-xl rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.7)] border border-white/20 overflow-hidden">
+              {/* Header élégant */}
+              <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 bg-gradient-to-r from-red-500/10 to-transparent">
+                <h3 className="text-base font-semibold text-white">Navigation</h3>
                 <motion.button
                   onClick={onClose}
                   whileTap={{ scale: 0.9 }}
@@ -153,40 +155,40 @@ export default function FloatingActionMenu({ isOpen, onClose, onAction }) {
                 </motion.button>
               </div>
 
-              {/* Liste verticale d'actions */}
-              <div className="flex flex-col gap-2 p-3">
+              {/* Grille de navigation en 2 colonnes */}
+              <div className="grid grid-cols-2 gap-3 p-4">
                 {actions.map((action, index) => {
                   const Icon = action.icon;
                   return (
                     <motion.button
                       key={action.id}
                       variants={actionItemVariants}
-                      whileTap={{ scale: 0.96 }}
+                      whileTap={{ scale: 0.95 }}
                       onClick={() => {
                         action.action();
                         onClose();
                       }}
-                      className="relative flex items-center gap-4 p-4 rounded-xl bg-white/5 active:bg-white/[0.08] border border-white/10 transition-all duration-200 group overflow-hidden"
+                      className="relative flex flex-col items-center gap-3 p-5 rounded-xl bg-white/5 active:bg-white/[0.08] border border-white/10 transition-all duration-200 group overflow-hidden min-h-[110px]"
                     >
                       {/* Gradient background on active */}
-                      <div className={`absolute inset-0 bg-gradient-to-r ${action.color} opacity-0 group-active:opacity-15 transition-opacity duration-150`} />
+                      <div className={`absolute inset-0 bg-gradient-to-br ${action.color} opacity-0 group-active:opacity-15 transition-opacity duration-150`} />
 
                       {/* Icon container */}
                       <motion.div
-                        className={`relative p-3 bg-gradient-to-br ${action.color} rounded-xl shadow-lg flex-shrink-0`}
+                        className={`relative p-3 bg-gradient-to-br ${action.color} rounded-xl shadow-lg`}
                         initial={{ scale: 1 }}
                         animate={{ scale: [1, 1.05, 1] }}
                         transition={{
-                          duration: 0.6,
-                          delay: index * 0.08,
+                          duration: 0.5,
+                          delay: index * 0.06,
                           ease: [0.22, 1, 0.36, 1]
                         }}
                       >
-                        <Icon className="w-5 h-5 text-white" strokeWidth={2.2} />
+                        <Icon className="w-6 h-6 text-white" strokeWidth={2.2} />
                       </motion.div>
 
                       {/* Label */}
-                      <span className="relative text-sm font-semibold text-white leading-tight flex-1 text-left">
+                      <span className="relative text-sm font-semibold text-white text-center leading-tight">
                         {action.label}
                       </span>
 
@@ -198,7 +200,7 @@ export default function FloatingActionMenu({ isOpen, onClose, onAction }) {
                         transition={{
                           duration: 2,
                           repeat: Infinity,
-                          repeatDelay: 5,
+                          repeatDelay: 6,
                           ease: 'easeInOut'
                         }}
                         style={{ pointerEvents: 'none' }}

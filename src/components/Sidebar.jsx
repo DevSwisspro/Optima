@@ -189,7 +189,7 @@ export default function Sidebar({ activeTab, setActiveTab, session, onLogout }) 
         animate={{ y: 0, opacity: 1 }}
         transition={{ type: "spring", stiffness: 100, damping: 20, delay: 0.3 }}
       >
-        <div className="relative flex items-center justify-between max-w-lg mx-auto px-6 py-2 pb-safe">
+        <div className="relative flex items-center justify-center gap-16 max-w-lg mx-auto px-6 py-2 pb-safe">
           {/* Dashboard */}
           <motion.button
             onClick={() => setActiveTab('dashboard')}
@@ -248,68 +248,39 @@ export default function Sidebar({ activeTab, setActiveTab, session, onLogout }) 
         </div>
       </motion.nav>
 
-      {/* Bouton flottant latéral droit - Actions rapides */}
+      {/* Bouton menu navigation en haut à droite */}
       <motion.button
         onClick={() => setIsActionMenuOpen(true)}
-        className="md:hidden fixed bottom-24 right-5 z-50 flex items-center justify-center w-14 h-14 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl shadow-2xl shadow-red-500/40"
-        whileTap={{ scale: 0.88 }}
-        whileHover={{ scale: 1.05 }}
-        initial={{ opacity: 0, scale: 0, x: 100 }}
+        className="md:hidden fixed top-5 right-5 z-50 flex items-center justify-center w-11 h-11 bg-gray-800/80 backdrop-blur-md rounded-xl border border-white/10 shadow-lg"
+        whileTap={{ scale: 0.92 }}
+        initial={{ opacity: 0, scale: 0.8, x: 50 }}
         animate={{
           opacity: 1,
           scale: 1,
-          x: 0,
-          boxShadow: [
-            '0 10px 30px rgba(239, 68, 68, 0.4)',
-            '0 10px 40px rgba(239, 68, 68, 0.5)',
-            '0 10px 30px rgba(239, 68, 68, 0.4)'
-          ]
+          x: 0
         }}
         transition={{
-          scale: { type: "spring", stiffness: 400, damping: 20, delay: 0.4 },
-          opacity: { duration: 0.3, delay: 0.4 },
-          x: { type: "spring", stiffness: 300, damping: 25, delay: 0.4 },
-          boxShadow: {
-            duration: 2.5,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }
+          type: "spring",
+          stiffness: 400,
+          damping: 25,
+          delay: 0.2
         }}
       >
-        {/* Pulse ring externe */}
-        <motion.div
-          className="absolute inset-0 rounded-2xl border-2 border-red-400"
-          animate={{
-            scale: [1, 1.3, 1],
-            opacity: [0.6, 0, 0.6]
-          }}
-          transition={{
-            duration: 2.5,
-            repeat: Infinity,
-            ease: "easeOut"
-          }}
-        />
-
-        {/* Glow effect subtil */}
-        <motion.div
-          className="absolute inset-0 rounded-2xl bg-red-400 blur-xl"
-          animate={{
-            scale: [1, 1.15, 1],
-            opacity: [0.4, 0.6, 0.4]
-          }}
-          transition={{
-            duration: 2.5,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-
-        <motion.div
-          animate={{ rotate: isActionMenuOpen ? 45 : 0 }}
-          transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+        {/* Icône grille 3x3 */}
+        <svg
+          className="w-5 h-5 text-gray-300"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         >
-          <Plus className="w-6 h-6 text-white relative z-10" strokeWidth={2.5} />
-        </motion.div>
+          <rect x="3" y="3" width="7" height="7" />
+          <rect x="14" y="3" width="7" height="7" />
+          <rect x="14" y="14" width="7" height="7" />
+          <rect x="3" y="14" width="7" height="7" />
+        </svg>
       </motion.button>
 
       {/* Menu flottant d'actions */}
