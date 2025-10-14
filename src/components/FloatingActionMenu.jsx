@@ -14,19 +14,22 @@ const FloatingActionMenu = React.memo(function FloatingActionMenu({ isOpen, onCl
   useEffect(() => {
     if (!isOpen) return;
 
-    let historyPushed = false;
-
     // Ajouter une entrée dans l'historique pour intercepter le retour
-    try {
-      window.history.pushState({ menuOpen: true }, '');
-      historyPushed = true;
-    } catch (e) {
-      console.warn('Could not push history state:', e);
+    const historyPushed = window.history.state?.menuOpen !== true;
+
+    if (historyPushed) {
+      try {
+        window.history.pushState({ menuOpen: true }, '');
+      } catch (e) {
+        console.warn('Could not push history state:', e);
+      }
     }
 
-    const handlePopState = () => {
-      // Fermer le menu sans condition
-      onClose();
+    const handlePopState = (event) => {
+      // Seulement fermer si on quitte l'état menuOpen
+      if (event.state?.menuOpen !== true) {
+        onClose();
+      }
     };
 
     const handleKeyDown = (event) => {
@@ -43,35 +46,30 @@ const FloatingActionMenu = React.memo(function FloatingActionMenu({ isOpen, onCl
       window.removeEventListener('popstate', handlePopState);
       window.removeEventListener('keydown', handleKeyDown);
 
-      // Nettoyer l'historique si on l'a modifié
-      if (historyPushed) {
-        try {
-          // Vérifier si l'état actuel est celui qu'on a ajouté
-          if (window.history.state?.menuOpen === true) {
-            window.history.back();
-          }
-        } catch (e) {
-          console.warn('Could not clean history state:', e);
-        }
-      }
+      // NE PAS faire history.back() ici car ça déclenche popstate
+      // L'utilisateur gère lui-même la navigation
     };
   }, [isOpen, onClose]);
 
   // Bloquer ABSOLUMENT tout le scroll et touch sur le viewport quand le menu est ouvert
   useEffect(() => {
-    if (isOpen) {
-      // Sauvegarder la position actuelle du scroll
-      const scrollY = window.scrollY;
+    if (!isOpen) return;
 
-      // Ajouter les classes de blocage
-      document.body.classList.add('menu-open');
-      document.body.style.top = `-${scrollY}px`;
+    // Sauvegarder la position actuelle du scroll
+    const scrollY = window.scrollY;
 
-      const root = document.getElementById('root');
-      if (root) {
-        root.classList.add('menu-open');
-      }
+    // Ajouter les classes de blocage
+    document.body.classList.add('menu-open');
+    document.body.style.top = `-${scrollY}px`;
 
+    const root = document.getElementById('root');
+    if (root) {
+      root.classList.add('menu-open');
+    }
+
+    // DÉLAI pour laisser le menu s'afficher AVANT de bloquer les événements
+    // Sinon le clic d'ouverture peut être capturé et provoquer une fermeture immédiate
+    const setupDelay = setTimeout(() => {
       // SOLUTION RADICALE : Bloquer TOUT par défaut sauf interactions menu
       const blockEverything = (e) => {
         // Autoriser les clics/touches dans le menu complet (pas juste le scroll)
@@ -104,16 +102,21 @@ const FloatingActionMenu = React.memo(function FloatingActionMenu({ isOpen, onCl
       document.addEventListener('touchmove', blockEverything, { passive: false, capture: true });
       document.addEventListener('touchend', blockEverything, { passive: false, capture: true });
 
-      return () => {
-        // Retirer les classes
-        document.body.classList.remove('menu-open');
-        document.body.style.top = '';
+      // Stocker les références pour le cleanup
+      window.__menuBlockers = {
+        blockEverything,
+        blockWindowScroll
+      };
+    }, 100); // 100ms de délai pour laisser le clic d'ouverture se terminer
 
-        if (root) {
-          root.classList.remove('menu-open');
-        }
+    return () => {
+      // Nettoyer le timeout si le menu se ferme avant
+      clearTimeout(setupDelay);
 
-        // Retirer tous les event listeners
+      // Retirer les event listeners s'ils ont été ajoutés
+      if (window.__menuBlockers) {
+        const { blockEverything, blockWindowScroll } = window.__menuBlockers;
+
         window.removeEventListener('touchstart', blockEverything, { capture: true });
         window.removeEventListener('touchmove', blockEverything, { capture: true });
         window.removeEventListener('touchend', blockEverything, { capture: true });
@@ -123,10 +126,20 @@ const FloatingActionMenu = React.memo(function FloatingActionMenu({ isOpen, onCl
         document.removeEventListener('touchmove', blockEverything, { capture: true });
         document.removeEventListener('touchend', blockEverything, { capture: true });
 
-        // Restaurer la position de scroll
-        window.scrollTo(0, scrollY);
-      };
-    }
+        delete window.__menuBlockers;
+      }
+
+      // Retirer les classes
+      document.body.classList.remove('menu-open');
+      document.body.style.top = '';
+
+      if (root) {
+        root.classList.remove('menu-open');
+      }
+
+      // Restaurer la position de scroll
+      window.scrollTo(0, scrollY);
+    };
   }, [isOpen]);
 
   // Mémoïser les actions pour éviter re-création à chaque render
@@ -168,6 +181,14 @@ const FloatingActionMenu = React.memo(function FloatingActionMenu({ isOpen, onCl
     onAction(actionId);
     onClose();
   }, [onAction, onClose]);
+
+  // Handler pour le backdrop avec protection contre les clics immédiats
+  const handleBackdropClick = useCallback((e) => {
+    // Vérifier que le clic vient bien du backdrop, pas d'un enfant
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  }, [onClose]);
 
   // Mémoïser les variants d'animation pour éviter re-création
   const backdropVariants = useMemo(() => ({
@@ -239,7 +260,7 @@ const FloatingActionMenu = React.memo(function FloatingActionMenu({ isOpen, onCl
             initial="hidden"
             animate="visible"
             exit="exit"
-            onClick={onClose}
+            onClick={handleBackdropClick}
             className="menu-backdrop fixed inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/80 backdrop-blur-xl z-[200]"
             style={{
               touchAction: 'auto',
