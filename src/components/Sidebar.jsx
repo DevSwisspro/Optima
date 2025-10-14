@@ -182,18 +182,18 @@ export default function Sidebar({ activeTab, setActiveTab, session, onLogout }) 
         </div>
       </motion.aside>
 
-      {/* Navigation Mobile (barre simplifiée Dashboard + Paramètres) */}
+      {/* Navigation Mobile (3 boutons: Dashboard | Menu | Paramètres) */}
       <motion.nav
         className="md:hidden fixed bottom-0 left-0 right-0 z-50 glass-strong border-t border-white/10 safe-area-bottom"
         initial={{ y: 100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ type: "spring", stiffness: 100, damping: 20, delay: 0.3 }}
       >
-        <div className="relative flex items-center justify-center gap-16 max-w-lg mx-auto px-6 py-2 pb-safe">
+        <div className="relative flex items-center justify-around max-w-lg mx-auto px-4 py-2 pb-safe">
           {/* Dashboard */}
           <motion.button
             onClick={() => setActiveTab('dashboard')}
-            className={`relative flex flex-col items-center justify-center gap-1 px-6 py-2.5 rounded-xl transition-all duration-200 ${
+            className={`relative flex flex-col items-center justify-center gap-0.5 px-4 py-2.5 rounded-xl transition-all duration-200 min-w-[70px] ${
               activeTab === 'dashboard' ? 'active:bg-primary/5' : 'active:bg-white/5'
             }`}
             whileTap={{ scale: 0.92 }}
@@ -209,12 +209,12 @@ export default function Sidebar({ activeTab, setActiveTab, session, onLogout }) 
               />
             )}
             <LayoutDashboard
-              className={`w-7 h-7 relative z-10 transition-colors ${
+              className={`w-6 h-6 relative z-10 transition-colors ${
                 activeTab === 'dashboard' ? 'text-primary drop-shadow-glow' : 'text-gray-400'
               }`}
             />
             <span
-              className={`text-xs font-semibold relative z-10 transition-colors leading-tight ${
+              className={`text-[10px] font-semibold relative z-10 transition-colors leading-tight ${
                 activeTab === 'dashboard' ? 'text-white' : 'text-gray-500'
               }`}
             >
@@ -222,7 +222,7 @@ export default function Sidebar({ activeTab, setActiveTab, session, onLogout }) 
             </span>
             {activeTab === 'dashboard' && (
               <motion.div
-                className="absolute -top-1 w-1.5 h-1.5 bg-primary rounded-full"
+                className="absolute -top-1 w-1 h-1 bg-primary rounded-full"
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ type: 'spring' }}
@@ -230,58 +230,94 @@ export default function Sidebar({ activeTab, setActiveTab, session, onLogout }) 
             )}
           </motion.button>
 
+          {/* Bouton Menu Central */}
+          <motion.button
+            onClick={() => setIsActionMenuOpen(true)}
+            className="relative flex items-center justify-center w-14 h-14 -mt-6 bg-gradient-to-br from-red-500 to-red-600 rounded-full shadow-2xl shadow-red-500/40"
+            whileTap={{ scale: 0.88 }}
+            whileHover={{ scale: 1.05 }}
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{
+              opacity: 1,
+              scale: 1,
+              boxShadow: [
+                '0 20px 50px rgba(239, 68, 68, 0.4)',
+                '0 20px 60px rgba(239, 68, 68, 0.5)',
+                '0 20px 50px rgba(239, 68, 68, 0.4)'
+              ]
+            }}
+            transition={{
+              scale: { type: "spring", stiffness: 400, damping: 20, delay: 0.15 },
+              opacity: { duration: 0.3, delay: 0.15 },
+              boxShadow: {
+                duration: 2.5,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }
+            }}
+          >
+            {/* Pulse ring externe */}
+            <motion.div
+              className="absolute inset-0 rounded-full border-2 border-red-400"
+              animate={{
+                scale: [1, 1.4, 1],
+                opacity: [0.6, 0, 0.6]
+              }}
+              transition={{
+                duration: 2.5,
+                repeat: Infinity,
+                ease: "easeOut"
+              }}
+            />
+
+            {/* Glow effect */}
+            <motion.div
+              className="absolute inset-0 rounded-full bg-red-400 blur-xl"
+              animate={{
+                scale: [1, 1.15, 1],
+                opacity: [0.4, 0.6, 0.4]
+              }}
+              transition={{
+                duration: 2.5,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            />
+
+            {/* Icône grille 3x3 */}
+            <svg
+              className="w-6 h-6 text-white relative z-10"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect x="3" y="3" width="7" height="7" />
+              <rect x="14" y="3" width="7" height="7" />
+              <rect x="14" y="14" width="7" height="7" />
+              <rect x="3" y="14" width="7" height="7" />
+            </svg>
+          </motion.button>
+
           {/* Paramètres */}
           <motion.button
             onClick={() => setIsSettingsOpen(true)}
             data-mobile-settings-btn
-            className="relative flex flex-col items-center justify-center gap-1 px-6 py-2.5 rounded-xl transition-all duration-200 active:bg-white/5"
+            className="relative flex flex-col items-center justify-center gap-0.5 px-4 py-2.5 rounded-xl transition-all duration-200 min-w-[70px] active:bg-white/5"
             whileTap={{ scale: 0.92 }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
+            transition={{ delay: 0.25 }}
           >
-            <Settings className="w-7 h-7 text-gray-400 relative z-10" />
-            <span className="text-xs font-semibold text-gray-500 leading-tight relative z-10">
+            <Settings className="w-6 h-6 text-gray-400 relative z-10" />
+            <span className="text-[10px] font-semibold text-gray-500 leading-tight relative z-10">
               Paramètres
             </span>
           </motion.button>
         </div>
       </motion.nav>
-
-      {/* Bouton menu navigation en haut à droite */}
-      <motion.button
-        onClick={() => setIsActionMenuOpen(true)}
-        className="md:hidden fixed top-5 right-5 z-50 flex items-center justify-center w-11 h-11 bg-gray-800/80 backdrop-blur-md rounded-xl border border-white/10 shadow-lg"
-        whileTap={{ scale: 0.92 }}
-        initial={{ opacity: 0, scale: 0.8, x: 50 }}
-        animate={{
-          opacity: 1,
-          scale: 1,
-          x: 0
-        }}
-        transition={{
-          type: "spring",
-          stiffness: 400,
-          damping: 25,
-          delay: 0.2
-        }}
-      >
-        {/* Icône grille 3x3 */}
-        <svg
-          className="w-5 h-5 text-gray-300"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <rect x="3" y="3" width="7" height="7" />
-          <rect x="14" y="3" width="7" height="7" />
-          <rect x="14" y="14" width="7" height="7" />
-          <rect x="3" y="14" width="7" height="7" />
-        </svg>
-      </motion.button>
 
       {/* Menu flottant d'actions */}
       <FloatingActionMenu

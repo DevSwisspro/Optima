@@ -80,7 +80,7 @@ export default function FloatingActionMenu({ isOpen, onClose, onAction }) {
   };
 
   const menuContainerVariants = {
-    hidden: { opacity: 0, y: -20, scale: 0.95 },
+    hidden: { opacity: 0, y: 30, scale: 0.9 },
     visible: {
       opacity: 1,
       y: 0,
@@ -94,8 +94,8 @@ export default function FloatingActionMenu({ isOpen, onClose, onAction }) {
     },
     exit: {
       opacity: 0,
-      y: -20,
-      scale: 0.95,
+      y: 30,
+      scale: 0.9,
       transition: {
         duration: 0.2,
         ease: [0.22, 1, 0.36, 1]
@@ -133,13 +133,13 @@ export default function FloatingActionMenu({ isOpen, onClose, onAction }) {
             style={{ touchAction: 'none' }}
           />
 
-          {/* Menu déroulant depuis le haut */}
+          {/* Menu centré au-dessus du bouton */}
           <motion.div
             variants={menuContainerVariants}
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="fixed top-20 right-4 z-[201] w-[90%] max-w-sm"
+            className="fixed left-1/2 -translate-x-1/2 bottom-28 z-[201] w-[90%] max-w-sm"
           >
             {/* Carte principale avec effet verre */}
             <div className="bg-gray-900/95 backdrop-blur-xl rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.7)] border border-white/20 overflow-hidden">
