@@ -1502,13 +1502,17 @@ rect:active,
   background: rgba(239, 68, 68, 0.5);
 }
 
-/* Bloquer le scroll bounce iOS quand menu ouvert */
+/* Bloquer ABSOLUMENT le scroll quand menu ouvert */
 body.menu-open {
   position: fixed !important;
   overflow: hidden !important;
   width: 100% !important;
   height: 100% !important;
+  left: 0 !important;
+  right: 0 !important;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: none !important;
+  touch-action: none !important;
 }
 
 #root.menu-open {
@@ -1516,4 +1520,17 @@ body.menu-open {
   overflow: hidden !important;
   width: 100% !important;
   height: 100% !important;
+  left: 0 !important;
+  right: 0 !important;
+  overscroll-behavior: none !important;
+  touch-action: none !important;
+}
+
+/* S'assurer que tous les enfants du root sont aussi figés */
+body.menu-open > * {
+  overflow: hidden !important;
+}
+
+#root.menu-open > * {
+  overflow: hidden !important;
 }

@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 
 export default function FloatingActionMenu({ isOpen, onClose, onAction }) {
-  // Bloquer complètement le scroll et le touch sur tout le viewport quand le menu est ouvert
+  // Bloquer ABSOLUMENT tout le scroll et touch sur le viewport quand le menu est ouvert
   useEffect(() => {
     if (isOpen) {
       // Sauvegarder la position actuelle du scroll
@@ -25,27 +25,34 @@ export default function FloatingActionMenu({ isOpen, onClose, onAction }) {
         root.classList.add('menu-open');
       }
 
-      // Empêcher complètement le scroll et slide sur tout sauf le menu
-      const preventScroll = (e) => {
-        // Ne bloquer que si le touch n'est pas sur le conteneur du menu
-        if (!e.target.closest('.floating-menu-scroll')) {
-          e.preventDefault();
-          e.stopPropagation();
+      // SOLUTION RADICALE : Bloquer TOUT par défaut
+      const blockEverything = (e) => {
+        // Autoriser uniquement si c'est dans le menu scrollable
+        const menuScroll = document.querySelector('.floating-menu-scroll');
+        if (menuScroll && menuScroll.contains(e.target)) {
+          // Laisser passer uniquement pour le scroll vertical dans le menu
+          return;
         }
+        // TOUT le reste est bloqué
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        return false;
       };
 
-      const preventTouch = (e) => {
-        if (!e.target.closest('.floating-menu-scroll')) {
-          e.stopPropagation();
-        }
+      // Bloquer window scroll directement
+      const blockWindowScroll = () => {
+        window.scrollTo(0, scrollY);
       };
 
-      // Bloquer tous les types d'événements
-      document.addEventListener('touchstart', preventTouch, { passive: false, capture: true });
-      document.addEventListener('touchmove', preventScroll, { passive: false, capture: true });
-      document.addEventListener('touchend', preventTouch, { passive: false, capture: true });
-      document.addEventListener('wheel', preventScroll, { passive: false, capture: true });
-      document.addEventListener('scroll', preventScroll, { passive: false, capture: true });
+      // Ajouter les event listeners avec la priorité maximale
+      window.addEventListener('touchstart', blockEverything, { passive: false, capture: true });
+      window.addEventListener('touchmove', blockEverything, { passive: false, capture: true });
+      window.addEventListener('touchend', blockEverything, { passive: false, capture: true });
+      window.addEventListener('wheel', blockEverything, { passive: false, capture: true });
+      window.addEventListener('scroll', blockWindowScroll, { passive: false, capture: true });
+      document.addEventListener('touchstart', blockEverything, { passive: false, capture: true });
+      document.addEventListener('touchmove', blockEverything, { passive: false, capture: true });
+      document.addEventListener('touchend', blockEverything, { passive: false, capture: true });
 
       return () => {
         // Retirer les classes
@@ -57,11 +64,14 @@ export default function FloatingActionMenu({ isOpen, onClose, onAction }) {
         }
 
         // Retirer tous les event listeners
-        document.removeEventListener('touchstart', preventTouch);
-        document.removeEventListener('touchmove', preventScroll);
-        document.removeEventListener('touchend', preventTouch);
-        document.removeEventListener('wheel', preventScroll);
-        document.removeEventListener('scroll', preventScroll);
+        window.removeEventListener('touchstart', blockEverything, { capture: true });
+        window.removeEventListener('touchmove', blockEverything, { capture: true });
+        window.removeEventListener('touchend', blockEverything, { capture: true });
+        window.removeEventListener('wheel', blockEverything, { capture: true });
+        window.removeEventListener('scroll', blockWindowScroll, { capture: true });
+        document.removeEventListener('touchstart', blockEverything, { capture: true });
+        document.removeEventListener('touchmove', blockEverything, { capture: true });
+        document.removeEventListener('touchend', blockEverything, { capture: true });
 
         // Restaurer la position de scroll
         window.scrollTo(0, scrollY);
@@ -171,21 +181,17 @@ export default function FloatingActionMenu({ isOpen, onClose, onAction }) {
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop premium avec blur progressif - bloque tous les événements */}
+          {/* Backdrop premium avec blur progressif */}
           <motion.div
             variants={backdropVariants}
             initial="hidden"
             animate="visible"
             exit="exit"
             onClick={onClose}
-            onTouchStart={(e) => e.preventDefault()}
-            onTouchMove={(e) => e.preventDefault()}
-            onTouchEnd={(e) => e.preventDefault()}
             className="fixed inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/80 backdrop-blur-xl z-[200]"
             style={{
               touchAction: 'none',
-              WebkitOverflowScrolling: 'touch',
-              overscrollBehavior: 'contain'
+              overscrollBehavior: 'none'
             }}
           />
 
@@ -195,16 +201,6 @@ export default function FloatingActionMenu({ isOpen, onClose, onAction }) {
             style={{
               overscrollBehavior: 'none',
               touchAction: 'none'
-            }}
-            onTouchStart={(e) => {
-              if (!e.target.closest('.floating-menu-scroll')) {
-                e.preventDefault();
-              }
-            }}
-            onTouchMove={(e) => {
-              if (!e.target.closest('.floating-menu-scroll')) {
-                e.preventDefault();
-              }
             }}
           >
             <motion.div
