@@ -1426,3 +1426,55 @@ rect:active,
     }
   }
 }
+
+/* ========================================
+   NOUVELLE NAVIGATION MOBILE - UX OPTIMISÉE
+   ======================================== */
+
+/* Effet glow pour le bouton d'actions flottant */
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 10px 30px rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    box-shadow: 0 10px 40px rgba(239, 68, 68, 0.5);
+  }
+}
+
+/* Animation smooth pour le backdrop du menu */
+@supports (backdrop-filter: blur(12px)) {
+  .floating-menu-backdrop {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+}
+
+/* Optimisations GPU pour animations fluides */
+.floating-action-button,
+.floating-menu-container,
+.mobile-nav-button {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Touch feedback premium pour actions rapides */
+@media (max-width: 768px) {
+  .floating-action-button:active {
+    transform: scale(0.92) translateZ(0);
+    transition: transform 150ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .mobile-nav-button:active {
+    transform: scale(0.94) translateZ(0);
+    transition: transform 120ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+
+/* Safe area pour notch iPhone */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .mobile-nav-safe {
+    padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
+  }
+}
