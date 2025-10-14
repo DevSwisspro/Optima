@@ -10,16 +10,49 @@ import {
 } from 'lucide-react';
 
 export default function FloatingActionMenu({ isOpen, onClose, onAction }) {
-  // Bloquer le scroll quand le menu est ouvert
+  // Bloquer complètement le scroll et le touch sur tout le viewport quand le menu est ouvert
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
+      // Sauvegarder la position actuelle du scroll
+      const scrollY = window.scrollY;
+
+      // Ajouter les classes de blocage
+      document.body.classList.add('menu-open');
+      document.body.style.top = `-${scrollY}px`;
+
+      const root = document.getElementById('root');
+      if (root) {
+        root.classList.add('menu-open');
+      }
+
+      // Empêcher le scroll avec preventDefault sur touch
+      const preventScroll = (e) => {
+        // Ne bloquer que si le touch n'est pas sur le conteneur du menu
+        if (!e.target.closest('.floating-menu-scroll')) {
+          e.preventDefault();
+        }
+      };
+
+      document.addEventListener('touchmove', preventScroll, { passive: false });
+      document.addEventListener('wheel', preventScroll, { passive: false });
+
+      return () => {
+        // Retirer les classes
+        document.body.classList.remove('menu-open');
+        document.body.style.top = '';
+
+        if (root) {
+          root.classList.remove('menu-open');
+        }
+
+        // Retirer les event listeners
+        document.removeEventListener('touchmove', preventScroll);
+        document.removeEventListener('wheel', preventScroll);
+
+        // Restaurer la position de scroll
+        window.scrollTo(0, scrollY);
+      };
     }
-    return () => {
-      document.body.style.overflow = '';
-    };
   }, [isOpen]);
 
   const actions = [
@@ -124,15 +157,22 @@ export default function FloatingActionMenu({ isOpen, onClose, onAction }) {
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop premium avec blur progressif */}
+          {/* Backdrop premium avec blur progressif - bloque tous les événements */}
           <motion.div
             variants={backdropVariants}
             initial="hidden"
             animate="visible"
             exit="exit"
             onClick={onClose}
+            onTouchStart={(e) => e.preventDefault()}
+            onTouchMove={(e) => e.preventDefault()}
+            onTouchEnd={(e) => e.preventDefault()}
             className="fixed inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/80 backdrop-blur-xl z-[200]"
-            style={{ touchAction: 'none' }}
+            style={{
+              touchAction: 'none',
+              WebkitOverflowScrolling: 'touch',
+              overscrollBehavior: 'contain'
+            }}
           />
 
           {/* Conteneur centré avec safe-area pour mobile */}
@@ -143,6 +183,7 @@ export default function FloatingActionMenu({ isOpen, onClose, onAction }) {
               animate="visible"
               exit="exit"
               className="w-full max-w-md pointer-events-auto"
+              style={{ overscrollBehavior: 'contain' }}
             >
               {/* Carte principale avec effet verre premium */}
               <div className="relative bg-gradient-to-br from-slate-900/98 via-slate-800/95 to-slate-900/98 backdrop-blur-2xl rounded-3xl shadow-[0_24px_80px_rgba(0,0,0,0.8),0_0_0_1px_rgba(255,255,255,0.1)] border border-white/[0.08] overflow-hidden">
@@ -165,7 +206,13 @@ export default function FloatingActionMenu({ isOpen, onClose, onAction }) {
                 </div>
 
                 {/* Grille de navigation premium - responsive et évolutive */}
-                <div className="grid grid-cols-2 sm:grid-cols-2 gap-3 p-5 max-h-[60vh] overflow-y-auto floating-menu-scroll">
+                <div
+                  className="grid grid-cols-2 sm:grid-cols-2 gap-3 p-5 max-h-[60vh] overflow-y-auto floating-menu-scroll"
+                  style={{
+                    overscrollBehavior: 'contain',
+                    WebkitOverflowScrolling: 'touch'
+                  }}
+                >
                   {actions.map((action, index) => {
                     const Icon = action.icon;
                     return (

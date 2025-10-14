@@ -1501,3 +1501,19 @@ rect:active,
 .floating-menu-scroll::-webkit-scrollbar-thumb:hover {
   background: rgba(239, 68, 68, 0.5);
 }
+
+/* Bloquer le scroll bounce iOS quand menu ouvert */
+body.menu-open {
+  position: fixed !important;
+  overflow: hidden !important;
+  width: 100% !important;
+  height: 100% !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+#root.menu-open {
+  position: fixed !important;
+  overflow: hidden !important;
+  width: 100% !important;
+  height: 100% !important;
+}
