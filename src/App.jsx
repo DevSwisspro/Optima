@@ -2216,7 +2216,7 @@ export default function App({ session, onLogout }) {
                       transition={{ duration: 0.35, delay: 0.15, ease: [0.25, 0.1, 0.25, 1] }}
                       value={dashboardFilter.year}
                       onChange={(e) => setDashboardFilter(prev => ({ ...prev, year: parseInt(e.target.value) }))}
-                      className="w-full card-premium-enhanced text-white text-center py-4 px-6 rounded-2xl focus:border-red-500/40 focus:ring-2 focus:ring-red-500/20 text-lg font-semibold transition-all duration-300 cursor-pointer hover:border-red-500/30"
+                      className="w-full card-premium-enhanced text-gray-900 text-center py-4 px-6 rounded-2xl focus:border-red-500/40 focus:ring-2 focus:ring-red-500/20 text-lg font-semibold transition-all duration-300 cursor-pointer hover:border-red-500/30"
                     >
                       {getAvailableYears(budgetItems).length > 0 ? getAvailableYears(budgetItems).map(year => (
                         <option key={year} value={year} className="bg-gray-800">{year}</option>
@@ -2229,7 +2229,7 @@ export default function App({ session, onLogout }) {
                       transition={{ duration: 0.35, delay: 0.22, ease: [0.25, 0.1, 0.25, 1] }}
                       value={dashboardFilter.month}
                       onChange={(e) => setDashboardFilter(prev => ({ ...prev, month: e.target.value }))}
-                      className="w-full card-premium-enhanced text-white text-center py-4 px-6 rounded-2xl focus:border-red-500/40 focus:ring-2 focus:ring-red-500/20 text-lg font-semibold transition-all duration-300 cursor-pointer hover:border-red-500/30"
+                      className="w-full card-premium-enhanced text-gray-900 text-center py-4 px-6 rounded-2xl focus:border-red-500/40 focus:ring-2 focus:ring-red-500/20 text-lg font-semibold transition-all duration-300 cursor-pointer hover:border-red-500/30"
                     >
                       <option value="all" className="bg-gray-800">Toute l'année</option>
                       {Array.from({ length: 12 }, (_, i) => (
