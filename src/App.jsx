@@ -2212,11 +2212,25 @@ export default function App({ session, onLogout }) {
                   <div className="mt-6 space-y-3 max-w-sm mx-auto">
                     <select
                       value={dashboardFilter.year}
-                      onChange={(e) => setDashboardFilter(prev => ({ ...prev, year: parseInt(e.target.value) }))}
+                      onChange={(e) => {
+                        e.stopPropagation();
+                        setDashboardFilter(prev => ({ ...prev, year: parseInt(e.target.value) }));
+                        setTimeout(() => e.target.blur(), 100);
+                      }}
+                      onBlur={(e) => {
+                        e.currentTarget.blur();
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                      onTouchEnd={(e) => {
+                        e.stopPropagation();
+                        setTimeout(() => e.target.blur(), 150);
+                      }}
                       className="w-full card-premium-enhanced text-gray-900 text-center py-4 px-6 rounded-2xl focus:border-red-500/40 focus:ring-2 focus:ring-red-500/20 text-lg font-semibold transition-all duration-150 cursor-pointer hover:border-red-500/30 active:scale-[0.98]"
                       style={{
                         WebkitTapHighlightColor: 'transparent',
-                        touchAction: 'manipulation'
+                        touchAction: 'manipulation',
+                        WebkitUserSelect: 'none',
+                        userSelect: 'none'
                       }}
                     >
                       {getAvailableYears(budgetItems).length > 0 ? getAvailableYears(budgetItems).map(year => (
@@ -2226,11 +2240,25 @@ export default function App({ session, onLogout }) {
 
                     <select
                       value={dashboardFilter.month}
-                      onChange={(e) => setDashboardFilter(prev => ({ ...prev, month: e.target.value }))}
+                      onChange={(e) => {
+                        e.stopPropagation();
+                        setDashboardFilter(prev => ({ ...prev, month: e.target.value }));
+                        setTimeout(() => e.target.blur(), 100);
+                      }}
+                      onBlur={(e) => {
+                        e.currentTarget.blur();
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                      onTouchEnd={(e) => {
+                        e.stopPropagation();
+                        setTimeout(() => e.target.blur(), 150);
+                      }}
                       className="w-full card-premium-enhanced text-gray-900 text-center py-4 px-6 rounded-2xl focus:border-red-500/40 focus:ring-2 focus:ring-red-500/20 text-lg font-semibold transition-all duration-150 cursor-pointer hover:border-red-500/30 active:scale-[0.98]"
                       style={{
                         WebkitTapHighlightColor: 'transparent',
-                        touchAction: 'manipulation'
+                        touchAction: 'manipulation',
+                        WebkitUserSelect: 'none',
+                        userSelect: 'none'
                       }}
                     >
                       <option value="all" className="bg-gray-800">Toute l'année</option>
