@@ -2224,23 +2224,48 @@ export default function App({ session, onLogout }) {
                       onFocus={(e) => {
                         e.preventDefault();
                         const scrollY = window.scrollY;
+                        const root = document.getElementById('root');
+
+                        // Verrouille body ET root
                         document.body.style.position = 'fixed';
                         document.body.style.top = `-${scrollY}px`;
                         document.body.style.width = '100%';
+                        document.body.style.overflow = 'hidden';
+
+                        if (root) {
+                          root.style.position = 'fixed';
+                          root.style.top = `-${scrollY}px`;
+                          root.style.width = '100%';
+                          root.style.overflow = 'hidden';
+                        }
                       }}
                       onBlur={() => {
                         const scrollY = document.body.style.top;
+                        const root = document.getElementById('root');
+
+                        // Déverrouille tout
                         document.body.style.position = '';
                         document.body.style.top = '';
                         document.body.style.width = '';
+                        document.body.style.overflow = '';
+
+                        if (root) {
+                          root.style.position = '';
+                          root.style.top = '';
+                          root.style.width = '';
+                          root.style.overflow = '';
+                        }
+
                         window.scrollTo(0, parseInt(scrollY || '0') * -1);
                       }}
-                      className="w-full card-premium-enhanced text-gray-900 text-center py-4 px-6 rounded-2xl focus:border-red-500/40 focus:ring-2 focus:ring-red-500/20 text-lg font-semibold transition-all duration-150 cursor-pointer hover:border-red-500/30 active:scale-[0.98]"
+                      className="w-full card-premium-enhanced text-gray-900 text-center py-4 px-6 rounded-2xl text-lg font-semibold transition-none cursor-pointer hover:border-red-500/30"
                       style={{
                         WebkitTapHighlightColor: 'transparent',
                         touchAction: 'manipulation',
                         position: 'relative',
-                        zIndex: 10
+                        zIndex: 10,
+                        outline: 'none',
+                        boxShadow: 'none'
                       }}
                     >
                       {getAvailableYears(budgetItems).length > 0 ? getAvailableYears(budgetItems).map(year => (
@@ -2254,23 +2279,48 @@ export default function App({ session, onLogout }) {
                       onFocus={(e) => {
                         e.preventDefault();
                         const scrollY = window.scrollY;
+                        const root = document.getElementById('root');
+
+                        // Verrouille body ET root
                         document.body.style.position = 'fixed';
                         document.body.style.top = `-${scrollY}px`;
                         document.body.style.width = '100%';
+                        document.body.style.overflow = 'hidden';
+
+                        if (root) {
+                          root.style.position = 'fixed';
+                          root.style.top = `-${scrollY}px`;
+                          root.style.width = '100%';
+                          root.style.overflow = 'hidden';
+                        }
                       }}
                       onBlur={() => {
                         const scrollY = document.body.style.top;
+                        const root = document.getElementById('root');
+
+                        // Déverrouille tout
                         document.body.style.position = '';
                         document.body.style.top = '';
                         document.body.style.width = '';
+                        document.body.style.overflow = '';
+
+                        if (root) {
+                          root.style.position = '';
+                          root.style.top = '';
+                          root.style.width = '';
+                          root.style.overflow = '';
+                        }
+
                         window.scrollTo(0, parseInt(scrollY || '0') * -1);
                       }}
-                      className="w-full card-premium-enhanced text-gray-900 text-center py-4 px-6 rounded-2xl focus:border-red-500/40 focus:ring-2 focus:ring-red-500/20 text-lg font-semibold transition-all duration-150 cursor-pointer hover:border-red-500/30 active:scale-[0.98]"
+                      className="w-full card-premium-enhanced text-gray-900 text-center py-4 px-6 rounded-2xl text-lg font-semibold transition-none cursor-pointer hover:border-red-500/30"
                       style={{
                         WebkitTapHighlightColor: 'transparent',
                         touchAction: 'manipulation',
                         position: 'relative',
-                        zIndex: 10
+                        zIndex: 10,
+                        outline: 'none',
+                        boxShadow: 'none'
                       }}
                     >
                       <option value="all" className="bg-gray-800">Toute l'année</option>
