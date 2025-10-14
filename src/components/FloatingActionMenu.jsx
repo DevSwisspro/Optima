@@ -10,6 +10,43 @@ import {
 } from 'lucide-react';
 
 export default function FloatingActionMenu({ isOpen, onClose, onAction }) {
+  // Gérer le bouton retour système (Android/iOS) et touche Échap (desktop)
+  useEffect(() => {
+    if (isOpen) {
+      // Ajouter une entrée dans l'historique pour intercepter le retour
+      window.history.pushState({ menuOpen: true }, '');
+
+      const handlePopState = (event) => {
+        // Si le menu est ouvert et qu'on détecte un retour, fermer le menu
+        if (isOpen) {
+          event.preventDefault();
+          onClose();
+          // Ne pas laisser le navigateur revenir en arrière
+          window.history.pushState({ menuOpen: false }, '');
+        }
+      };
+
+      const handleKeyDown = (event) => {
+        // Fermer avec la touche Échap
+        if (event.key === 'Escape' && isOpen) {
+          onClose();
+        }
+      };
+
+      window.addEventListener('popstate', handlePopState);
+      window.addEventListener('keydown', handleKeyDown);
+
+      return () => {
+        window.removeEventListener('popstate', handlePopState);
+        window.removeEventListener('keydown', handleKeyDown);
+        // Nettoyer l'historique si le menu se ferme autrement
+        if (window.history.state?.menuOpen) {
+          window.history.back();
+        }
+      };
+    }
+  }, [isOpen, onClose]);
+
   // Bloquer ABSOLUMENT tout le scroll et touch sur le viewport quand le menu est ouvert
   useEffect(() => {
     if (isOpen) {
