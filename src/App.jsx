@@ -2184,6 +2184,30 @@ export default function App({ session, onLogout }) {
         onLogout={onLogout}
       />
 
+      {/* Barre de titre de page fixe (mobile only) - Sous OPTIMA */}
+      <div className="md:hidden page-title-bar">
+        <div className="flex items-center justify-center gap-3">
+          <div className="p-2 bg-gradient-to-br from-red-500/20 to-red-600/20 rounded-xl border border-red-500/30">
+            {activeTab === "dashboard" && <BarChart3 className="w-5 h-5 text-red-400" strokeWidth={2.5} />}
+            {activeTab === "tasks" && <List className="w-5 h-5 text-red-400" strokeWidth={2.5} />}
+            {activeTab === "notes" && <FileText className="w-5 h-5 text-red-400" strokeWidth={2.5} />}
+            {activeTab === "shopping" && <ShoppingCart className="w-5 h-5 text-red-400" strokeWidth={2.5} />}
+            {activeTab === "budget" && <Wallet className="w-5 h-5 text-red-400" strokeWidth={2.5} />}
+            {activeTab === "budget-dashboard" && <BarChart3 className="w-5 h-5 text-red-400" strokeWidth={2.5} />}
+            {activeTab === "media" && <Play className="w-5 h-5 text-red-400" strokeWidth={2.5} />}
+          </div>
+          <h2 className="text-lg font-semibold text-white/95 tracking-tight">
+            {activeTab === "dashboard" && "Dashboard"}
+            {activeTab === "tasks" && "Mes Tâches"}
+            {activeTab === "notes" && "Mes Notes"}
+            {activeTab === "shopping" && "Mes Courses"}
+            {activeTab === "budget" && "Mon Budget"}
+            {activeTab === "budget-dashboard" && "Budget Avancé"}
+            {activeTab === "media" && "Mes Médias"}
+          </h2>
+        </div>
+      </div>
+
       {/* Conteneur principal avec scroll mobile optimisé */}
       <div className="mobile-scroll-container md:overflow-visible md:relative md:top-auto md:left-auto md:right-auto md:bottom-auto md:position-relative">
 
@@ -2201,15 +2225,6 @@ export default function App({ session, onLogout }) {
               <div
                 className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-10 space-y-8 md:space-y-12"
               >
-              {/* Mobile Section Title */}
-              <div className="md:hidden mb-6 py-4 px-4">
-                <div className="flex items-center justify-center gap-2">
-                  <div className="p-1.5 bg-gradient-to-br from-red-500 to-red-600 rounded-lg">
-                    <BarChart3 className="w-4 h-4 text-white" strokeWidth={2.5} />
-                  </div>
-                  <h2 className="text-base font-bold text-white">Dashboard</h2>
-                </div>
-              </div>
               {/* Header Dashboard - Mobile vs Desktop */}
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
@@ -4173,15 +4188,6 @@ export default function App({ session, onLogout }) {
 
           {activeTab === "tasks" && (
             <PageTransition pageKey="tasks">
-              {/* Mobile Section Title */}
-              <div className="md:hidden mb-6 py-4 px-4">
-                <div className="flex items-center justify-center gap-2">
-                  <div className="p-1.5 bg-gradient-to-br from-red-500 to-red-600 rounded-lg">
-                    <List className="w-4 h-4 text-white" strokeWidth={2.5} />
-                  </div>
-                  <h2 className="text-base font-bold text-white">Tasks</h2>
-                </div>
-              </div>
               {/* Header Tâches - Mobile vs Desktop harmonisé */}
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
@@ -4465,15 +4471,6 @@ export default function App({ session, onLogout }) {
 
           {activeTab === "notes" && (
             <PageTransition pageKey="notes">
-              {/* Mobile Section Title */}
-              <div className="md:hidden mb-6 py-4 px-4">
-                <div className="flex items-center justify-center gap-2">
-                  <div className="p-1.5 bg-gradient-to-br from-red-500 to-red-600 rounded-lg">
-                    <FileText className="w-4 h-4 text-white" strokeWidth={2.5} />
-                  </div>
-                  <h2 className="text-base font-bold text-white">Notes</h2>
-                </div>
-              </div>
               {/* Header Notes - Mobile vs Desktop harmonisé */}
 
               {/* Mobile Header - Sticky en haut du scroll container */}
@@ -4748,15 +4745,6 @@ export default function App({ session, onLogout }) {
         {/* Section des courses */}
         {activeTab === "shopping" && (
           <PageTransition pageKey="shopping">
-            {/* Mobile Section Title */}
-            <div className="md:hidden mb-6 py-4 px-4">
-              <div className="flex items-center justify-center gap-2">
-                <div className="p-1.5 bg-gradient-to-br from-red-500 to-red-600 rounded-lg">
-                  <ShoppingCart className="w-4 h-4 text-white" strokeWidth={2.5} />
-                </div>
-                <h2 className="text-base font-bold text-white">Shopping</h2>
-              </div>
-            </div>
             {/* Header Courses - Mobile vs Desktop harmonisé */}
 
             {/* Mobile Header - Sticky en haut du scroll container */}
@@ -4995,15 +4983,6 @@ export default function App({ session, onLogout }) {
         {/* Onglet Budget */}
         {activeTab === "budget" && (
           <PageTransition pageKey="budget">
-            {/* Mobile Section Title */}
-            <div className="md:hidden mb-6 py-4 px-4">
-              <div className="flex items-center justify-center gap-2">
-                <div className="p-1.5 bg-gradient-to-br from-red-500 to-red-600 rounded-lg">
-                  <Wallet className="w-4 h-4 text-white" strokeWidth={2.5} />
-                </div>
-                <h2 className="text-base font-bold text-white">Budget</h2>
-              </div>
-            </div>
             {/* Header Budget - Mobile vs Desktop harmonisé */}
 
             {/* Mobile Header - Sticky en haut du scroll container */}

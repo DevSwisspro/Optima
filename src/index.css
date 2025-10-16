@@ -1614,10 +1614,25 @@ body.menu-open > * {
     scroll-behavior: smooth;
   }
 
+  /* Zone de titre de page fixe sous OPTIMA (mobile uniquement) */
+  .page-title-bar {
+    position: fixed;
+    top: 88px; /* Hauteur du header OPTIMA */
+    left: 0;
+    right: 0;
+    z-index: 40; /* En dessous du header OPTIMA (z-50) mais au-dessus du contenu */
+    background: linear-gradient(180deg, rgba(15, 15, 20, 0.98) 0%, rgba(25, 25, 35, 0.95) 100%);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 20px 16px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+  }
+
   /* Conteneur principal avec scroll isolé sur mobile */
   .mobile-scroll-container {
     position: fixed;
-    top: 88px; /* Hauteur du header OPTIMA */
+    top: 152px; /* Hauteur du header OPTIMA (88px) + barre de titre (64px) */
     left: 0;
     right: 0;
     bottom: 64px; /* Hauteur de la bottom nav */
