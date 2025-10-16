@@ -2087,29 +2087,36 @@ export default function App({ session, onLogout }) {
   const TaskRow = ({ t }) => (
     <motion.div
       layout
-      initial={{ opacity: 0, x: -20, scale: 0.95 }}
-      animate={{ opacity: 1, x: 0, scale: 1 }}
-      exit={{ opacity: 0, x: 20, scale: 0.95 }}
-      transition={{ duration: 0.2 }}
-      className={`group relative rounded-xl bg-gradient-to-br from-gray-900/90 to-gray-800/90 border border-white/10 hover:border-red-500/30 transition-all duration-300 ${
+      initial={{ opacity: 0, y: 20, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -20, scale: 0.95 }}
+      transition={{
+        duration: 0.4,
+        ease: [0.25, 0.1, 0.25, 1],
+        layout: { duration: 0.3 }
+      }}
+      className={`group relative rounded-2xl bg-gradient-to-br from-gray-900/95 to-gray-800/95 border border-white/10 hover:border-red-500/40 transition-all duration-300 mb-4 ${
         t.completed ? "opacity-60" : ""
       }`}
+      style={{
+        boxShadow: '0 8px 16px -4px rgba(0, 0, 0, 0.4), 0 4px 8px -2px rgba(0, 0, 0, 0.3)'
+      }}
     >
-      <div className="relative flex items-center gap-4 p-4 md:p-5">
+      <div className="relative flex items-center gap-4 sm:gap-5 p-5 sm:p-6 md:p-6">
         {/* Bouton de complétion */}
         <motion.button
           onClick={() => completeTask(t.id)}
           whileTap={{ scale: 0.9 }}
           whileHover={{ scale: 1.1 }}
           transition={{ type: "spring", stiffness: 400, damping: 17 }}
-          className="flex-shrink-0 w-10 h-10 md:w-11 md:h-11 rounded-xl bg-gradient-to-br from-red-500 to-red-600 hover:from-red-400 hover:to-red-500 shadow-lg hover:shadow-red-500/50 transition-all duration-300 flex items-center justify-center"
+          className="flex-shrink-0 w-11 h-11 sm:w-12 sm:h-12 md:w-12 md:h-12 rounded-xl bg-gradient-to-br from-red-500 to-red-600 hover:from-red-400 hover:to-red-500 shadow-lg hover:shadow-red-500/50 transition-all duration-300 flex items-center justify-center"
         >
-          <Check className="w-5 h-5 md:w-6 md:h-6 text-white" />
+          <Check className="w-5 h-5 sm:w-6 sm:h-6 md:w-6 md:h-6 text-white" />
         </motion.button>
 
         {/* Contenu de la tâche */}
-        <div className="flex-1 min-w-0 flex items-center justify-between gap-4">
-          <span className="text-base md:text-lg font-medium text-white break-words leading-relaxed">
+        <div className="flex-1 min-w-0 flex items-center justify-between gap-4 sm:gap-5">
+          <span className="text-base sm:text-lg md:text-lg font-medium text-white break-words leading-relaxed sm:leading-loose" style={{ lineHeight: '1.8' }}>
             {t.text}
           </span>
 
@@ -2122,9 +2129,9 @@ export default function App({ session, onLogout }) {
 
       {/* Effet de lueur au survol */}
       <div
-        className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+        className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
         style={{
-          background: 'linear-gradient(90deg, transparent 0%, rgba(239, 68, 68, 0.05) 50%, transparent 100%)'
+          background: 'linear-gradient(90deg, transparent 0%, rgba(239, 68, 68, 0.08) 50%, transparent 100%)'
         }}
       />
     </motion.div>
@@ -4409,7 +4416,7 @@ export default function App({ session, onLogout }) {
                             </span>
                           </div>
                         </div>
-                        <div className="flex flex-col mobile-spacing">
+                        <div className="flex flex-col space-y-0 pt-2">
                           <AnimatePresence mode="popLayout">
                             {tasksByPriority.urgent.map((t, index) => <TaskRow key={t.id} t={t} />)}
                           </AnimatePresence>
@@ -4446,7 +4453,7 @@ export default function App({ session, onLogout }) {
                             </span>
                           </div>
                         </div>
-                        <div className="flex flex-col mobile-spacing">
+                        <div className="flex flex-col space-y-0 pt-2">
                           <AnimatePresence mode="popLayout">
                             {tasksByPriority.normal.map((t, index) => <TaskRow key={t.id} t={t} />)}
                           </AnimatePresence>
