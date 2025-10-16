@@ -1573,4 +1573,29 @@ body.menu-open > * {
     contain: layout style paint;
     content-visibility: auto;
   }
+
+  /* Scrollbar personnalisé pour les listes de tâches */
+  *::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: rgba(239, 68, 68, 0.3);
+    border-radius: 3px;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: rgba(239, 68, 68, 0.5);
+  }
+
+  /* Optimiser le scroll touch sur mobile */
+  .task-scroll-container {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+    scroll-behavior: smooth;
+  }
 }

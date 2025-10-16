@@ -2087,36 +2087,45 @@ export default function App({ session, onLogout }) {
   const TaskRow = ({ t }) => (
     <motion.div
       layout
-      initial={{ opacity: 0, y: 20, scale: 0.95 }}
+      initial={{ opacity: 0, y: 20, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: -20, scale: 0.95 }}
+      exit={{ opacity: 0, y: -20, scale: 0.98 }}
       transition={{
-        duration: 0.4,
-        ease: [0.25, 0.1, 0.25, 1],
+        duration: 0.35,
+        ease: [0.22, 1, 0.36, 1],
         layout: { duration: 0.3 }
       }}
-      className={`group relative rounded-2xl bg-gradient-to-br from-gray-900/95 to-gray-800/95 border border-white/10 hover:border-red-500/40 transition-all duration-300 mb-4 ${
+      className={`group relative rounded-2xl backdrop-blur-sm border border-white/15 hover:border-red-500/50 transition-all duration-300 mb-3 md:mb-4 ${
         t.completed ? "opacity-60" : ""
       }`}
       style={{
-        boxShadow: '0 8px 16px -4px rgba(0, 0, 0, 0.4), 0 4px 8px -2px rgba(0, 0, 0, 0.3)'
+        background: 'linear-gradient(135deg, rgba(30, 30, 40, 0.98) 0%, rgba(20, 20, 30, 0.95) 100%)',
+        boxShadow: '0 4px 12px -2px rgba(0, 0, 0, 0.5), 0 2px 6px -1px rgba(0, 0, 0, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.05)',
+        WebkitBackdropFilter: 'blur(8px)',
+        touchAction: 'manipulation'
       }}
     >
-      <div className="relative flex items-center gap-4 sm:gap-5 p-5 sm:p-6 md:p-6">
+      <div className="relative flex items-center gap-3 sm:gap-4 p-4 sm:p-5 md:p-5">
         {/* Bouton de complétion */}
         <motion.button
           onClick={() => completeTask(t.id)}
-          whileTap={{ scale: 0.9 }}
-          whileHover={{ scale: 1.1 }}
-          transition={{ type: "spring", stiffness: 400, damping: 17 }}
-          className="flex-shrink-0 w-11 h-11 sm:w-12 sm:h-12 md:w-12 md:h-12 rounded-xl bg-gradient-to-br from-red-500 to-red-600 hover:from-red-400 hover:to-red-500 shadow-lg hover:shadow-red-500/50 transition-all duration-300 flex items-center justify-center"
+          whileTap={{ scale: 0.92 }}
+          whileHover={{ scale: 1.08 }}
+          transition={{ type: "spring", stiffness: 500, damping: 20 }}
+          className="flex-shrink-0 w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-red-500 to-red-600 hover:from-red-400 hover:to-red-500 shadow-md hover:shadow-red-500/40 transition-all duration-200 flex items-center justify-center"
         >
-          <Check className="w-5 h-5 sm:w-6 sm:h-6 md:w-6 md:h-6 text-white" />
+          <Check className="w-5 h-5 sm:w-6 sm:h-6 text-white" strokeWidth={2.5} />
         </motion.button>
 
         {/* Contenu de la tâche */}
-        <div className="flex-1 min-w-0 flex items-center justify-between gap-4 sm:gap-5">
-          <span className="text-base sm:text-lg md:text-lg font-medium text-white break-words leading-relaxed sm:leading-loose" style={{ lineHeight: '1.8' }}>
+        <div className="flex-1 min-w-0 flex items-center justify-between gap-3 sm:gap-4">
+          <span
+            className="text-[15px] sm:text-base md:text-lg font-medium text-white/95 break-words"
+            style={{
+              lineHeight: '1.6',
+              letterSpacing: '-0.01em'
+            }}
+          >
             {t.text}
           </span>
 
@@ -2127,11 +2136,11 @@ export default function App({ session, onLogout }) {
         </div>
       </div>
 
-      {/* Effet de lueur au survol */}
+      {/* Subtle shine effect on hover */}
       <div
         className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
         style={{
-          background: 'linear-gradient(90deg, transparent 0%, rgba(239, 68, 68, 0.08) 50%, transparent 100%)'
+          background: 'linear-gradient(135deg, transparent 0%, rgba(239, 68, 68, 0.06) 50%, transparent 100%)'
         }}
       />
     </motion.div>
@@ -4369,7 +4378,14 @@ export default function App({ session, onLogout }) {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.8 }}
-                className="glass-dark rounded-3xl p-6 min-h-96 neo-shadow border border-white/20 card-premium"
+                className="glass-dark rounded-3xl p-4 md:p-6 min-h-96 neo-shadow border border-white/20 card-premium"
+                style={{
+                  maxHeight: 'calc(100vh - 320px)',
+                  overflowY: 'auto',
+                  WebkitOverflowScrolling: 'touch',
+                  scrollbarWidth: 'thin',
+                  scrollbarColor: 'rgba(239, 68, 68, 0.3) transparent'
+                }}
               >
                 {(tasksByPriority.urgent.length === 0 && tasksByPriority.normal.length === 0) ? (
                   <div
