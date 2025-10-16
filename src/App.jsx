@@ -2087,43 +2087,48 @@ export default function App({ session, onLogout }) {
   const TaskRow = ({ t }) => (
     <motion.div
       layout
-      initial={{ opacity: 0, y: 20, scale: 0.98 }}
+      initial={{ opacity: 0, y: 24, scale: 0.97 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: -20, scale: 0.98 }}
+      exit={{ opacity: 0, y: -24, scale: 0.97, transition: { duration: 0.2 } }}
       transition={{
-        duration: 0.35,
-        ease: [0.22, 1, 0.36, 1],
-        layout: { duration: 0.3 }
+        duration: 0.45,
+        ease: [0.19, 1, 0.22, 1],
+        layout: { duration: 0.35, ease: [0.19, 1, 0.22, 1] }
       }}
-      className={`group relative rounded-2xl backdrop-blur-sm border border-white/15 hover:border-red-500/50 transition-all duration-300 mb-3 md:mb-4 ${
-        t.completed ? "opacity-60" : ""
+      className={`group relative rounded-[20px] backdrop-blur-md border border-white/[0.12] hover:border-red-500/60 active:scale-[0.98] transition-all duration-200 mb-4 ${
+        t.completed ? "opacity-50" : ""
       }`}
       style={{
-        background: 'linear-gradient(135deg, rgba(30, 30, 40, 0.98) 0%, rgba(20, 20, 30, 0.95) 100%)',
-        boxShadow: '0 4px 12px -2px rgba(0, 0, 0, 0.5), 0 2px 6px -1px rgba(0, 0, 0, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.05)',
-        WebkitBackdropFilter: 'blur(8px)',
-        touchAction: 'manipulation'
+        background: 'linear-gradient(145deg, rgba(32, 33, 42, 0.97) 0%, rgba(22, 23, 32, 0.95) 100%)',
+        boxShadow: '0 2px 16px -4px rgba(0, 0, 0, 0.6), 0 8px 24px -8px rgba(0, 0, 0, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.08)',
+        WebkitBackdropFilter: 'blur(12px)',
+        touchAction: 'manipulation',
+        WebkitTapHighlightColor: 'transparent'
       }}
     >
-      <div className="relative flex items-center gap-3 sm:gap-4 p-4 sm:p-5 md:p-5">
-        {/* Bouton de complétion */}
+      <div className="relative flex items-center gap-4 p-5 sm:p-6">
+        {/* Bouton de complétion - Style Todoist */}
         <motion.button
           onClick={() => completeTask(t.id)}
-          whileTap={{ scale: 0.92 }}
-          whileHover={{ scale: 1.08 }}
-          transition={{ type: "spring", stiffness: 500, damping: 20 }}
-          className="flex-shrink-0 w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-red-500 to-red-600 hover:from-red-400 hover:to-red-500 shadow-md hover:shadow-red-500/40 transition-all duration-200 flex items-center justify-center"
+          whileTap={{ scale: 0.88 }}
+          whileHover={{ scale: 1.05 }}
+          transition={{ type: "spring", stiffness: 600, damping: 25 }}
+          className="flex-shrink-0 w-[52px] h-[52px] sm:w-14 sm:h-14 rounded-[16px] bg-gradient-to-br from-red-500 via-red-600 to-red-700 hover:from-red-400 hover:via-red-500 hover:to-red-600 shadow-lg hover:shadow-red-500/50 active:shadow-md transition-shadow duration-200 flex items-center justify-center"
+          style={{
+            boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3), inset 0 -2px 4px rgba(0, 0, 0, 0.2)'
+          }}
         >
-          <Check className="w-5 h-5 sm:w-6 sm:h-6 text-white" strokeWidth={2.5} />
+          <Check className="w-6 h-6 sm:w-7 sm:h-7 text-white" strokeWidth={3} />
         </motion.button>
 
         {/* Contenu de la tâche */}
-        <div className="flex-1 min-w-0 flex items-center justify-between gap-3 sm:gap-4">
+        <div className="flex-1 min-w-0 flex items-center justify-between gap-4">
           <span
-            className="text-[15px] sm:text-base md:text-lg font-medium text-white/95 break-words"
+            className="text-[16px] sm:text-[17px] md:text-lg font-medium text-white/96 break-words"
             style={{
-              lineHeight: '1.6',
-              letterSpacing: '-0.01em'
+              lineHeight: '1.5',
+              letterSpacing: '-0.02em',
+              fontWeight: 500
             }}
           >
             {t.text}
@@ -2136,18 +2141,18 @@ export default function App({ session, onLogout }) {
         </div>
       </div>
 
-      {/* Subtle shine effect on hover */}
+      {/* Subtle glow on hover */}
       <div
-        className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+        className="absolute inset-0 rounded-[20px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
         style={{
-          background: 'linear-gradient(135deg, transparent 0%, rgba(239, 68, 68, 0.06) 50%, transparent 100%)'
+          background: 'radial-gradient(circle at 50% 0%, rgba(239, 68, 68, 0.08) 0%, transparent 70%)'
         }}
       />
     </motion.div>
   );
 
   return (
-    <div className="min-h-screen gradient-dark text-white relative overflow-x-hidden">
+    <div className="min-h-screen gradient-dark text-white relative">
       {/* Header Desktop Premium */}
       <Header session={session} onLogout={onLogout} />
 
@@ -2165,14 +2170,17 @@ export default function App({ session, onLogout }) {
         onLogout={onLogout}
       />
 
-      {/* Pull to Refresh (mobile only) */}
-      <PullToRefresh onRefresh={async () => {
-        // Simuler un refresh (recharger les données du localStorage)
-        await new Promise(resolve => setTimeout(resolve, 800));
-        window.location.reload();
-      }}>
-        <div className="max-w-7xl mx-auto space-y-4 md:space-y-6 pb-24 md:pb-8 px-4 sm:px-6 lg:px-8 md:ml-20 pt-[5.5rem] md:pt-0">
-          {/* Contenu Principal avec Transitions Fluides */}
+      {/* Conteneur principal avec scroll mobile optimisé */}
+      <div className="mobile-scroll-container md:overflow-visible md:relative md:top-auto md:left-auto md:right-auto md:bottom-auto md:position-relative">
+
+        {/* Pull to Refresh (mobile only) */}
+        <PullToRefresh onRefresh={async () => {
+          // Simuler un refresh (recharger les données du localStorage)
+          await new Promise(resolve => setTimeout(resolve, 800));
+          window.location.reload();
+        }}>
+          <div className="max-w-7xl mx-auto space-y-4 md:space-y-6 pb-6 md:pb-8 px-4 sm:px-6 lg:px-8 md:ml-20 md:pt-0">
+            {/* Contenu Principal avec Transitions Fluides */}
         
           {activeTab === "dashboard" && (
             <PageTransition pageKey="dashboard">
@@ -4378,14 +4386,7 @@ export default function App({ session, onLogout }) {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.8 }}
-                className="glass-dark rounded-3xl p-4 md:p-6 min-h-96 neo-shadow border border-white/20 card-premium"
-                style={{
-                  maxHeight: 'calc(100vh - 320px)',
-                  overflowY: 'auto',
-                  WebkitOverflowScrolling: 'touch',
-                  scrollbarWidth: 'thin',
-                  scrollbarColor: 'rgba(239, 68, 68, 0.3) transparent'
-                }}
+                className="glass-dark rounded-3xl p-5 md:p-6 min-h-96 neo-shadow border border-white/20 card-premium"
               >
                 {(tasksByPriority.urgent.length === 0 && tasksByPriority.normal.length === 0) ? (
                   <div
@@ -6615,7 +6616,8 @@ export default function App({ session, onLogout }) {
           </div>
         </footer>
       </div>
-      </PullToRefresh>
+        </PullToRefresh>
+      </div>
 
       {/* Menu priorité fixed - affiché au-dessus de tous les éléments */}
       {showPriorityMenu && (

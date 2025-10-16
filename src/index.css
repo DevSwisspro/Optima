@@ -1555,6 +1555,21 @@ body.menu-open > * {
   overflow: hidden !important;
 }
 
+/* Bloquer le scroll du body sur mobile pour isoler le scroll du contenu */
+@media (max-width: 768px) {
+  body {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+  }
+
+  #root {
+    overflow: hidden;
+    height: 100vh;
+  }
+}
+
 /* Optimisations de rendu mobile */
 @media (max-width: 768px) {
   /* Réduire le coût des backdrop-blur sur mobile */
@@ -1597,5 +1612,34 @@ body.menu-open > * {
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: contain;
     scroll-behavior: smooth;
+  }
+
+  /* Conteneur principal avec scroll isolé sur mobile */
+  .mobile-scroll-container {
+    position: fixed;
+    top: 88px; /* Hauteur du header OPTIMA */
+    left: 0;
+    right: 0;
+    bottom: 64px; /* Hauteur de la bottom nav */
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    will-change: scroll-position;
+    overscroll-behavior-y: contain;
+  }
+
+  /* Scrollbar personnalisée pour le conteneur principal */
+  .mobile-scroll-container::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .mobile-scroll-container::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .mobile-scroll-container::-webkit-scrollbar-thumb {
+    background: rgba(239, 68, 68, 0.25);
+    border-radius: 2px;
   }
 }
