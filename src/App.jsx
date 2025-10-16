@@ -4215,13 +4215,30 @@ export default function App({ session, onLogout }) {
                 transition={{ duration: 0.5 }}
                 className="text-center"
               >
-                {/* Mobile Header - Version ultra-compacte */}
-                <div className="md:hidden text-center mb-4">
+                {/* Mobile Header - Sticky sous le header OPTIMA */}
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.2 }}
+                  className="md:hidden sticky z-40 -mx-4 sm:-mx-6 px-4 sm:px-6 py-4 mb-4"
+                  style={{
+                    top: '88px', // Hauteur du header OPTIMA
+                    background: 'linear-gradient(180deg, rgba(10, 10, 15, 0.98) 0%, rgba(20, 20, 30, 0.95) 100%)',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                    borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)'
+                  }}
+                >
                   <div className="flex items-center justify-center gap-2">
-                    <List className="w-5 h-5 text-red-400" />
-                    <h2 className="text-lg font-bold text-white">Mes Tâches</h2>
+                    <div className="p-1.5 bg-gradient-to-br from-red-500 to-red-600 rounded-lg" style={{
+                      boxShadow: '0 2px 8px rgba(239, 68, 68, 0.35)'
+                    }}>
+                      <List className="w-4 h-4 text-white" strokeWidth={2.5} />
+                    </div>
+                    <h2 className="text-base font-bold text-white tracking-wide">Mes Tâches</h2>
                   </div>
-                </div>
+                </motion.div>
 
                 {/* Desktop Header - Style Dashboard */}
                 <div className="hidden md:block">
