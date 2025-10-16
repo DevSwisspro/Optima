@@ -5,7 +5,7 @@ import { Settings } from 'lucide-react';
 export default function MobileHeader({ onSettingsClick }) {
   return (
     <motion.header
-      className="md:hidden fixed top-0 left-0 right-0 z-40 backdrop-blur-xl border-b border-white/10"
+      className="md:hidden fixed top-0 left-0 right-0 z-50 backdrop-blur-xl border-b border-white/10"
       initial={{ y: -50, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{

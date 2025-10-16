@@ -2067,18 +2067,23 @@ export default function App({ session, onLogout }) {
 
   const PriorityBadge = ({ p }) => (
     <div
-      className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold shadow-md border transition-all duration-200 ${
-        p === "urgent" ? "bg-red-500/20 text-red-400 border-red-500/40" :
-        p === "normal" ? "bg-orange-500/20 text-orange-400 border-orange-500/40" :
-        "bg-gray-500/20 text-gray-400 border-gray-500/40"
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition-all duration-200 ${
+        p === "urgent" ? "bg-red-500/15 text-red-400/90 border-red-500/30" :
+        p === "normal" ? "bg-orange-500/15 text-orange-400/90 border-orange-500/30" :
+        "bg-gray-500/15 text-gray-400/90 border-gray-500/30"
       }`}
+      style={{
+        boxShadow: p === "urgent"
+          ? '0 1px 4px rgba(239, 68, 68, 0.15)'
+          : '0 1px 4px rgba(251, 146, 60, 0.15)'
+      }}
     >
-      <div className={`w-2 h-2 rounded-full ${
+      <div className={`w-1.5 h-1.5 rounded-full ${
         p === "urgent" ? "bg-red-500" :
         p === "normal" ? "bg-orange-500" :
         "bg-gray-500"
       }`}></div>
-      <span className="whitespace-nowrap">
+      <span className="whitespace-nowrap tracking-wide uppercase">
         {PRIORITY_LABELS[p]}
       </span>
     </div>
@@ -2106,35 +2111,40 @@ export default function App({ session, onLogout }) {
         WebkitTapHighlightColor: 'transparent'
       }}
     >
-      <div className="relative flex items-center gap-4 p-5 sm:p-6">
-        {/* Bouton de complétion - Style Todoist */}
+      <div className="relative flex items-center gap-3 sm:gap-4 p-4 sm:p-5">
+        {/* Bouton de complétion - Compact et élégant */}
         <motion.button
           onClick={() => completeTask(t.id)}
-          whileTap={{ scale: 0.88 }}
-          whileHover={{ scale: 1.05 }}
-          transition={{ type: "spring", stiffness: 600, damping: 25 }}
-          className="flex-shrink-0 w-[52px] h-[52px] sm:w-14 sm:h-14 rounded-[16px] bg-gradient-to-br from-red-500 via-red-600 to-red-700 hover:from-red-400 hover:via-red-500 hover:to-red-600 shadow-lg hover:shadow-red-500/50 active:shadow-md transition-shadow duration-200 flex items-center justify-center"
+          whileTap={{ scale: 0.90 }}
+          whileHover={{ scale: 1.06 }}
+          transition={{ type: "spring", stiffness: 550, damping: 22 }}
+          className={`flex-shrink-0 w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center shadow-md hover:shadow-lg active:shadow-sm transition-all duration-150 ${
+            t.priority === "urgent"
+              ? "bg-gradient-to-br from-red-500 to-red-600 hover:from-red-400 hover:to-red-500"
+              : "bg-gradient-to-br from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500"
+          }`}
           style={{
-            boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3), inset 0 -2px 4px rgba(0, 0, 0, 0.2)'
+            boxShadow: t.priority === "urgent"
+              ? '0 2px 8px rgba(239, 68, 68, 0.35)'
+              : '0 2px 8px rgba(251, 146, 60, 0.35)'
           }}
         >
-          <Check className="w-6 h-6 sm:w-7 sm:h-7 text-white" strokeWidth={3} />
+          <Check className="w-5 h-5 sm:w-5.5 sm:h-5.5 text-white" strokeWidth={2.5} />
         </motion.button>
 
         {/* Contenu de la tâche */}
-        <div className="flex-1 min-w-0 flex items-center justify-between gap-4">
+        <div className="flex-1 min-w-0 flex items-center justify-between gap-3">
           <span
-            className="text-[16px] sm:text-[17px] md:text-lg font-medium text-white/96 break-words"
+            className="text-[15px] sm:text-base md:text-base font-medium text-white/95 break-words leading-relaxed"
             style={{
-              lineHeight: '1.5',
-              letterSpacing: '-0.02em',
+              letterSpacing: '-0.01em',
               fontWeight: 500
             }}
           >
             {t.text}
           </span>
 
-          {/* Badge de priorité */}
+          {/* Badge de priorité - Plus compact */}
           <div className="flex-shrink-0">
             <PriorityBadge p={t.priority} />
           </div>
@@ -4413,25 +4423,16 @@ export default function App({ session, onLogout }) {
                         animate={{ opacity: 1, y: 0 }}
                         className="space-y-5"
                       >
-                        <div
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          className="flex items-center mobile-spacing p-responsive-sm border-b border-red-500/40"
-                        >
-                          <div className="p-responsive-sm bg-gradient-to-br from-red-500 to-red-600 rounded-xl shadow-lg">
-                            <Sparkles className="icon-responsive-sm text-white" />
+                        <div className="flex items-center gap-3 pb-3 mb-2 border-b border-red-500/30">
+                          <div className="p-2 bg-gradient-to-br from-red-500 to-red-600 rounded-lg">
+                            <Sparkles className="w-4 h-4 text-white" />
                           </div>
-                          <div className="flex items-center mobile-spacing text-red-400 font-bold text-responsive-xl">
-                            À faire rapidement
-                            <span
-                              initial={{ scale: 0 }}
-                              animate={{ scale: 1 }}
-                              transition={{ type: "spring", bounce: 0.5 }}
-                              className="text-responsive-xs bg-gradient-to-r from-red-500 to-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg"
-                            >
-                              {tasksByPriority.urgent.length}
-                            </span>
-                          </div>
+                          <span className="text-sm font-semibold text-red-400/90 tracking-wide uppercase">
+                            Urgent
+                          </span>
+                          <span className="ml-auto text-xs font-medium text-red-400/60 bg-red-500/10 px-2 py-1 rounded-full">
+                            {tasksByPriority.urgent.length}
+                          </span>
                         </div>
                         <div className="flex flex-col space-y-0 pt-2">
                           <AnimatePresence mode="popLayout">
@@ -4449,26 +4450,16 @@ export default function App({ session, onLogout }) {
                         transition={{ delay: 0.1 }}
                         className="space-y-5"
                       >
-                        <div
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: 0.1 }}
-                          className="flex items-center mobile-spacing p-responsive-sm border-b border-orange-500/40"
-                        >
-                          <div className="p-responsive-sm bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg">
-                            <Calendar className="icon-responsive-sm text-white" />
+                        <div className="flex items-center gap-3 pb-3 mb-2 border-b border-orange-500/30">
+                          <div className="p-2 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg">
+                            <Calendar className="w-4 h-4 text-white" />
                           </div>
-                          <div className="flex items-center mobile-spacing text-orange-400 font-bold text-responsive-xl">
-                            À faire prochainement
-                            <span
-                              initial={{ scale: 0 }}
-                              animate={{ scale: 1 }}
-                              transition={{ type: "spring", bounce: 0.5, delay: 0.1 }}
-                              className="text-responsive-xs bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg"
-                            >
-                              {tasksByPriority.normal.length}
-                            </span>
-                          </div>
+                          <span className="text-sm font-semibold text-orange-400/90 tracking-wide uppercase">
+                            Normal
+                          </span>
+                          <span className="ml-auto text-xs font-medium text-orange-400/60 bg-orange-500/10 px-2 py-1 rounded-full">
+                            {tasksByPriority.normal.length}
+                          </span>
                         </div>
                         <div className="flex flex-col space-y-0 pt-2">
                           <AnimatePresence mode="popLayout">
