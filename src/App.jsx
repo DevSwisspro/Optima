@@ -2111,14 +2111,14 @@ export default function App({ session, onLogout }) {
         WebkitTapHighlightColor: 'transparent'
       }}
     >
-      <div className="relative flex items-center gap-3 sm:gap-4 p-4 sm:p-5">
-        {/* Bouton de complétion - Compact et élégant */}
+      <div className="relative flex items-center gap-3 sm:gap-4 p-5 sm:p-6">
+        {/* Bouton de complétion - Plus compact */}
         <motion.button
           onClick={() => completeTask(t.id)}
           whileTap={{ scale: 0.90 }}
           whileHover={{ scale: 1.06 }}
           transition={{ type: "spring", stiffness: 550, damping: 22 }}
-          className={`flex-shrink-0 w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center shadow-md hover:shadow-lg active:shadow-sm transition-all duration-150 ${
+          className={`flex-shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shadow-md hover:shadow-lg active:shadow-sm transition-all duration-150 ${
             t.priority === "urgent"
               ? "bg-gradient-to-br from-red-500 to-red-600 hover:from-red-400 hover:to-red-500"
               : "bg-gradient-to-br from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500"
@@ -2129,25 +2129,21 @@ export default function App({ session, onLogout }) {
               : '0 2px 8px rgba(251, 146, 60, 0.35)'
           }}
         >
-          <Check className="w-5 h-5 sm:w-5.5 sm:h-5.5 text-white" strokeWidth={2.5} />
+          <Check className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-white" strokeWidth={2.5} />
         </motion.button>
 
-        {/* Contenu de la tâche */}
-        <div className="flex-1 min-w-0 flex items-center justify-between gap-3">
+        {/* Contenu de la tâche - Zone de texte agrandie */}
+        <div className="flex-1 min-w-0">
           <span
-            className="text-[15px] sm:text-base md:text-base font-medium text-white/95 break-words leading-relaxed"
+            className="text-[15px] sm:text-base md:text-base font-medium text-white/95 break-words leading-relaxed block"
             style={{
               letterSpacing: '-0.01em',
-              fontWeight: 500
+              fontWeight: 500,
+              lineHeight: '1.6'
             }}
           >
             {t.text}
           </span>
-
-          {/* Badge de priorité - Plus compact */}
-          <div className="flex-shrink-0">
-            <PriorityBadge p={t.priority} />
-          </div>
         </div>
       </div>
 
@@ -4452,7 +4448,7 @@ export default function App({ session, onLogout }) {
                             <Calendar className="w-4 h-4 text-white" />
                           </div>
                           <span className="text-sm font-semibold text-orange-400/90 tracking-wide uppercase">
-                            Normal
+                            À faire prochainement
                           </span>
                         </div>
                         <div className="flex flex-col space-y-0 pt-2">
