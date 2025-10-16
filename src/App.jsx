@@ -2224,15 +2224,13 @@ export default function App({ session, onLogout }) {
                       value={dashboardFilter.year}
                       onChange={(e) => {
                         setDashboardFilter(prev => ({ ...prev, year: parseInt(e.target.value) }));
-                        e.target.blur();
                       }}
-                      className="w-full text-gray-900 text-center py-4 px-6 rounded-2xl text-lg font-semibold cursor-pointer bg-white/95 border border-gray-200 shadow-md"
+                      className="w-full text-gray-900 text-center py-4 px-6 rounded-2xl text-lg font-semibold cursor-pointer bg-white/95 border-0 shadow-md focus:outline-none focus:ring-0"
                       style={{
                         WebkitTapHighlightColor: 'transparent',
                         WebkitAppearance: 'none',
                         appearance: 'none',
-                        outline: 'none',
-                        boxShadow: 'none',
+                        touchAction: 'manipulation',
                         backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23E53935' d='M10.293 3.293L6 7.586 1.707 3.293A1 1 0 00.293 4.707l5 5a1 1 0 001.414 0l5-5a1 1 0 10-1.414-1.414z'/%3E%3C/svg%3E")`,
                         backgroundRepeat: 'no-repeat',
                         backgroundPosition: 'right 1rem center',
@@ -2248,15 +2246,13 @@ export default function App({ session, onLogout }) {
                       value={dashboardFilter.month}
                       onChange={(e) => {
                         setDashboardFilter(prev => ({ ...prev, month: e.target.value }));
-                        e.target.blur();
                       }}
-                      className="w-full text-gray-900 text-center py-4 px-6 rounded-2xl text-lg font-semibold cursor-pointer bg-white/95 border border-gray-200 shadow-md"
+                      className="w-full text-gray-900 text-center py-4 px-6 rounded-2xl text-lg font-semibold cursor-pointer bg-white/95 border-0 shadow-md focus:outline-none focus:ring-0"
                       style={{
                         WebkitTapHighlightColor: 'transparent',
                         WebkitAppearance: 'none',
                         appearance: 'none',
-                        outline: 'none',
-                        boxShadow: 'none',
+                        touchAction: 'manipulation',
                         backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23E53935' d='M10.293 3.293L6 7.586 1.707 3.293A1 1 0 00.293 4.707l5 5a1 1 0 001.414 0l5-5a1 1 0 10-1.414-1.414z'/%3E%3C/svg%3E")`,
                         backgroundRepeat: 'no-repeat',
                         backgroundPosition: 'right 1rem center',
