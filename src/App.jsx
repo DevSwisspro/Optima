@@ -2184,6 +2184,38 @@ export default function App({ session, onLogout }) {
         onLogout={onLogout}
       />
 
+      {/* Titre de page fixe (mobile only) - Affiché sous OPTIMA */}
+      <motion.div
+        key={activeTab}
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="md:hidden mobile-page-title"
+      >
+        <div className="flex items-center justify-center gap-2">
+          <div className="p-1.5 bg-gradient-to-br from-red-500 to-red-600 rounded-lg" style={{
+            boxShadow: '0 2px 8px rgba(239, 68, 68, 0.35)'
+          }}>
+            {activeTab === "dashboard" && <BarChart3 className="w-4 h-4 text-white" strokeWidth={2.5} />}
+            {activeTab === "tasks" && <List className="w-4 h-4 text-white" strokeWidth={2.5} />}
+            {activeTab === "notes" && <FileText className="w-4 h-4 text-white" strokeWidth={2.5} />}
+            {activeTab === "shopping" && <ShoppingCart className="w-4 h-4 text-white" strokeWidth={2.5} />}
+            {activeTab === "budget" && <Wallet className="w-4 h-4 text-white" strokeWidth={2.5} />}
+            {activeTab === "budget-dashboard" && <BarChart3 className="w-4 h-4 text-white" strokeWidth={2.5} />}
+            {activeTab === "media" && <Play className="w-4 h-4 text-white" strokeWidth={2.5} />}
+          </div>
+          <h2 className="text-base font-bold text-white tracking-wide">
+            {activeTab === "dashboard" && "Dashboard"}
+            {activeTab === "tasks" && "Mes Tâches"}
+            {activeTab === "notes" && "Mes Notes"}
+            {activeTab === "shopping" && "Mes Courses"}
+            {activeTab === "budget" && "Mon Budget"}
+            {activeTab === "budget-dashboard" && "Budget Avancé"}
+            {activeTab === "media" && "Mes Médias"}
+          </h2>
+        </div>
+      </motion.div>
+
       {/* Conteneur principal avec scroll mobile optimisé */}
       <div className="mobile-scroll-container md:overflow-visible md:relative md:top-auto md:left-auto md:right-auto md:bottom-auto md:position-relative">
 
@@ -2209,30 +2241,6 @@ export default function App({ session, onLogout }) {
                 className="text-center"
               >
                 {/* Mobile Header - Sticky en haut du scroll container */}
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: 0.2 }}
-                  className="md:hidden sticky z-40 -mx-4 sm:-mx-6 px-4 sm:px-6 py-4 mb-4"
-                  style={{
-                    top: '0',
-                    background: 'linear-gradient(180deg, rgba(10, 10, 15, 0.98) 0%, rgba(20, 20, 30, 0.95) 100%)',
-                    backdropFilter: 'blur(20px)',
-                    WebkitBackdropFilter: 'blur(20px)',
-                    borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-                    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)'
-                  }}
-                >
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="p-1.5 bg-gradient-to-br from-red-500 to-red-600 rounded-lg" style={{
-                      boxShadow: '0 2px 8px rgba(239, 68, 68, 0.35)'
-                    }}>
-                      <BarChart3 className="w-4 h-4 text-white" strokeWidth={2.5} />
-                    </div>
-                    <h2 className="text-base font-bold text-white tracking-wide">Dashboard</h2>
-                  </div>
-                </motion.div>
-
                   {/* Filtres Mobile - Optimisés pour réactivité native */}
                   <div className="mt-6 space-y-3 max-w-sm mx-auto">
                     <select
@@ -4196,30 +4204,6 @@ export default function App({ session, onLogout }) {
                 className="text-center"
               >
                 {/* Mobile Header - Sticky en haut du scroll container */}
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: 0.2 }}
-                  className="md:hidden sticky z-40 -mx-4 sm:-mx-6 px-4 sm:px-6 py-4 mb-4"
-                  style={{
-                    top: '0', // Stick au top du scroll container
-                    background: 'linear-gradient(180deg, rgba(10, 10, 15, 0.98) 0%, rgba(20, 20, 30, 0.95) 100%)',
-                    backdropFilter: 'blur(20px)',
-                    WebkitBackdropFilter: 'blur(20px)',
-                    borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-                    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)'
-                  }}
-                >
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="p-1.5 bg-gradient-to-br from-red-500 to-red-600 rounded-lg" style={{
-                      boxShadow: '0 2px 8px rgba(239, 68, 68, 0.35)'
-                    }}>
-                      <List className="w-4 h-4 text-white" strokeWidth={2.5} />
-                    </div>
-                    <h2 className="text-base font-bold text-white tracking-wide">Mes Tâches</h2>
-                  </div>
-                </motion.div>
-
                 {/* Desktop Header - Style Dashboard */}
                 <div className="hidden md:block">
                   <div className="glass-dark rounded-3xl p-8 border border-white/10 card-premium">
@@ -4498,30 +4482,6 @@ export default function App({ session, onLogout }) {
               {/* Header Notes - Mobile vs Desktop harmonisé */}
 
               {/* Mobile Header - Sticky en haut du scroll container */}
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.2 }}
-                className="md:hidden sticky z-40 -mx-4 sm:-mx-6 px-4 sm:px-6 py-4 mb-4"
-                style={{
-                  top: '0',
-                  background: 'linear-gradient(180deg, rgba(10, 10, 15, 0.98) 0%, rgba(20, 20, 30, 0.95) 100%)',
-                  backdropFilter: 'blur(20px)',
-                  WebkitBackdropFilter: 'blur(20px)',
-                  borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)'
-                }}
-              >
-                <div className="flex items-center justify-center gap-2">
-                  <div className="p-1.5 bg-gradient-to-br from-red-500 to-red-600 rounded-lg" style={{
-                    boxShadow: '0 2px 8px rgba(239, 68, 68, 0.35)'
-                  }}>
-                    <FileText className="w-4 h-4 text-white" strokeWidth={2.5} />
-                  </div>
-                  <h2 className="text-base font-bold text-white tracking-wide">Mes Notes</h2>
-                </div>
-              </motion.div>
-
               {/* Desktop Header - Style horizontal harmonisé */}
               <div className="hidden md:block">
                 <div
@@ -4796,30 +4756,6 @@ export default function App({ session, onLogout }) {
             {/* Header Courses - Mobile vs Desktop harmonisé */}
 
             {/* Mobile Header - Sticky en haut du scroll container */}
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.2 }}
-              className="md:hidden sticky z-40 -mx-4 sm:-mx-6 px-4 sm:px-6 py-4 mb-4"
-              style={{
-                top: '0',
-                background: 'linear-gradient(180deg, rgba(10, 10, 15, 0.98) 0%, rgba(20, 20, 30, 0.95) 100%)',
-                backdropFilter: 'blur(20px)',
-                WebkitBackdropFilter: 'blur(20px)',
-                borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)'
-              }}
-            >
-              <div className="flex items-center justify-center gap-2">
-                <div className="p-1.5 bg-gradient-to-br from-red-500 to-red-600 rounded-lg" style={{
-                  boxShadow: '0 2px 8px rgba(239, 68, 68, 0.35)'
-                }}>
-                  <ShoppingCart className="w-4 h-4 text-white" strokeWidth={2.5} />
-                </div>
-                <h2 className="text-base font-bold text-white tracking-wide">Mes Courses</h2>
-              </div>
-            </motion.div>
-
             {/* Desktop Header - Style horizontal harmonisé */}
             <div className="hidden md:block">
               <motion.div
@@ -5058,30 +4994,6 @@ export default function App({ session, onLogout }) {
             {/* Header Budget - Mobile vs Desktop harmonisé */}
 
             {/* Mobile Header - Sticky en haut du scroll container */}
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.2 }}
-              className="md:hidden sticky z-40 -mx-4 sm:-mx-6 px-4 sm:px-6 py-4 mb-4"
-              style={{
-                top: '0',
-                background: 'linear-gradient(180deg, rgba(10, 10, 15, 0.98) 0%, rgba(20, 20, 30, 0.95) 100%)',
-                backdropFilter: 'blur(20px)',
-                WebkitBackdropFilter: 'blur(20px)',
-                borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)'
-              }}
-            >
-              <div className="flex items-center justify-center gap-2">
-                <div className="p-1.5 bg-gradient-to-br from-red-500 to-red-600 rounded-lg" style={{
-                  boxShadow: '0 2px 8px rgba(239, 68, 68, 0.35)'
-                }}>
-                  <Wallet className="w-4 h-4 text-white" strokeWidth={2.5} />
-                </div>
-                <h2 className="text-base font-bold text-white tracking-wide">Mon Budget</h2>
-              </div>
-            </motion.div>
-
             {/* Desktop Header - Style horizontal harmonisé */}
             <div className="hidden md:block">
               <motion.div
