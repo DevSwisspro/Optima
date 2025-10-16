@@ -2158,14 +2158,6 @@ export default function App({ session, onLogout }) {
             <PageTransition pageKey="dashboard">
               <div
                 className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-10 space-y-8 md:space-y-12"
-                style={{
-                  willChange: 'auto',
-                  transform: 'translateZ(0)',
-                  backfaceVisibility: 'hidden',
-                  WebkitBackfaceVisibility: 'hidden',
-                  perspective: '1000px',
-                  WebkitPerspective: '1000px'
-                }}
               >
               {/* Header Dashboard - Mobile vs Desktop */}
               <motion.div

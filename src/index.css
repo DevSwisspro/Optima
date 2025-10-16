@@ -1213,11 +1213,11 @@ clipPath,
 .recharts-xAxis *,
 .recharts-yAxis *,
 .card-premium-level-1,
-.card-premium-level-1 *,
-.card-premium-level-1 > *,
+.card-premium-level-1 *:not(select),
+.card-premium-level-1 > *:not(select),
 .card-premium-level-2,
-.card-premium-level-2 *,
-.card-premium-level-2 > * {
+.card-premium-level-2 *:not(select),
+.card-premium-level-2 > *:not(select) {
   outline: none !important;
   outline-width: 0 !important;
   outline-style: none !important;
@@ -1271,15 +1271,15 @@ rect:active,
 .card-premium-level-1:focus,
 .card-premium-level-1:active,
 .card-premium-level-1:hover,
-.card-premium-level-1 *:focus,
-.card-premium-level-1 *:active,
-.card-premium-level-1 *:hover,
+.card-premium-level-1 *:not(select):focus,
+.card-premium-level-1 *:not(select):active,
+.card-premium-level-1 *:not(select):hover,
 .card-premium-level-2:focus,
 .card-premium-level-2:active,
 .card-premium-level-2:hover,
-.card-premium-level-2 *:focus,
-.card-premium-level-2 *:active,
-.card-premium-level-2 *:hover {
+.card-premium-level-2 *:not(select):focus,
+.card-premium-level-2 *:not(select):active,
+.card-premium-level-2 *:not(select):hover {
   outline: none !important;
   outline-width: 0 !important;
   outline-style: none !important;
@@ -1291,16 +1291,28 @@ rect:active,
   -webkit-focus-ring-color: transparent !important;
 }
 
+/* Exception pour selects natifs - doit conserver son comportement */
+@media (max-width: 768px) {
+  select {
+    pointer-events: auto !important;
+    touch-action: manipulation !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
+    position: relative !important;
+    z-index: 100 !important;
+  }
+}
+
 /* Spécifique mobile - Suppression du focus-visible */
 @media (max-width: 768px) {
-  *:focus-visible,
-  *:focus,
+  *:not(select):focus-visible,
+  *:not(select):focus,
   svg:focus-visible,
   svg *:focus-visible,
   .recharts-wrapper:focus-visible,
-  .recharts-wrapper *:focus-visible,
+  .recharts-wrapper *:not(select):focus-visible,
   .recharts-surface:focus-visible,
-  .recharts-surface *:focus-visible {
+  .recharts-surface *:not(select):focus-visible {
     outline: none !important;
     outline-width: 0 !important;
     outline-style: none !important;
