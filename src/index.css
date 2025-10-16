@@ -1627,6 +1627,7 @@ body.menu-open > * {
     touch-action: pan-y;
     will-change: scroll-position;
     overscroll-behavior-y: contain;
+    padding-bottom: 100px; /* Espace pour voir le footer correctement */
   }
 
   /* Scrollbar personnalisée pour le conteneur principal */

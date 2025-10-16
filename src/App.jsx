@@ -2208,49 +2208,30 @@ export default function App({ session, onLogout }) {
                 transition={{ duration: 0.5 }}
                 className="text-center"
               >
-                {/* Mobile Header - Premium centré */}
-                <div className="md:hidden">
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
-                    className="relative"
-                  >
-                    {/* Hero Header Card */}
-                    <div className="card-premium-level-2 rounded-3xl p-8 mx-auto max-w-md relative overflow-hidden">
-                      {/* Animated gradient background */}
-                      <div className="absolute inset-0 bg-gradient-to-br from-red-500/8 via-red-600/4 to-transparent pointer-events-none" />
-
-                      {/* Radial glow effect */}
-                      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-red-500/10 blur-3xl rounded-full" />
-
-                      <div className="relative flex flex-col items-center gap-5 text-center">
-                        {/* Icon badge */}
-                        <motion.div
-                          initial={{ scale: 0.8, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          transition={{ duration: 0.5, delay: 0.1, type: "spring", bounce: 0.4 }}
-                          className="relative"
-                        >
-                          <div className="absolute inset-0 bg-red-500/20 blur-xl rounded-full animate-pulse" />
-                          <div className="relative p-5 bg-gradient-to-br from-red-500 via-red-600 to-red-700 rounded-2xl shadow-red-premium">
-                            <div className="absolute inset-0 bg-gradient-to-br from-white/15 to-transparent rounded-2xl" />
-                            <BarChart3 className="w-9 h-9 text-white relative z-10" />
-                          </div>
-                        </motion.div>
-
-                        {/* Title */}
-                        <motion.div
-                          initial={{ opacity: 0, y: 5 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.4, delay: 0.2 }}
-                        >
-                          <h1 className="text-display-lg text-white mb-2">Dashboard</h1>
-                          <p className="text-body-md text-gray-400">Vue d'ensemble de vos finances</p>
-                        </motion.div>
-                      </div>
+                {/* Mobile Header - Sticky en haut du scroll container */}
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.2 }}
+                  className="md:hidden sticky z-40 -mx-4 sm:-mx-6 px-4 sm:px-6 py-4 mb-4"
+                  style={{
+                    top: '0',
+                    background: 'linear-gradient(180deg, rgba(10, 10, 15, 0.98) 0%, rgba(20, 20, 30, 0.95) 100%)',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                    borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)'
+                  }}
+                >
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="p-1.5 bg-gradient-to-br from-red-500 to-red-600 rounded-lg" style={{
+                      boxShadow: '0 2px 8px rgba(239, 68, 68, 0.35)'
+                    }}>
+                      <BarChart3 className="w-4 h-4 text-white" strokeWidth={2.5} />
                     </div>
-                  </motion.div>
+                    <h2 className="text-base font-bold text-white tracking-wide">Dashboard</h2>
+                  </div>
+                </motion.div>
 
                   {/* Filtres Mobile - Optimisés pour réactivité native */}
                   <div className="mt-6 space-y-3 max-w-sm mx-auto">
@@ -2328,7 +2309,7 @@ export default function App({ session, onLogout }) {
                       Budget Avancé
                     </motion.button>
                   </div>
-                </div>
+                </motion.div>
 
                 {/* Desktop Header - Premium élégant */}
                 <div className="hidden md:block">
@@ -2410,7 +2391,7 @@ export default function App({ session, onLogout }) {
                     </div>
                   </div>
                 </div>
-              </motion.div>
+              </div>
 
               {budgetItems.length > 0 ? (
                 <>
@@ -2968,12 +2949,11 @@ export default function App({ session, onLogout }) {
                   </button>
                 </div>
               )}
-              </div>
             </PageTransition>
           )}
 
           {activeTab === "budget-dashboard" && (
-            <div
+            <motion.div
               key="budget-dashboard"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -3055,7 +3035,7 @@ export default function App({ session, onLogout }) {
                 <>
                   {/* Vue Mensuelle */}
                   {budgetDashboardView === "monthly" && (
-                    <div 
+                    <motion.div
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       className="space-y-6"
@@ -3143,12 +3123,12 @@ export default function App({ session, onLogout }) {
                           </div>
                         </div>
                       </div>
-                    </div>
+                    </motion.div>
                   )}
 
                   {/* Vue Catégories - 5 Blocs séparés */}
                   {budgetDashboardView === "categories" && (
-                    <div 
+                    <motion.div
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       className="space-y-6"
@@ -3433,12 +3413,12 @@ export default function App({ session, onLogout }) {
                           </div>
                         </div>
                       </div>
-                    </div>
+                    </motion.div>
                   )}
 
                   {/* Vue Comparative */}
                   {budgetDashboardView === "comparative" && (
-                    <div 
+                    <motion.div
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       className="space-y-6"
@@ -4038,12 +4018,12 @@ export default function App({ session, onLogout }) {
                           })()}
                         </div>
                       </div>
-                    </div>
+                    </motion.div>
                   )}
 
                   {/* Vue Tableau */}
                   {budgetDashboardView === "table" && (
-                    <div 
+                    <motion.div
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       className="space-y-6"
@@ -4187,7 +4167,7 @@ export default function App({ session, onLogout }) {
                           );
                         })()}
                       </div>
-                    </div>
+                    </motion.div>
                   )}
                 </>
               ) : (
@@ -4203,26 +4183,26 @@ export default function App({ session, onLogout }) {
                   </button>
                 </div>
               )}
-            </div>
+            </motion.div>
           )}
 
           {activeTab === "tasks" && (
             <PageTransition pageKey="tasks">
               {/* Header Tâches - Mobile vs Desktop harmonisé */}
-              <div
+              <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
                 className="text-center"
               >
-                {/* Mobile Header - Sticky sous le header OPTIMA */}
+                {/* Mobile Header - Sticky en haut du scroll container */}
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: 0.2 }}
                   className="md:hidden sticky z-40 -mx-4 sm:-mx-6 px-4 sm:px-6 py-4 mb-4"
                   style={{
-                    top: '88px', // Hauteur du header OPTIMA
+                    top: '0', // Stick au top du scroll container
                     background: 'linear-gradient(180deg, rgba(10, 10, 15, 0.98) 0%, rgba(20, 20, 30, 0.95) 100%)',
                     backdropFilter: 'blur(20px)',
                     WebkitBackdropFilter: 'blur(20px)',
@@ -4244,7 +4224,7 @@ export default function App({ session, onLogout }) {
                 <div className="hidden md:block">
                   <div className="glass-dark rounded-3xl p-8 border border-white/10 card-premium">
                     <div className="flex flex-row justify-between items-center">
-                      <div
+                      <motion.div
                         initial={{ x: -30, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ delay: 0.2 }}
@@ -4257,9 +4237,9 @@ export default function App({ session, onLogout }) {
                           <h2 className="text-4xl font-bold text-white mb-2">Gestionnaire de Tâches</h2>
                           <p className="text-xl text-gray-300">Organisez et suivez vos objectifs</p>
                         </div>
-                      </div>
+                      </motion.div>
 
-                      <div
+                      <motion.div
                         initial={{ x: 30, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ delay: 0.3 }}
@@ -4269,11 +4249,11 @@ export default function App({ session, onLogout }) {
                           <div className="text-sm text-gray-400">Tâches totales</div>
                           <div className="text-3xl font-bold text-white">{tasks.length}</div>
                         </div>
-                      </div>
+                      </motion.div>
                     </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
 
               {/* Zone d'ajout de tâche - Mobile vs Desktop */}
 
@@ -4333,7 +4313,7 @@ export default function App({ session, onLogout }) {
 
               {/* Desktop - Version horizontale compacte */}
               <div className="hidden md:block">
-                <div
+                <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
@@ -4387,11 +4367,11 @@ export default function App({ session, onLogout }) {
                       Ajouter
                     </motion.button>
                   </div>
-                </div>
+                </motion.div>
               </div>
 
               {/* Barre de recherche harmonisée */}
-              <div
+              <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
@@ -4410,31 +4390,31 @@ export default function App({ session, onLogout }) {
                     />
                   </div>
                 </div>
-              </div>
+              </motion.div>
 
               {/* Zone d'affichage des tâches harmonisée */}
-              <div
+              <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.8 }}
                 className="glass-dark rounded-3xl p-5 md:p-6 min-h-96 neo-shadow border border-white/20 card-premium"
               >
                 {(tasksByPriority.urgent.length === 0 && tasksByPriority.normal.length === 0) ? (
-                  <div
+                  <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     className="text-center text-gray-300 py-16"
                   >
-                    <div
+                    <motion.div
                       animate={{ rotate: [0, 5, -5, 0] }}
                       transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                       className="text-responsive-4xl spacing-responsive-md"
                     >
                       📝
-                    </div>
+                    </motion.div>
                     <div className="text-responsive-2xl font-bold spacing-responsive-sm text-white">Aucune tâche</div>
                     <div className="text-responsive-lg text-gray-400">Créez votre première tâche pour commencer</div>
-                  </div>
+                  </motion.div>
                 ) : (
                   <div className="space-y-8 md:space-y-10">
                     {/* Section À faire rapidement */}
@@ -4509,7 +4489,7 @@ export default function App({ session, onLogout }) {
 
                   </div>
                 )}
-              </div>
+              </motion.div>
             </PageTransition>
           )}
 
@@ -4517,13 +4497,30 @@ export default function App({ session, onLogout }) {
             <PageTransition pageKey="notes">
               {/* Header Notes - Mobile vs Desktop harmonisé */}
 
-              {/* Mobile Header - Version ultra-compacte */}
-              <div className="md:hidden text-center mb-4">
+              {/* Mobile Header - Sticky en haut du scroll container */}
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.2 }}
+                className="md:hidden sticky z-40 -mx-4 sm:-mx-6 px-4 sm:px-6 py-4 mb-4"
+                style={{
+                  top: '0',
+                  background: 'linear-gradient(180deg, rgba(10, 10, 15, 0.98) 0%, rgba(20, 20, 30, 0.95) 100%)',
+                  backdropFilter: 'blur(20px)',
+                  WebkitBackdropFilter: 'blur(20px)',
+                  borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)'
+                }}
+              >
                 <div className="flex items-center justify-center gap-2">
-                  <FileText className="w-5 h-5 text-red-400" />
-                  <h2 className="text-lg font-bold text-white">Mes Notes</h2>
+                  <div className="p-1.5 bg-gradient-to-br from-red-500 to-red-600 rounded-lg" style={{
+                    boxShadow: '0 2px 8px rgba(239, 68, 68, 0.35)'
+                  }}>
+                    <FileText className="w-4 h-4 text-white" strokeWidth={2.5} />
+                  </div>
+                  <h2 className="text-base font-bold text-white tracking-wide">Mes Notes</h2>
                 </div>
-              </div>
+              </motion.div>
 
               {/* Desktop Header - Style horizontal harmonisé */}
               <div className="hidden md:block">
@@ -4798,68 +4795,41 @@ export default function App({ session, onLogout }) {
           <PageTransition pageKey="shopping">
             {/* Header Courses - Mobile vs Desktop harmonisé */}
 
-            {/* Mobile Header - Style centralisé harmonisé */}
-            <div className="md:hidden">
-              <div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.2, type: "spring", bounce: 0.3 }}
-                className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 mx-auto max-w-sm card-premium"
-              >
-                <div className="text-center space-y-4">
-                  <div
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 0.4 }}
-                    className="inline-flex items-center justify-center p-4 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl shadow-xl mx-auto"
-                  >
-                    <ShoppingCart className="w-8 h-8 text-white" />
-                  </div>
-
-                  <div className="space-y-2">
-                    <h1
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.5 }}
-                      className="title-main font-black bg-gradient-to-r from-red-400 via-red-500 to-red-600 bg-clip-text text-transparent"
-                    >
-                      COURSES
-                    </h1>
-                    <p
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.6 }}
-                      className="text-responsive-base text-gray-300 font-medium"
-                    >
-                      Gérez votre liste de courses
-                    </p>
-                  </div>
-
-                  <div
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 0.7, type: "spring" }}
-                    className="bg-white/10 rounded-2xl p-3 backdrop-blur-sm"
-                  >
-                    <div className="text-center">
-                      <div className="text-responsive-xs text-gray-400 font-medium mb-1">Articles</div>
-                      <div className="text-responsive-2xl font-bold text-white">{shoppingItems.length}</div>
-                    </div>
-                  </div>
+            {/* Mobile Header - Sticky en haut du scroll container */}
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.2 }}
+              className="md:hidden sticky z-40 -mx-4 sm:-mx-6 px-4 sm:px-6 py-4 mb-4"
+              style={{
+                top: '0',
+                background: 'linear-gradient(180deg, rgba(10, 10, 15, 0.98) 0%, rgba(20, 20, 30, 0.95) 100%)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)'
+              }}
+            >
+              <div className="flex items-center justify-center gap-2">
+                <div className="p-1.5 bg-gradient-to-br from-red-500 to-red-600 rounded-lg" style={{
+                  boxShadow: '0 2px 8px rgba(239, 68, 68, 0.35)'
+                }}>
+                  <ShoppingCart className="w-4 h-4 text-white" strokeWidth={2.5} />
                 </div>
+                <h2 className="text-base font-bold text-white tracking-wide">Mes Courses</h2>
               </div>
-            </div>
+            </motion.div>
 
             {/* Desktop Header - Style horizontal harmonisé */}
             <div className="hidden md:block">
-              <div
+              <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
                 className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 card-premium"
               >
                 <div className="flex items-center justify-between">
-                  <div
+                  <motion.div
                     initial={{ x: -30, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: 0.2 }}
@@ -4872,9 +4842,9 @@ export default function App({ session, onLogout }) {
                       <h2 className="text-4xl font-bold text-white mb-2">Liste de Courses</h2>
                       <p className="text-xl text-gray-300">Gérez votre liste de courses</p>
                     </div>
-                  </div>
+                  </motion.div>
 
-                  <div
+                  <motion.div
                     initial={{ x: 30, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: 0.3 }}
@@ -4884,9 +4854,9 @@ export default function App({ session, onLogout }) {
                       <div className="text-sm text-gray-400">Articles totaux</div>
                       <div className="text-3xl font-bold text-white">{shoppingItems.length}</div>
                     </div>
-                  </div>
+                  </motion.div>
                 </div>
-              </div>
+              </motion.div>
             </div>
 
             {/* Zone d'ajout d'article */}
@@ -5087,57 +5057,41 @@ export default function App({ session, onLogout }) {
           <PageTransition pageKey="budget">
             {/* Header Budget - Mobile vs Desktop harmonisé */}
 
-            {/* Mobile Header - Style centralisé harmonisé */}
-            <div className="md:hidden">
-              <div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.2, type: "spring", bounce: 0.3 }}
-                className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 mx-auto max-w-sm card-premium"
-              >
-                <div className="text-center space-y-4">
-                  <div
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 0.4 }}
-                    className="inline-flex items-center justify-center p-4 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl shadow-xl mx-auto"
-                  >
-                    <Wallet className="w-8 h-8 text-white" />
-                  </div>
-
-                  <div className="space-y-2">
-                    <h1
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.5 }}
-                      className="title-main font-black bg-gradient-to-r from-red-400 via-red-500 to-red-600 bg-clip-text text-transparent"
-                    >
-                      BUDGET
-                    </h1>
-                    <p
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.6 }}
-                      className="text-responsive-base text-gray-300 font-medium"
-                    >
-                      Gérez vos finances personnelles
-                    </p>
-                  </div>
-
+            {/* Mobile Header - Sticky en haut du scroll container */}
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.2 }}
+              className="md:hidden sticky z-40 -mx-4 sm:-mx-6 px-4 sm:px-6 py-4 mb-4"
+              style={{
+                top: '0',
+                background: 'linear-gradient(180deg, rgba(10, 10, 15, 0.98) 0%, rgba(20, 20, 30, 0.95) 100%)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)'
+              }}
+            >
+              <div className="flex items-center justify-center gap-2">
+                <div className="p-1.5 bg-gradient-to-br from-red-500 to-red-600 rounded-lg" style={{
+                  boxShadow: '0 2px 8px rgba(239, 68, 68, 0.35)'
+                }}>
+                  <Wallet className="w-4 h-4 text-white" strokeWidth={2.5} />
                 </div>
+                <h2 className="text-base font-bold text-white tracking-wide">Mon Budget</h2>
               </div>
-            </div>
+            </motion.div>
 
             {/* Desktop Header - Style horizontal harmonisé */}
             <div className="hidden md:block">
-              <div
+              <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
                 className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 card-premium"
               >
                 <div className="flex items-center justify-between">
-                  <div
+                  <motion.div
                     initial={{ x: -30, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: 0.2 }}
@@ -5150,13 +5104,13 @@ export default function App({ session, onLogout }) {
                       <h2 className="text-4xl font-bold text-white mb-2">Gestion du Budget</h2>
                       <p className="text-xl text-gray-300">Gérez vos finances personnelles</p>
                     </div>
-                  </div>
+                  </motion.div>
 
                 </div>
-              </div>
+              </motion.div>
             </div>
 
-            <div
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
@@ -5634,7 +5588,7 @@ export default function App({ session, onLogout }) {
                   </div>
                 )}
               </div>
-            </div>
+            </motion.div>
 
             {/* Jauges de progression des budgets définis */}
             {(budgetLimits?.categories && Object.values(budgetLimits.categories).some(limit => limit > 0) ||
@@ -6108,7 +6062,7 @@ export default function App({ session, onLogout }) {
 
             {/* Liste des opérations */}
             {budgetItems.length > 0 && (
-              <div 
+              <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 border border-gray-700/50 shadow-2xl card-premium"
@@ -6188,10 +6142,10 @@ export default function App({ session, onLogout }) {
                           </div>
                         </div>
                       ))}
-                  
+
                 </div>
 
-              </div>
+              </motion.div>
             )}
 
             {budgetItems.length === 0 && (
@@ -6210,42 +6164,42 @@ export default function App({ session, onLogout }) {
 
             {/* Mobile Header - Style centralisé harmonisé */}
             <div className="md:hidden">
-              <div
+              <motion.div
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.2, type: "spring", bounce: 0.3 }}
                 className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 mx-auto max-w-sm card-premium"
               >
                 <div className="text-center space-y-4">
-                  <div
+                  <motion.div
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: 0.4 }}
                     className="inline-flex items-center justify-center p-4 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl shadow-xl mx-auto"
                   >
                     <Play className="w-8 h-8 text-white" />
-                  </div>
+                  </motion.div>
 
                   <div className="space-y-2">
-                    <h1
+                    <motion.h1
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.5 }}
                       className="title-main font-black bg-gradient-to-r from-red-400 via-red-500 to-red-600 bg-clip-text text-transparent"
                     >
                       MEDIA
-                    </h1>
-                    <p
+                    </motion.h1>
+                    <motion.p
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.6 }}
                       className="text-responsive-base text-gray-300 font-medium"
                     >
                       Suivez vos films et séries
-                    </p>
+                    </motion.p>
                   </div>
 
-                  <div
+                  <motion.div
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: 0.7, type: "spring" }}
@@ -6255,21 +6209,21 @@ export default function App({ session, onLogout }) {
                       <div className="text-responsive-xs text-gray-400 font-medium mb-1">Médias</div>
                       <div className="text-responsive-2xl font-bold text-white">{mediaItems.length}</div>
                     </div>
-                  </div>
+                  </motion.div>
                 </div>
-              </div>
+              </motion.div>
             </div>
 
             {/* Desktop Header - Style horizontal harmonisé */}
             <div className="hidden md:block">
-              <div
+              <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
                 className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 card-premium"
               >
                 <div className="flex items-center justify-between">
-                  <div
+                  <motion.div
                     initial={{ x: -30, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: 0.2 }}
@@ -6282,9 +6236,9 @@ export default function App({ session, onLogout }) {
                       <h2 className="text-4xl font-bold text-white mb-2">Gestionnaire de Médias</h2>
                       <p className="text-xl text-gray-300">Suivez vos films et séries</p>
                     </div>
-                  </div>
+                  </motion.div>
 
-                  <div
+                  <motion.div
                     initial={{ x: 30, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: 0.3 }}
@@ -6294,13 +6248,13 @@ export default function App({ session, onLogout }) {
                       <div className="text-sm text-gray-400">Médias totaux</div>
                       <div className="text-3xl font-bold text-white">{mediaItems.length}</div>
                     </div>
-                  </div>
+                  </motion.div>
                 </div>
-              </div>
+              </motion.div>
             </div>
 
             {/* Zone d'ajout de média harmonisée */}
-            <div
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
@@ -6437,7 +6391,7 @@ export default function App({ session, onLogout }) {
                 <Plus className="w-5 h-5 mr-2" />
                 {editingMedia ? "Modifier" : "Ajouter"} {MEDIA_TYPES[mediaType]}
               </Button>
-            </div>
+            </motion.div>
 
             {/* Filtres */}
             <div className="bg-gray-800 rounded-xl p-4">
