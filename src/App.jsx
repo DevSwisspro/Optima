@@ -2185,12 +2185,13 @@ export default function App({ session, onLogout }) {
       />
 
       {/* Titre de page fixe (mobile only) - Affiché sous OPTIMA */}
-      <motion.div
-        key={activeTab}
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
+      <div
         className="md:hidden mobile-page-title"
+        style={{
+          willChange: 'auto',
+          transform: 'translateZ(0)',
+          backfaceVisibility: 'hidden'
+        }}
       >
         <div className="flex items-center justify-center gap-2">
           <div className="p-1.5 bg-gradient-to-br from-red-500 to-red-600 rounded-lg" style={{
@@ -2214,7 +2215,7 @@ export default function App({ session, onLogout }) {
             {activeTab === "media" && "Mes Médias"}
           </h2>
         </div>
-      </motion.div>
+      </div>
 
       {/* Conteneur principal avec scroll mobile optimisé */}
       <div className="mobile-scroll-container md:overflow-visible md:relative md:top-auto md:left-auto md:right-auto md:bottom-auto md:position-relative">

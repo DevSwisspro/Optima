@@ -1627,6 +1627,9 @@ body.menu-open > * {
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
     padding: 16px;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    will-change: auto;
   }
 
   /* Conteneur principal avec scroll isolé sur mobile */
@@ -1640,9 +1643,11 @@ body.menu-open > * {
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     touch-action: pan-y;
-    will-change: scroll-position;
     overscroll-behavior-y: contain;
     padding-bottom: 100px; /* Espace pour voir le footer correctement */
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    will-change: auto;
   }
 
   /* Scrollbar personnalisée pour le conteneur principal */
