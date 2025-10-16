@@ -811,6 +811,10 @@ export default function App({ session, onLogout }) {
   const barChartRef = useRef(null);
   const pieChartRef = useRef(null);
 
+  // Refs pour les selects mobile du dashboard (gestion focus)
+  const yearSelectRef = useRef(null);
+  const monthSelectRef = useRef(null);
+
   // États pour les paramètres
   const [showSettings, setShowSettings] = useState(false);
   const [recurringExpenses, setRecurringExpenses] = useState([]);
@@ -2213,7 +2217,14 @@ export default function App({ session, onLogout }) {
                   {/* Filtres Mobile - Optimisés pour réactivité native */}
                   <div className="mt-6 space-y-3 max-w-sm mx-auto">
                     <select
+                      ref={yearSelectRef}
                       value={dashboardFilter.year}
+                      onFocus={() => {
+                        // Blur l'autre select avant d'ouvrir celui-ci
+                        if (monthSelectRef.current && document.activeElement === monthSelectRef.current) {
+                          monthSelectRef.current.blur();
+                        }
+                      }}
                       onChange={(e) => {
                         setDashboardFilter(prev => ({ ...prev, year: parseInt(e.target.value) }));
                       }}
@@ -2235,7 +2246,14 @@ export default function App({ session, onLogout }) {
                     </select>
 
                     <select
+                      ref={monthSelectRef}
                       value={dashboardFilter.month}
+                      onFocus={() => {
+                        // Blur l'autre select avant d'ouvrir celui-ci
+                        if (yearSelectRef.current && document.activeElement === yearSelectRef.current) {
+                          yearSelectRef.current.blur();
+                        }
+                      }}
                       onChange={(e) => {
                         setDashboardFilter(prev => ({ ...prev, month: e.target.value }));
                       }}
