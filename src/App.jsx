@@ -2218,32 +2218,27 @@ export default function App({ session, onLogout }) {
                     </div>
                   </motion.div>
 
-                  {/* Filtres Mobile - Style Cards */}
-                  <div
-                    className="mt-6 space-y-3 max-w-sm mx-auto"
-                    style={{
-                      position: 'relative',
-                      transform: 'translateZ(0)',
-                      backfaceVisibility: 'hidden',
-                      WebkitBackfaceVisibility: 'hidden'
-                    }}
-                  >
+                  {/* Filtres Mobile - Optimisés pour réactivité native */}
+                  <div className="mt-6 space-y-3 max-w-sm mx-auto">
                     <select
                       value={dashboardFilter.year}
                       onChange={(e) => {
                         setDashboardFilter(prev => ({ ...prev, year: parseInt(e.target.value) }));
                       }}
-                      className="w-full card-premium-enhanced text-gray-900 text-center py-4 px-6 rounded-2xl text-lg font-semibold transition-none cursor-pointer hover:border-red-500/30"
+                      className="w-full text-gray-900 text-center py-4 px-6 rounded-2xl text-lg font-semibold cursor-pointer bg-white/95 border border-gray-200 shadow-md"
                       style={{
                         WebkitTapHighlightColor: 'transparent',
-                        touchAction: 'manipulation',
-                        outline: 'none',
-                        boxShadow: 'none'
+                        WebkitAppearance: 'none',
+                        appearance: 'none',
+                        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23E53935' d='M10.293 3.293L6 7.586 1.707 3.293A1 1 0 00.293 4.707l5 5a1 1 0 001.414 0l5-5a1 1 0 10-1.414-1.414z'/%3E%3C/svg%3E")`,
+                        backgroundRepeat: 'no-repeat',
+                        backgroundPosition: 'right 1rem center',
+                        backgroundSize: '1em'
                       }}
                     >
                       {getAvailableYears(budgetItems).length > 0 ? getAvailableYears(budgetItems).map(year => (
-                        <option key={year} value={year} className="bg-gray-800">{year}</option>
-                      )) : <option value={new Date().getFullYear()} className="bg-gray-800">{new Date().getFullYear()}</option>}
+                        <option key={year} value={year}>{year}</option>
+                      )) : <option value={new Date().getFullYear()}>{new Date().getFullYear()}</option>}
                     </select>
 
                     <select
@@ -2251,17 +2246,20 @@ export default function App({ session, onLogout }) {
                       onChange={(e) => {
                         setDashboardFilter(prev => ({ ...prev, month: e.target.value }));
                       }}
-                      className="w-full card-premium-enhanced text-gray-900 text-center py-4 px-6 rounded-2xl text-lg font-semibold transition-none cursor-pointer hover:border-red-500/30"
+                      className="w-full text-gray-900 text-center py-4 px-6 rounded-2xl text-lg font-semibold cursor-pointer bg-white/95 border border-gray-200 shadow-md"
                       style={{
                         WebkitTapHighlightColor: 'transparent',
-                        touchAction: 'manipulation',
-                        outline: 'none',
-                        boxShadow: 'none'
+                        WebkitAppearance: 'none',
+                        appearance: 'none',
+                        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23E53935' d='M10.293 3.293L6 7.586 1.707 3.293A1 1 0 00.293 4.707l5 5a1 1 0 001.414 0l5-5a1 1 0 10-1.414-1.414z'/%3E%3C/svg%3E")`,
+                        backgroundRepeat: 'no-repeat',
+                        backgroundPosition: 'right 1rem center',
+                        backgroundSize: '1em'
                       }}
                     >
-                      <option value="all" className="bg-gray-800">Toute l'année</option>
+                      <option value="all">Toute l'année</option>
                       {Array.from({ length: 12 }, (_, i) => (
-                        <option key={i + 1} value={i + 1} className="bg-gray-800">
+                        <option key={i + 1} value={i + 1}>
                           {new Date(2024, i).toLocaleDateString('fr-FR', { month: 'long' })}
                         </option>
                       ))}
