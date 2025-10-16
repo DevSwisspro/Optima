@@ -4430,9 +4430,6 @@ export default function App({ session, onLogout }) {
                           <span className="text-sm font-semibold text-red-400/90 tracking-wide uppercase">
                             Urgent
                           </span>
-                          <span className="ml-auto text-xs font-medium text-red-400/60 bg-red-500/10 px-2 py-1 rounded-full">
-                            {tasksByPriority.urgent.length}
-                          </span>
                         </div>
                         <div className="flex flex-col space-y-0 pt-2">
                           <AnimatePresence mode="popLayout">
@@ -4456,9 +4453,6 @@ export default function App({ session, onLogout }) {
                           </div>
                           <span className="text-sm font-semibold text-orange-400/90 tracking-wide uppercase">
                             Normal
-                          </span>
-                          <span className="ml-auto text-xs font-medium text-orange-400/60 bg-orange-500/10 px-2 py-1 rounded-full">
-                            {tasksByPriority.normal.length}
                           </span>
                         </div>
                         <div className="flex flex-col space-y-0 pt-2">
@@ -6620,7 +6614,7 @@ export default function App({ session, onLogout }) {
           transition={{ duration: 0.2, ease: "easeOut" }}
           className="fixed bg-gray-900/95 backdrop-blur-xl rounded-2xl border border-white/30 overflow-hidden shadow-2xl shadow-black/50"
           style={{
-            zIndex: 9999,
+            zIndex: 40,
             top: menuPosition.top,
             left: menuPosition.left,
             width: menuPosition.width
