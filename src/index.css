@@ -1617,7 +1617,7 @@ body.menu-open > * {
   /* Zone de titre de page fixe sous OPTIMA (mobile uniquement) */
   .page-title-bar {
     position: fixed;
-    top: 64px; /* Hauteur réelle du header OPTIMA (py-4 + pb-3 ˜ 64px) */
+    top: 80px; /* Hauteur du header OPTIMA avec safe-area (~72-80px) */
     left: 0;
     right: 0;
     z-index: 40; /* En dessous du header OPTIMA (z-50) mais au-dessus du contenu */
@@ -1632,7 +1632,7 @@ body.menu-open > * {
   /* Conteneur principal avec scroll isolÃ© sur mobile */
   .mobile-scroll-container {
     position: fixed;
-    top: 128px; /* Hauteur réelle: header OPTIMA (64px) + barre de titre (64px) */
+    top: 144px; /* Hauteur du header OPTIMA avec safe-area (80px) + barre de titre (64px) */
     left: 0;
     right: 0;
     bottom: 64px; /* Hauteur de la bottom nav */
