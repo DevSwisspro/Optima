@@ -1618,7 +1618,7 @@ body.menu-open > * {
   /* Conteneur principal avec scroll isolé sur mobile */
   .mobile-scroll-container {
     position: fixed;
-    top: calc(max(env(safe-area-inset-top, 0px), 12px) + 53px); /* Header: paddingTop max(safe-area, 12px) + inner content (py-4 16px + text 24px + pb-3 12px + border 1px = 53px) */
+    top: calc(env(safe-area-inset-top, 0px) + 65px); /* Header height: paddingTop 12px + py-4 16px + text 24px + pb-3 12px + border 1px = 65px */
     left: 0;
     right: 0;
     bottom: 64px; /* Hauteur de la bottom nav */
