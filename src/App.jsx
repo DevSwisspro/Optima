@@ -2226,7 +2226,7 @@ export default function App({ session, onLogout }) {
                       onChange={(e) => {
                         setDashboardFilter(prev => ({ ...prev, year: parseInt(e.target.value) }));
                       }}
-                      className="w-full text-gray-900 text-center py-4 px-6 rounded-2xl text-lg font-semibold cursor-pointer bg-white/95 border-0 shadow-md focus:outline-none focus:ring-0"
+                      className="mobile-white-button year-selector w-full text-gray-900 text-center py-4 px-6 rounded-2xl text-lg font-semibold cursor-pointer bg-white/95 border-0 shadow-md focus:outline-none focus:ring-0"
                       style={{
                         WebkitTapHighlightColor: 'transparent',
                         WebkitAppearance: 'none',
@@ -2255,7 +2255,7 @@ export default function App({ session, onLogout }) {
                       onChange={(e) => {
                         setDashboardFilter(prev => ({ ...prev, month: e.target.value }));
                       }}
-                      className="w-full text-gray-900 text-center py-4 px-6 rounded-2xl text-lg font-semibold cursor-pointer bg-white/95 border-0 shadow-md focus:outline-none focus:ring-0"
+                      className="mobile-white-button period-selector w-full text-gray-900 text-center py-4 px-6 rounded-2xl text-lg font-semibold cursor-pointer bg-white/95 border-0 shadow-md focus:outline-none focus:ring-0"
                       style={{
                         WebkitTapHighlightColor: 'transparent',
                         WebkitAppearance: 'none',

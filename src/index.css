@@ -1655,4 +1655,35 @@ body.menu-open > * {
     background-color: #FFFFFF !important;
     color: #000000 !important;
   }
+
+  /* Force padding-bottom sur TOUTES les pages pour éviter coupure en bas */
+  body {
+    padding-bottom: 150px !important;
+  }
+
+  .dashboard-page,
+  .budget-page,
+  [class*="page"],
+  main,
+  .main-content {
+    padding-bottom: 150px !important;
+    margin-bottom: 150px !important;
+  }
+}
+
+/* Force TOUT en blanc sur mobile - Boutons année/période */
+@media (max-width: 1024px) {
+  .mobile-white-button,
+  .year-selector,
+  .period-selector {
+    background: white !important;
+    background-color: white !important;
+    color: black !important;
+  }
+
+  .mobile-white-button *,
+  .year-selector *,
+  .period-selector * {
+    color: black !important;
+  }
 }
