@@ -1627,6 +1627,7 @@ body.menu-open > * {
     -webkit-overflow-scrolling: touch;
     touch-action: pan-y;
     overscroll-behavior-y: contain;
+    padding-top: 20px; /* Espace entre le header et le premier élément de contenu */
     padding-bottom: 120px; /* Espace augmenté pour voir le footer "Dev Suisse" confortablement */
   }
 
