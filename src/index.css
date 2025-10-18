@@ -1618,7 +1618,7 @@ body.menu-open > * {
   /* Conteneur principal avec scroll isolé sur mobile */
   .mobile-scroll-container {
     position: fixed;
-    top: 100px; /* Header 81px + grand écart de 19px pour un design plus aéré et élégant */
+    top: 81px; /* Header exactement 81px - contenu commence DIRECTEMENT après le header sans gap */
     left: 0;
     right: 0;
     bottom: 64px; /* Hauteur de la bottom nav */
