@@ -2,7 +2,21 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Settings } from 'lucide-react';
 
-export default function MobileHeader({ onSettingsClick }) {
+export default function MobileHeader({ onSettingsClick, activeTab = "dashboard" }) {
+  // Mapping des titres selon l'onglet actif
+  const pageTitles = {
+    dashboard: "Dashboard",
+    tasks: "Mes Tâches",
+    notes: "Notes",
+    shopping: "Mes Courses",
+    budget: "Mon Budget",
+    "budget-dashboard": "Budget Avancé",
+    media: "Mes Médias",
+    settings: "Paramètres"
+  };
+
+  const currentTitle = pageTitles[activeTab] || "Dashboard";
+
   return (
     <header
       className="md:hidden fixed top-0 left-0 right-0 z-50 backdrop-blur-xl border-b border-white/10"
@@ -16,7 +30,7 @@ export default function MobileHeader({ onSettingsClick }) {
       }}
     >
       <div className="relative flex items-center justify-center px-4 py-4 pb-3">
-        {/* Titre OPTIMA centré avec rouge signature */}
+        {/* Titre dynamique de la page avec style signature OPTIMA */}
         <h1
           className="text-[20px] font-bold tracking-[1px] uppercase relative"
           style={{
@@ -28,7 +42,7 @@ export default function MobileHeader({ onSettingsClick }) {
             filter: 'drop-shadow(0 0 8px rgba(255, 59, 48, 0.6))'
           }}
         >
-          OPTIMA
+          {currentTitle}
         </h1>
 
         {/* Bouton Paramètres à droite */}

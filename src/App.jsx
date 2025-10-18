@@ -2171,7 +2171,9 @@ export default function App({ session, onLogout }) {
       <Header session={session} onLogout={onLogout} />
 
       {/* Header Mobile avec titre OPTIMA */}
-      <MobileHeader onSettingsClick={() => {
+      <MobileHeader
+        activeTab={activeTab}
+        onSettingsClick={() => {
         // Le Sidebar gère déjà le panneau de paramètres
         document.querySelector('[data-mobile-settings-btn]')?.click();
       }} />
@@ -2184,29 +2186,6 @@ export default function App({ session, onLogout }) {
         onLogout={onLogout}
       />
 
-      {/* Barre de titre de page fixe (mobile only) - Sous OPTIMA */}
-      <div className="md:hidden page-title-bar">
-        <div className="flex items-center justify-center gap-3">
-          <div className="p-2 bg-gradient-to-br from-red-500/20 to-red-600/20 rounded-xl border border-red-500/30">
-            {activeTab === "dashboard" && <BarChart3 className="w-5 h-5 text-red-400" strokeWidth={2.5} />}
-            {activeTab === "tasks" && <List className="w-5 h-5 text-red-400" strokeWidth={2.5} />}
-            {activeTab === "notes" && <FileText className="w-5 h-5 text-red-400" strokeWidth={2.5} />}
-            {activeTab === "shopping" && <ShoppingCart className="w-5 h-5 text-red-400" strokeWidth={2.5} />}
-            {activeTab === "budget" && <Wallet className="w-5 h-5 text-red-400" strokeWidth={2.5} />}
-            {activeTab === "budget-dashboard" && <BarChart3 className="w-5 h-5 text-red-400" strokeWidth={2.5} />}
-            {activeTab === "media" && <Play className="w-5 h-5 text-red-400" strokeWidth={2.5} />}
-          </div>
-          <h2 className="text-lg font-semibold text-white/95 tracking-tight">
-            {activeTab === "dashboard" && "Dashboard"}
-            {activeTab === "tasks" && "Mes Tâches"}
-            {activeTab === "notes" && "Mes Notes"}
-            {activeTab === "shopping" && "Mes Courses"}
-            {activeTab === "budget" && "Mon Budget"}
-            {activeTab === "budget-dashboard" && "Budget Avancé"}
-            {activeTab === "media" && "Mes Médias"}
-          </h2>
-        </div>
-      </div>
 
       {/* Conteneur principal avec scroll mobile optimisé */}
       <div className="mobile-scroll-container md:overflow-visible md:relative md:top-auto md:left-auto md:right-auto md:bottom-auto md:position-relative">
