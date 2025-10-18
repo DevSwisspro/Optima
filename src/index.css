@@ -1618,7 +1618,7 @@ body.menu-open > * {
   /* Conteneur principal avec scroll isolé sur mobile */
   .mobile-scroll-container {
     position: fixed;
-    top: 65px; /* Header height exacte: paddingTop 12px + py-4 16px + text 24px + pb-3 12px + border 1px = 65px */
+    top: 85px; /* Header RÉELLE height: 12px paddingTop + 16px py-4 + 40px (Settings button) + 12px pb-3 + 1px border = 81px + 4px marge */
     left: 0;
     right: 0;
     bottom: 64px; /* Hauteur de la bottom nav */
@@ -1627,7 +1627,7 @@ body.menu-open > * {
     -webkit-overflow-scrolling: touch;
     touch-action: pan-y;
     overscroll-behavior-y: contain;
-    padding-top: 16px; /* Petit espace entre header et début du contenu */
+    padding-top: 0; /* Pas de padding - le pt-6 du div interne suffit */
     padding-bottom: 150px !important; /* Espace augmenté pour éviter que le contenu passe sous la bottom nav */
   }
 
