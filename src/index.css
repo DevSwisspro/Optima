@@ -1618,7 +1618,7 @@ body.menu-open > * {
   /* Conteneur principal avec scroll isolé sur mobile */
   .mobile-scroll-container {
     position: fixed;
-    top: 85px; /* Header RÉELLE height: 12px paddingTop + 16px py-4 + 40px (Settings button) + 12px pb-3 + 1px border = 81px + 4px marge */
+    top: 100px; /* Header 81px + grand écart de 19px pour un design plus aéré et élégant */
     left: 0;
     right: 0;
     bottom: 64px; /* Hauteur de la bottom nav */
