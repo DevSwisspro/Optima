@@ -933,6 +933,16 @@ export default function App({ session, onLogout }) {
   const [editingBudgetItem, setEditingBudgetItem] = useState(null);
   const [budgetFilter, setBudgetFilter] = useState({});
 
+  // Force scroll en haut au chargement et au changement d'onglet
+  useEffect(() => {
+    const scrollContainer = document.querySelector('.mobile-scroll-container');
+    if (scrollContainer) {
+      scrollContainer.scrollTo({ top: 0, behavior: 'instant' });
+    }
+    // Aussi scroll le body au cas où
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [activeTab]); // Se déclenche au chargement et quand activeTab change
+
   // Gestionnaire de clic global pour fermer les tooltips - CORRIGÉ
   useEffect(() => {
     let closeTimeoutId = null;
