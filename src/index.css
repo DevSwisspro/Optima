@@ -1618,7 +1618,7 @@ body.menu-open > * {
   /* Conteneur principal avec scroll isolé sur mobile */
   .mobile-scroll-container {
     position: fixed;
-    top: calc(env(safe-area-inset-top, 0px) + 68px); /* Dynamic: safe-area + header content (py-4 + text + pb-3 + border) */
+    top: calc(env(safe-area-inset-top, 0px) + 88px); /* Safe-area + header (12-44px safe + 16px py-4 + 24px text + 12px pb-3 + 1px border + 23px margin) */
     left: 0;
     right: 0;
     bottom: 64px; /* Hauteur de la bottom nav */
@@ -1627,7 +1627,7 @@ body.menu-open > * {
     -webkit-overflow-scrolling: touch;
     touch-action: pan-y;
     overscroll-behavior-y: contain;
-    padding-bottom: 120px; /* Espace augment� pour voir le footer "Dev Suisse" confortablement */
+    padding-bottom: 120px; /* Espace augment� pour voir le footer "Dev Suisse" confortablement */
   }
 
   /* Scrollbar personnalisée pour le conteneur principal */
