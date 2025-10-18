@@ -1628,7 +1628,7 @@ body.menu-open > * {
     touch-action: pan-y;
     overscroll-behavior-y: contain;
     padding-top: 20px; /* Espace entre le header et le premier élément de contenu */
-    padding-bottom: 120px; /* Espace augmenté pour voir le footer "Dev Suisse" confortablement */
+    padding-bottom: 150px !important; /* Espace augmenté pour éviter que le contenu passe sous la bottom nav */
   }
 
   /* Scrollbar personnalisée pour le conteneur principal */
@@ -1643,5 +1643,16 @@ body.menu-open > * {
   .mobile-scroll-container::-webkit-scrollbar-thumb {
     background: rgba(239, 68, 68, 0.25);
     border-radius: 2px;
+  }
+
+  /* Force selects mobile à avoir un fond blanc et texte noir */
+  .mobile-scroll-container select {
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+  }
+
+  .mobile-scroll-container select option {
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
   }
 }
