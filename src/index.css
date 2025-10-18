@@ -1627,7 +1627,7 @@ body.menu-open > * {
     -webkit-overflow-scrolling: touch;
     touch-action: pan-y;
     overscroll-behavior-y: contain;
-    padding-top: 20px; /* Espace entre le header et le premier élément de contenu */
+    padding-top: 16px; /* Petit espace entre header et début du contenu */
     padding-bottom: 150px !important; /* Espace augmenté pour éviter que le contenu passe sous la bottom nav */
   }
 
@@ -1654,20 +1654,6 @@ body.menu-open > * {
   .mobile-scroll-container select option {
     background-color: #FFFFFF !important;
     color: #000000 !important;
-  }
-
-  /* Force padding-bottom sur TOUTES les pages pour éviter coupure en bas */
-  body {
-    padding-bottom: 150px !important;
-  }
-
-  .dashboard-page,
-  .budget-page,
-  [class*="page"],
-  main,
-  .main-content {
-    padding-bottom: 150px !important;
-    margin-bottom: 150px !important;
   }
 }
 

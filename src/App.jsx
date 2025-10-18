@@ -2206,7 +2206,7 @@ export default function App({ session, onLogout }) {
           await new Promise(resolve => setTimeout(resolve, 800));
           window.location.reload();
         }}>
-          <div className="max-w-7xl mx-auto space-y-4 md:space-y-6 pb-6 md:pb-8 px-4 sm:px-6 lg:px-8 md:ml-20 md:pt-0">
+          <div className="max-w-7xl mx-auto space-y-4 md:space-y-6 pb-6 md:pb-8 px-4 sm:px-6 lg:px-8 md:ml-20 pt-6 md:pt-0">
             {/* Contenu Principal avec Transitions Fluides */}
         
           {activeTab === "dashboard" && (
