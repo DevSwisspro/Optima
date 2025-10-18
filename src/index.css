@@ -1618,7 +1618,7 @@ body.menu-open > * {
   /* Conteneur principal avec scroll isolÃ© sur mobile */
   .mobile-scroll-container {
     position: fixed;
-    top: 110px; /* Hauteur réelle : header OPTIMA (110px) + barre de titre (70px) */
+    top: 80px; /* Hauteur réelle : header OPTIMA (110px) + barre de titre (70px) */
     left: 0;
     right: 0;
     bottom: 64px; /* Hauteur de la bottom nav */
