@@ -1618,7 +1618,7 @@ body.menu-open > * {
   /* Conteneur principal avec scroll isolé sur mobile */
   .mobile-scroll-container {
     position: fixed;
-    top: 80px; /* Header total height: max safe-area/paddingTop (12-44px) + py-4 16px + text 24px + pb-3 12px + border 1px + small buffer */
+    top: 65px; /* Header height exacte: paddingTop 12px + py-4 16px + text 24px + pb-3 12px + border 1px = 65px */
     left: 0;
     right: 0;
     bottom: 64px; /* Hauteur de la bottom nav */
@@ -1627,8 +1627,7 @@ body.menu-open > * {
     -webkit-overflow-scrolling: touch;
     touch-action: pan-y;
     overscroll-behavior-y: contain;
-    padding-top: 16px; /* Espace entre le header et le d\u00e9but du contenu */
-    padding-bottom: 120px; /* Espace augment\u00e9 pour voir le footer "Dev Suisse" confortablement */
+    padding-bottom: 120px; /* Espace augmenté pour voir le footer "Dev Suisse" confortablement */
   }
 
   /* Scrollbar personnalisée pour le conteneur principal */
