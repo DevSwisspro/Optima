@@ -238,7 +238,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Mobile optimizations */
-@media (max-width: 640px) {
+@media (max-width: 767px) {
   html {
     font-size: clamp(13px, 1.6vw, 15px);
     /* Bloquer overscroll sur mobile */
@@ -360,6 +360,47 @@ h1, h2, h3, h4, h5, h6 {
       opacity: 1;
       transform: translateY(0);
     }
+  }
+
+  /* Conteneur principal avec scroll isolé - FIX HEADER */
+  .mobile-scroll-container {
+    position: fixed !important;
+    top: 150px !important; /* Header (~81px) + 69px gap = 150px pour VISIBILITÉ */
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 64px !important; /* Bottom nav */
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    overscroll-behavior-y: contain;
+    padding-top: 0 !important;
+    padding-bottom: 84px !important; /* 64px nav + 20px gap */
+  }
+
+  /* Scrollbar pour mobile-scroll-container */
+  .mobile-scroll-container::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .mobile-scroll-container::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .mobile-scroll-container::-webkit-scrollbar-thumb {
+    background: rgba(239, 68, 68, 0.25);
+    border-radius: 2px;
+  }
+
+  /* Force selects en blanc sur mobile */
+  .mobile-scroll-container select {
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+  }
+
+  .mobile-scroll-container select option {
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
   }
 }
 
