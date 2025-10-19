@@ -1627,8 +1627,8 @@ body.menu-open > * {
     -webkit-overflow-scrolling: touch;
     touch-action: pan-y;
     overscroll-behavior-y: contain;
-    padding-top: 100px !important; /* TRÈS grand espace entre titre et boutons - design ultra aéré */
-    padding-bottom: 100px !important; /* Espace en bas pour que le texte/footer reste visible */
+    padding-top: 24px !important; /* Espace raisonnable entre titre et boutons - garde les boutons visibles */
+    padding-bottom: 120px !important; /* Espace en bas pour que le texte/footer reste visible */
   }
 
   /* Scrollbar personnalisée pour le conteneur principal */
