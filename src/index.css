@@ -1618,7 +1618,7 @@ body.menu-open > * {
   /* Conteneur principal avec scroll isolé sur mobile */
   .mobile-scroll-container {
     position: fixed;
-    top: 81px; /* Header exactement 81px */
+    top: 81px; /* Header: 12px paddingTop + 16px py-4 + 40px Settings button + 12px pb-3 + 1px border = 81px */
     left: 0;
     right: 0;
     bottom: 64px; /* Hauteur de la bottom nav */
@@ -1627,8 +1627,8 @@ body.menu-open > * {
     -webkit-overflow-scrolling: touch;
     touch-action: pan-y;
     overscroll-behavior-y: contain;
-    padding-top: 24px !important; /* Espace raisonnable entre titre et boutons - garde les boutons visibles */
-    padding-bottom: 120px !important; /* Espace en bas pour que le texte/footer reste visible */
+    padding-top: 20px !important; /* GAP UNIQUE ET CONSTANT: 20px entre le header et le premier élément sur TOUTES les pages */
+    padding-bottom: 84px !important; /* Bottom nav (64px) + 20px gap = 84px pour footer visible */
   }
 
   /* Scrollbar personnalisée pour le conteneur principal */
