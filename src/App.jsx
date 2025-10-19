@@ -2042,6 +2042,9 @@ export default function App({ session, onLogout }) {
       mediaType: media.type,
       id: media.api_id
     });
+
+    // Scroll vers le haut pour afficher le formulaire
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const filtered = useMemo(() => {
@@ -6448,13 +6451,13 @@ export default function App({ session, onLogout }) {
                                   </div>
                                 </div>
 
-                                {/* Boutons d'action - visibles au survol */}
-                                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                {/* Boutons d'action - toujours visibles sur mobile, survol sur desktop */}
+                                <div className="flex gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
                                   <Button
                                     size="icon"
                                     variant="ghost"
                                     onClick={() => startEditMedia(media)}
-                                    className="h-8 w-8 rounded-lg bg-gray-700/60 hover:bg-gray-600 text-gray-300 hover:text-white"
+                                    className="h-8 w-8 rounded-lg bg-gray-700/60 hover:bg-gray-600 text-gray-300 hover:text-white touch-target"
                                   >
                                     <Edit className="w-3 h-3" />
                                   </Button>
@@ -6462,7 +6465,7 @@ export default function App({ session, onLogout }) {
                                     size="icon"
                                     variant="ghost"
                                     onClick={() => deleteMedia(media.id)}
-                                    className="h-8 w-8 rounded-lg bg-red-600/60 hover:bg-red-500 text-white"
+                                    className="h-8 w-8 rounded-lg bg-red-600/60 hover:bg-red-500 text-white touch-target"
                                   >
                                     <Trash2 className="w-3 h-3" />
                                   </Button>
