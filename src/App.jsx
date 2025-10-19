@@ -4221,6 +4221,7 @@ export default function App({ session, onLogout }) {
 
           {activeTab === "tasks" && (
             <PageTransition pageKey="tasks">
+              <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 md:-mt-4 md:pb-10 space-y-8 md:space-y-12">
               {/* Header Tâches - Mobile vs Desktop harmonisé */}
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
@@ -4499,11 +4500,13 @@ export default function App({ session, onLogout }) {
                   </div>
                 )}
               </motion.div>
+              </div>
             </PageTransition>
           )}
 
           {activeTab === "notes" && (
             <PageTransition pageKey="notes">
+              <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 md:-mt-4 md:pb-10 space-y-8 md:space-y-12">
               {/* Header Notes - Mobile vs Desktop harmonisé */}
 
               {/* Mobile Header - Sticky en haut du scroll container */}
@@ -4768,9 +4771,10 @@ export default function App({ session, onLogout }) {
                         </div>
                       </div>
                     ))}
-                  
+
                   </div>
                 )}
+              </div>
               </div>
             </PageTransition>
           )}
@@ -4778,6 +4782,7 @@ export default function App({ session, onLogout }) {
         {/* Section des courses */}
         {activeTab === "shopping" && (
           <PageTransition pageKey="shopping">
+            <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 md:-mt-4 md:pb-10 space-y-8 md:space-y-12">
             {/* Header Courses - Mobile vs Desktop harmonisé */}
 
             {/* Mobile Header - Sticky en haut du scroll container */}
@@ -5010,12 +5015,14 @@ export default function App({ session, onLogout }) {
                 </div>
               )}
             </div>
+            </div>
           </PageTransition>
         )}
 
         {/* Onglet Budget */}
         {activeTab === "budget" && (
           <PageTransition pageKey="budget">
+            <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 md:-mt-4 md:pb-10 space-y-8 md:space-y-12">
             {/* Header Budget - Mobile vs Desktop harmonisé */}
 
             {/* Mobile Header - Sticky en haut du scroll container */}
@@ -6090,12 +6097,14 @@ export default function App({ session, onLogout }) {
                 <p className="text-gray-400 text-lg">Aucune opération enregistrée.</p>
               </div>
             )}
+            </div>
           </PageTransition>
         )}
 
         {/* Section des médias */}
         {activeTab === "media" && (
           <PageTransition pageKey="media">
+            <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 md:-mt-4 md:pb-10 space-y-8 md:space-y-12">
             {/* Header Media - Mobile vs Desktop harmonisé */}
 
             {/* Mobile Header - Style centralisé harmonisé */}
@@ -6529,6 +6538,7 @@ export default function App({ session, onLogout }) {
                   
                 </div>
               )}
+            </div>
             </div>
           </PageTransition>
         )}
