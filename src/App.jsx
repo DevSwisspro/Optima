@@ -2256,7 +2256,7 @@ export default function App({ session, onLogout }) {
           {activeTab === "dashboard" && (
             <PageTransition pageKey="dashboard">
               <div
-                className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 md:py-10 space-y-8 md:space-y-12"
+                className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 md:pt-4 md:pb-10 space-y-8 md:space-y-12"
               >
               {/* Header Dashboard - Mobile vs Desktop */}
               <motion.div
