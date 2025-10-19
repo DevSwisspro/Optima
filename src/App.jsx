@@ -2044,7 +2044,17 @@ export default function App({ session, onLogout }) {
     });
 
     // Scroll vers le haut pour afficher le formulaire
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Sur mobile, scroller le conteneur fixe, sur desktop scroller la window
+    setTimeout(() => {
+      const scrollContainer = document.querySelector('.mobile-scroll-container');
+      if (scrollContainer && window.innerWidth < 768) {
+        // Mobile: scroller le conteneur
+        scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        // Desktop: scroller la window
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }, 50); // Petit délai pour laisser React mettre à jour l'UI
   };
 
   const filtered = useMemo(() => {
