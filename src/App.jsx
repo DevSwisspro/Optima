@@ -6426,89 +6426,92 @@ export default function App({ session, onLogout }) {
                               })()}
                             </div>
 
-                            {/* Contenu principal */}
-                            <div className="flex-1 p-5 space-y-4">
+                            {/* Contenu principal - Structure cohérente */}
+                            <div className="flex-1 p-5 flex flex-col min-h-[160px]">
 
-                              {/* Header avec titre et actions */}
-                              <div className="flex justify-between items-start gap-3">
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-center gap-3 mb-2 flex-wrap">
-                                    <h3 className="text-lg font-semibold text-white leading-tight">
-                                      {media.title}
-                                    </h3>
+                              {/* Ligne 1: Titre à gauche | Badges à droite */}
+                              <div className="flex justify-between items-start gap-3 mb-3">
+                                <h3 className="text-lg font-semibold text-white leading-tight flex-1 min-w-0">
+                                  {media.title}
+                                </h3>
 
-                                    {/* Badges type et statut à côté du titre */}
-                                    <Badge className="bg-red-600/90 text-white text-xs px-2 py-1 rounded-md font-medium">
-                                      {media.type === 'movie' ? '🎬 Film' : media.type === 'tv' ? '📺 Série' : '🎌 Animé'}
-                                    </Badge>
+                                {/* Badges Type + Statut compacts */}
+                                <div className="flex gap-1.5 flex-shrink-0">
+                                  <Badge className="bg-red-600/90 text-white text-xs px-2 py-0.5 rounded-md font-medium">
+                                    {media.type === 'movie' ? '🎬' : media.type === 'tv' ? '📺' : '🎌'}
+                                  </Badge>
 
-                                    <Badge className={`text-xs px-2 py-1 rounded-md font-medium ${
-                                      media.status === 'watched' ? 'bg-emerald-600 text-white' :
-                                      media.status === 'watching' ? 'bg-blue-600 text-white' :
-                                      'bg-amber-600 text-white'
-                                    }`}>
-                                      {media.status === 'watched' ? '✓ Vu' : media.status === 'watching' ? '▶ En cours' : '○ À voir'}
-                                    </Badge>
-                                  </div>
-
-                                  {/* Infos essentielles */}
-                                  <div className="flex items-center gap-3 text-sm text-gray-400">
-                                    {media.release_date && (
-                                      <span className="flex items-center gap-1">
-                                        📅 {typeof media.release_date === 'string' ? media.release_date.split('-')[0] : media.release_date}
-                                      </span>
-                                    )}
-                                  </div>
-                                </div>
-
-                                {/* Boutons d'action - toujours visibles sur mobile, survol sur desktop */}
-                                <div className="flex gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
-                                  <Button
-                                    size="icon"
-                                    variant="ghost"
-                                    onClick={() => startEditMedia(media)}
-                                    className="h-8 w-8 rounded-lg bg-gray-700/60 hover:bg-gray-600 text-gray-300 hover:text-white touch-target"
-                                  >
-                                    <Edit className="w-3 h-3" />
-                                  </Button>
-                                  <Button
-                                    size="icon"
-                                    variant="ghost"
-                                    onClick={() => deleteMedia(media.id)}
-                                    className="h-8 w-8 rounded-lg bg-red-600/60 hover:bg-red-500 text-white touch-target"
-                                  >
-                                    <Trash2 className="w-3 h-3" />
-                                  </Button>
+                                  <Badge className={`text-xs px-2 py-0.5 rounded-md font-medium ${
+                                    media.status === 'watched' ? 'bg-emerald-600 text-white' :
+                                    media.status === 'watching' ? 'bg-blue-600 text-white' :
+                                    'bg-amber-600 text-white'
+                                  }`}>
+                                    {media.status === 'watched' ? '✓' : media.status === 'watching' ? '▶' : '○'}
+                                  </Badge>
                                 </div>
                               </div>
 
-                              {/* Ma note personnelle - uniquement si vu */}
-                              {media.status === "watched" && media.rating && (
-                                <div className="flex items-center gap-1 text-xs media-stars-container">
-                                  <span className="text-gray-400 font-medium shrink-0">Note:</span>
-                                  <div className="star-rating flex items-center gap-0.5">
-                                    {[1, 2, 3, 4, 5].map((star) => (
-                                      <Star
-                                        key={star}
-                                        className={`w-2.5 h-2.5 ${
-                                          star <= media.rating
-                                            ? 'text-yellow-400 fill-yellow-400'
-                                            : 'text-gray-600'
-                                        }`}
-                                      />
-                                    ))}
-                                  </div>
+                              {/* Ligne 2: Infos (date) */}
+                              {media.release_date && (
+                                <div className="text-sm text-gray-400 mb-3">
+                                  📅 {typeof media.release_date === 'string' ? media.release_date.split('-')[0] : media.release_date}
                                 </div>
                               )}
 
-                              {/* Commentaire personnel - s'il existe */}
-                              {media.status === "watched" && media.comment && (
-                                <div className="bg-gray-700/30 rounded-xl p-3 border border-gray-600/30">
-                                  <p className="text-gray-200 text-sm italic leading-relaxed">
-                                    "{media.comment}"
-                                  </p>
+                              {/* Ligne 3: Note à gauche | Boutons à droite */}
+                              <div className="mt-auto">
+                                <div className="flex justify-between items-center mb-3">
+                                  {/* Note (si vue) */}
+                                  {media.status === "watched" && media.rating ? (
+                                    <div className="flex items-center gap-1 text-xs">
+                                      <span className="text-gray-400 font-medium shrink-0">Note:</span>
+                                      <div className="star-rating flex items-center gap-0.5">
+                                        {[1, 2, 3, 4, 5].map((star) => (
+                                          <Star
+                                            key={star}
+                                            className={`w-3 h-3 ${
+                                              star <= media.rating
+                                                ? 'text-yellow-400 fill-yellow-400'
+                                                : 'text-gray-600'
+                                            }`}
+                                          />
+                                        ))}
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <div></div>
+                                  )}
+
+                                  {/* Boutons d'action */}
+                                  <div className="flex gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
+                                    <Button
+                                      size="icon"
+                                      variant="ghost"
+                                      onClick={() => startEditMedia(media)}
+                                      className="h-8 w-8 rounded-lg bg-gray-700/60 hover:bg-gray-600 text-gray-300 hover:text-white touch-target"
+                                    >
+                                      <Edit className="w-3 h-3" />
+                                    </Button>
+                                    <Button
+                                      size="icon"
+                                      variant="ghost"
+                                      onClick={() => deleteMedia(media.id)}
+                                      className="h-8 w-8 rounded-lg bg-red-600/60 hover:bg-red-500 text-white touch-target"
+                                    >
+                                      <Trash2 className="w-3 h-3" />
+                                    </Button>
+                                  </div>
                                 </div>
-                              )}
+
+                                {/* Commentaire personnel - s'il existe */}
+                                {media.status === "watched" && media.comment && (
+                                  <div className="bg-gray-700/30 rounded-xl p-3 border border-gray-600/30">
+                                    <p className="text-gray-200 text-sm italic leading-relaxed">
+                                      "{media.comment}"
+                                    </p>
+                                  </div>
+                                )}
+                              </div>
 
                             </div>
                           </div>
