@@ -1618,7 +1618,7 @@ body.menu-open > * {
   /* Conteneur principal avec scroll isolé sur mobile */
   .mobile-scroll-container {
     position: fixed;
-    top: 110px; /* Header (81px) + GAP (29px) = 110px - Les boutons commencent EN DESSOUS du titre et sont VISIBLES */
+    top: 150px; /* GRAND GAP: Header (~81px) + 69px d'espace = 150px - Boutons BIEN VISIBLES */
     left: 0;
     right: 0;
     bottom: 64px; /* Hauteur de la bottom nav */
