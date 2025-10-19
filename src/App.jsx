@@ -5007,7 +5007,7 @@ export default function App({ session, onLogout }) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 card-premium"
+              className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 card-premium mt-6 md:mt-8"
             >
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-2xl font-bold text-white">Gestion des Données</h3>
@@ -5754,7 +5754,7 @@ export default function App({ session, onLogout }) {
             )}
 
             {/* Cartes colorées résumé */}
-            <div className="grid grid-cols-2 md:grid-cols-6 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-6 gap-6 mt-6 md:mt-8">
               <div 
                 whileHover={{ scale: 1.05, y: -5 }}
                 className="relative overflow-hidden bg-gradient-to-br from-green-500/20 to-emerald-600/20 rounded-xl p-4 border border-green-500/30 backdrop-blur-sm group cursor-pointer min-h-[100px] card-premium"
@@ -5958,7 +5958,7 @@ export default function App({ session, onLogout }) {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 border border-gray-700/50 shadow-2xl card-premium"
+                className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 border border-gray-700/50 shadow-2xl card-premium mt-6 md:mt-8"
               >
                 <h3 className="text-lg font-semibold text-white mb-6">Opérations récentes</h3>
 
