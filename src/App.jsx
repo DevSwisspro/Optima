@@ -6439,7 +6439,7 @@ export default function App({ session, onLogout }) {
                               {media.status === "watched" && media.rating && (
                                 <div className="flex items-center gap-1 text-xs media-stars-container">
                                   <span className="text-gray-400 font-medium shrink-0">Note:</span>
-                                  <div className="star-rating">
+                                  <div className="star-rating flex items-center gap-0.5">
                                     {[1, 2, 3, 4, 5].map((star) => (
                                       <Star
                                         key={star}
