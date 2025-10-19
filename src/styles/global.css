@@ -365,7 +365,7 @@ h1, h2, h3, h4, h5, h6 {
   /* Conteneur principal avec scroll isolé - FIX HEADER */
   .mobile-scroll-container {
     position: fixed !important;
-    top: 140px !important; /* Header (~81px) + gap ~59px pour espace généreux et visibilité optimale */
+    top: 0 !important; /* Container dès le top de l'écran */
     left: 0 !important;
     right: 0 !important;
     bottom: 64px !important; /* Bottom nav */
@@ -374,7 +374,7 @@ h1, h2, h3, h4, h5, h6 {
     -webkit-overflow-scrolling: touch;
     touch-action: pan-y;
     overscroll-behavior-y: contain;
-    padding-top: 0 !important;
+    padding-top: 140px !important; /* Header (81px) + espace (59px) - contenu scroll SOUS le header */
     padding-bottom: 84px !important; /* 64px nav + 20px gap */
   }
 
