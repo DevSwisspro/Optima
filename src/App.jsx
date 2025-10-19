@@ -1902,6 +1902,9 @@ export default function App({ session, onLogout }) {
   };
 
   const selectApiResult = (result) => {
+    console.log('✅ Résultat API sélectionné:', result);
+    console.log('🖼️ Poster sélectionné:', result.posterPath);
+
     setSelectedApiResult(result);
     setMediaTitle(result.title);
     setMediaType(result.mediaType);
@@ -1914,6 +1917,10 @@ export default function App({ session, onLogout }) {
   // Fonctions pour les médias
   const addMedia = async () => {
     if (!mediaTitle.trim() || !userId) return;
+
+    // 🔍 Diagnostic: vérifier si selectedApiResult contient le poster
+    console.log('📝 addMedia - selectedApiResult:', selectedApiResult);
+    console.log('🖼️ addMedia - posterPath:', selectedApiResult?.posterPath);
 
     const newMedia = {
       user_id: userId,
@@ -1930,6 +1937,8 @@ export default function App({ session, onLogout }) {
       date_watched: mediaStatus === 'watched' ? new Date().toISOString() : null,
       api_id: selectedApiResult?.id || null
     };
+
+    console.log('💾 Media à sauvegarder:', newMedia);
 
     try {
       if (editingMedia) {
@@ -6355,28 +6364,31 @@ export default function App({ session, onLogout }) {
 
                             {/* Poster - propre sans overlay */}
                             <div className="flex-shrink-0">
-                              {media.poster_path ? (
-                                <img
-                                  src={
-                                    media.poster_path.startsWith('http')
-                                      ? media.poster_path
-                                      : `https://image.tmdb.org/t/p/w500${media.poster_path}`
-                                  }
-                                  alt={media.title}
-                                  className="w-full h-64 object-cover rounded-t-lg shadow-md"
-                                  loading="lazy"
-                                  decoding="async"
-                                  onError={(e) => {
-                                    console.error('Erreur chargement image:', media.poster_path);
-                                    e.target.style.display = 'none';
-                                    e.target.parentElement.innerHTML = '<div class="w-full h-64 bg-gray-700/50 flex items-center justify-center rounded-t-lg"><svg class="w-8 h-8 text-gray-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"/></svg></div>';
-                                  }}
-                                />
-                              ) : (
-                                <div className="w-full h-64 bg-gray-700/50 flex items-center justify-center rounded-t-lg">
-                                  <Play className="w-8 h-8 text-gray-500" />
-                                </div>
-                              )}
+                              {(() => {
+                                console.log(`🖼️ Affichage média "${media.title}" - poster_path:`, media.poster_path);
+                                return media.poster_path ? (
+                                  <img
+                                    src={
+                                      media.poster_path.startsWith('http')
+                                        ? media.poster_path
+                                        : `https://image.tmdb.org/t/p/w500${media.poster_path}`
+                                    }
+                                    alt={media.title}
+                                    className="w-full h-64 object-cover rounded-t-lg shadow-md"
+                                    loading="lazy"
+                                    decoding="async"
+                                    onError={(e) => {
+                                      console.error('❌ Erreur chargement image pour:', media.title, 'URL:', e.target.src);
+                                      e.target.style.display = 'none';
+                                      e.target.parentElement.innerHTML = '<div class="w-full h-64 bg-gray-700/50 flex items-center justify-center rounded-t-lg"><svg class="w-8 h-8 text-gray-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"/></svg></div>';
+                                    }}
+                                  />
+                                ) : (
+                                  <div className="w-full h-64 bg-gray-700/50 flex items-center justify-center rounded-t-lg">
+                                    <Play className="w-8 h-8 text-gray-500" />
+                                  </div>
+                                );
+                              })()}
                             </div>
 
                             {/* Contenu principal */}
