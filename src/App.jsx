@@ -588,8 +588,21 @@ const TMDB_API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
 
+// Vérification de la clé API au chargement
+if (!TMDB_API_KEY) {
+  console.error('❌ ERREUR: VITE_TMDB_API_KEY non configurée !');
+  console.error('📝 Sur Netlify: Site Settings > Environment variables > Add variable');
+  console.error('🔑 Nom: VITE_TMDB_API_KEY');
+  console.error('🔑 Valeur: b121567bcaadb1d20806b5f9fc7590dc');
+}
+
 const searchTMDB = async (query, type = 'multi') => {
-  if (!query || !TMDB_API_KEY) return [];
+  if (!query) return [];
+
+  if (!TMDB_API_KEY) {
+    console.error('❌ Recherche TMDB impossible: clé API manquante');
+    return [];
+  }
 
   try {
     // Recherche prioritairement en français
@@ -1888,6 +1901,15 @@ export default function App({ session, onLogout }) {
       } else {
         const searchType = mediaType === 'movie' ? 'movie' : mediaType === 'tv' ? 'tv' : 'multi';
         console.log('🎬 Recherche TMDB pour:', query, 'Type:', searchType);
+
+        if (!TMDB_API_KEY) {
+          console.error('❌ Impossible de rechercher: VITE_TMDB_API_KEY non configurée');
+          alert('⚠️ Configuration manquante\n\nLa clé API TMDB n\'est pas configurée.\n\nSur Netlify: Site Settings > Environment variables\nAjoutez: VITE_TMDB_API_KEY = b121567bcaadb1d20806b5f9fc7590dc');
+          setSearchLoading(false);
+          setShowSuggestions(false);
+          return;
+        }
+
         results = await searchTMDB(query, searchType);
       }
 
