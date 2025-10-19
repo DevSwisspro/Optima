@@ -5975,7 +5975,7 @@ export default function App({ session, onLogout }) {
                       .map(item => (
                         <div
                           key={item.id}
-                          className="group relative overflow-hidden rounded-xl border border-gray-700/50 bg-gray-700/90 backdrop-blur-sm shadow-xl md:hover:shadow-2xl transition-shadow duration-300 card-premium"
+                          className="group relative overflow-hidden rounded-xl border border-gray-700/50 bg-gray-700/90 backdrop-blur-sm shadow-xl md:hover:shadow-2xl transition-shadow duration-300 card-premium pointer-events-none md:pointer-events-auto"
                           style={{
                             touchAction: 'pan-y',
                             WebkitTapHighlightColor: 'transparent'
@@ -6013,20 +6013,20 @@ export default function App({ session, onLogout }) {
                               </div>
                             </div>
                             
-                            <div className="flex gap-2">
-                              <Button 
-                                size="icon" 
-                                variant="outline" 
-                                onClick={() => startEditBudgetItem(item)} 
-                                className="rounded-full bg-gray-600 hover:bg-gray-500 border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 active:scale-95"
+                            <div className="flex gap-2 pointer-events-auto">
+                              <Button
+                                size="icon"
+                                variant="outline"
+                                onClick={() => startEditBudgetItem(item)}
+                                className="rounded-full bg-gray-600 hover:bg-gray-500 border-0 shadow-lg hover:shadow-xl transition-all duration-300 md:transform md:hover:scale-110 active:scale-95"
                               >
                                 ✏️
                               </Button>
-                              <Button 
-                                size="icon" 
-                                variant="outline" 
-                                onClick={() => deleteBudgetItem(item.id)} 
-                                className="rounded-full bg-red-600 hover:bg-red-500 border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 active:scale-95"
+                              <Button
+                                size="icon"
+                                variant="outline"
+                                onClick={() => deleteBudgetItem(item.id)}
+                                className="rounded-full bg-red-600 hover:bg-red-500 border-0 shadow-lg hover:shadow-xl transition-all duration-300 md:transform md:hover:scale-110 active:scale-95"
                               >
                                 <Trash2 className="w-4 h-4 text-white" />
                               </Button>
