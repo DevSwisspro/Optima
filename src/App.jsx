@@ -4230,7 +4230,7 @@ export default function App({ session, onLogout }) {
               >
                 {/* Mobile Header - Sticky en haut du scroll container */}
                 {/* Desktop Header - Style Dashboard */}
-                <div className="hidden md:block">
+                <div className="hidden md:block md:-mt-4">
                   <div className="glass-dark rounded-3xl p-8 border border-white/10 card-premium">
                     <div className="flex flex-row justify-between items-center">
                       <motion.div
@@ -4508,7 +4508,7 @@ export default function App({ session, onLogout }) {
 
               {/* Mobile Header - Sticky en haut du scroll container */}
               {/* Desktop Header - Style horizontal harmonisé */}
-              <div className="hidden md:block">
+              <div className="hidden md:block md:-mt-4">
                 <div
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -4782,7 +4782,7 @@ export default function App({ session, onLogout }) {
 
             {/* Mobile Header - Sticky en haut du scroll container */}
             {/* Desktop Header - Style horizontal harmonisé */}
-            <div className="hidden md:block">
+            <div className="hidden md:block md:-mt-4">
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -5020,7 +5020,7 @@ export default function App({ session, onLogout }) {
 
             {/* Mobile Header - Sticky en haut du scroll container */}
             {/* Desktop Header - Style horizontal harmonisé */}
-            <div className="hidden md:block">
+            <div className="hidden md:block md:-mt-4">
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -6151,7 +6151,7 @@ export default function App({ session, onLogout }) {
             </div>
 
             {/* Desktop Header - Style horizontal harmonisé */}
-            <div className="hidden md:block">
+            <div className="hidden md:block md:-mt-4">
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
