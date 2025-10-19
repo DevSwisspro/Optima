@@ -2206,13 +2206,13 @@ export default function App({ session, onLogout }) {
           await new Promise(resolve => setTimeout(resolve, 800));
           window.location.reload();
         }}>
-          <div className="max-w-7xl mx-auto space-y-4 md:space-y-6 pb-6 md:pb-8 px-4 sm:px-6 lg:px-8 md:ml-20 pt-6 md:pt-0">
+          <div className="max-w-7xl mx-auto space-y-4 md:space-y-6 pb-6 md:pb-8 px-4 sm:px-6 lg:px-8 md:ml-20 md:pt-0">
             {/* Contenu Principal avec Transitions Fluides */}
         
           {activeTab === "dashboard" && (
             <PageTransition pageKey="dashboard">
               <div
-                className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-10 space-y-8 md:space-y-12"
+                className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 md:py-10 space-y-8 md:space-y-12"
               >
               {/* Header Dashboard - Mobile vs Desktop */}
               <motion.div
@@ -2223,7 +2223,7 @@ export default function App({ session, onLogout }) {
               >
                 {/* Mobile Header - Sticky en haut du scroll container */}
                   {/* Filtres Mobile - Optimisés pour réactivité native */}
-                  <div className="mt-6 grid grid-cols-2 gap-3 max-w-md mx-auto">
+                  <div className="grid grid-cols-2 gap-3 max-w-md mx-auto">
                     <select
                       ref={yearSelectRef}
                       value={dashboardFilter.year}
