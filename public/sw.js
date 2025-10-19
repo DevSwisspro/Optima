@@ -1,8 +1,8 @@
 // Service Worker pour Optima PWA
 // IMPORTANT: Incrémenter ces versions à chaque déploiement pour forcer la mise à jour
-const CACHE_NAME = 'optima-v2025-10-07T15-55-59';
-const STATIC_CACHE = 'optima-static-v2025-10-07T15-55-59';
-const DYNAMIC_CACHE = 'optima-dynamic-v2025-10-07T15-55-59';
+const CACHE_NAME = 'optima-v2025-10-19T22-30-00';
+const STATIC_CACHE = 'optima-static-v2025-10-19T22-30-00';
+const DYNAMIC_CACHE = 'optima-dynamic-v2025-10-19T22-30-00';
 
 // Fichiers à mettre en cache immédiatement
 const STATIC_FILES = [
@@ -13,11 +13,14 @@ const STATIC_FILES = [
   '/icons/icon-512x512.png'
 ];
 
-// URLs d'API à ne pas mettre en cache
+// URLs d'API et images externes à ne pas mettre en cache
 const SKIP_CACHE_URLS = [
   'api.themoviedb.org',
-  'graphql.anilist.co',
-  'supabase'
+  'image.tmdb.org',        // Images TMDB
+  'anilist.co',            // Images + API AniList
+  'supabase',
+  'fonts.googleapis.com',  // Google Fonts
+  'fonts.gstatic.com'
 ];
 
 // Installation du Service Worker
