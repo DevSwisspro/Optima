@@ -2387,7 +2387,7 @@ export default function App({ session, onLogout }) {
                   {/* Statistiques - Mobile vs Desktop différenciés */}
 
                   {/* Version Mobile - Cards verticales centrées */}
-                  <div className="md:hidden">
+                  <div className="md:hidden mt-6 md:mt-8">
                     <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
@@ -2646,7 +2646,7 @@ export default function App({ session, onLogout }) {
                   )}
 
                   {/* Graphiques mensuels */}
-                  <div className="space-y-8 md:space-y-12">
+                  <div className="space-y-8 md:space-y-12 mt-6 md:mt-8">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
                     {/* Graphique en barres mensuelles */}
                     <motion.div
@@ -2921,7 +2921,7 @@ export default function App({ session, onLogout }) {
 
                   {/* Graphiques annuels */}
                   {getAvailableYears(budgetItems).length > 1 && (
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6 md:mt-8">
                     </div>
                   )}
                 </>
@@ -4223,7 +4223,7 @@ export default function App({ session, onLogout }) {
               {/* Zone d'ajout de tâche - Mobile vs Desktop */}
 
               {/* Mobile - Version ultra-compacte */}
-              <div className="md:hidden">
+              <div className="md:hidden mt-6">
                 <div className="bg-gray-800/50 rounded-lg p-4 sm:p-4 border border-white/20">
                   <div className="space-y-3 sm:space-y-3">
                     {/* Input mobile compact */}
@@ -4277,7 +4277,7 @@ export default function App({ session, onLogout }) {
               </div>
 
               {/* Desktop - Version horizontale compacte */}
-              <div className="hidden md:block">
+              <div className="hidden md:block mt-6 md:mt-8">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -4340,7 +4340,7 @@ export default function App({ session, onLogout }) {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
-                className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 card-premium"
+                className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 card-premium mt-6 md:mt-8"
               >
                 <div className="flex items-center gap-4">
                   <div className="p-3 sm:p-3 bg-gradient-to-br from-gray-600 to-gray-700 rounded-2xl shadow-lg">
@@ -4362,7 +4362,7 @@ export default function App({ session, onLogout }) {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.8 }}
-                className="glass-dark rounded-3xl p-5 md:p-6 min-h-96 neo-shadow border border-white/20 card-premium"
+                className="glass-dark rounded-3xl p-5 md:p-6 min-h-96 neo-shadow border border-white/20 card-premium mt-6 md:mt-8"
               >
                 {(tasksByPriority.urgent.length === 0 && tasksByPriority.normal.length === 0) ? (
                   <motion.div
@@ -4505,7 +4505,7 @@ export default function App({ session, onLogout }) {
               {/* Zone d'ajout de note - Mobile vs Desktop */}
 
               {/* Mobile - Version centrée et verticale */}
-              <div className="md:hidden">
+              <div className="md:hidden mt-6">
                 <div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -4570,7 +4570,7 @@ export default function App({ session, onLogout }) {
               </div>
 
               {/* Desktop - Version horizontale intégrée */}
-              <div className="hidden md:block">
+              <div className="hidden md:block mt-6 md:mt-8">
                 <div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -4636,7 +4636,7 @@ export default function App({ session, onLogout }) {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
-                className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 card-premium"
+                className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 card-premium mt-6 md:mt-8"
               >
                 <div className="flex items-center gap-4">
                   <div className="p-3 sm:p-3 bg-gradient-to-br from-gray-600 to-gray-700 rounded-2xl shadow-lg">
@@ -4658,7 +4658,7 @@ export default function App({ session, onLogout }) {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.8 }}
-                className="glass-dark rounded-3xl p-6 min-h-96 neo-shadow border border-white/20 card-premium"
+                className="glass-dark rounded-3xl p-6 min-h-96 neo-shadow border border-white/20 card-premium mt-6 md:mt-8"
               >
                 {filteredNotes.length === 0 ? (
                   <div
@@ -4777,7 +4777,7 @@ export default function App({ session, onLogout }) {
             </div>
 
             {/* Zone d'ajout d'article */}
-            <div className="bg-gray-800 rounded-xl p-6 space-y-4 card-premium">
+            <div className="bg-gray-800 rounded-xl p-6 space-y-4 card-premium mt-6 md:mt-8">
               <div className="space-y-3">
                 <Input 
                   value={itemName} 
@@ -4849,7 +4849,7 @@ export default function App({ session, onLogout }) {
             </div>
 
             {/* Zone d'affichage des courses */}
-            <div className="bg-gray-800 rounded-xl p-6 min-h-96 card-premium">
+            <div className="bg-gray-800 rounded-xl p-6 min-h-96 card-premium mt-6 md:mt-8">
               {filteredShoppingItems.length === 0 ? (
                 <div className="text-center text-gray-400 py-16">
                   <div className="text-2xl mb-4">🛒</div>
@@ -6150,7 +6150,7 @@ export default function App({ session, onLogout }) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 card-premium"
+              className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 card-premium mt-6 md:mt-8"
             >
               <div className="flex items-center gap-3 mb-6">
                 <div className="p-3 bg-gradient-to-br from-red-600 to-red-700 rounded-2xl shadow-lg">
@@ -6286,7 +6286,7 @@ export default function App({ session, onLogout }) {
             </motion.div>
 
             {/* Filtres */}
-            <div className="bg-gray-800 rounded-xl p-4">
+            <div className="bg-gray-800 rounded-xl p-4 mt-6 md:mt-8">
               <div className="flex flex-wrap items-center gap-4">
                 <div className="flex-1 min-w-64">
                   <Input
@@ -6328,7 +6328,7 @@ export default function App({ session, onLogout }) {
             </div>
 
             {/* Liste des médias */}
-            <div className="bg-gray-800 rounded-xl p-6 min-h-96 card-premium">
+            <div className="bg-gray-800 rounded-xl p-6 min-h-96 card-premium mt-6 md:mt-8">
               {filteredMedia.length === 0 ? (
                 <div className="text-center text-gray-400 py-16">
                   <div className="text-2xl mb-4">🎬</div>
