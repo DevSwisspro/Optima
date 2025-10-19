@@ -5754,7 +5754,7 @@ export default function App({ session, onLogout }) {
             )}
 
             {/* Cartes colorées résumé */}
-            <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-6 gap-6">
               <div 
                 whileHover={{ scale: 1.05, y: -5 }}
                 className="relative overflow-hidden bg-gradient-to-br from-green-500/20 to-emerald-600/20 rounded-xl p-4 border border-green-500/30 backdrop-blur-sm group cursor-pointer min-h-[100px] card-premium"
@@ -5960,9 +5960,9 @@ export default function App({ session, onLogout }) {
                 animate={{ opacity: 1, y: 0 }}
                 className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 border border-gray-700/50 shadow-2xl card-premium"
               >
-                <h3 className="text-lg font-semibold text-white mb-4">Opérations récentes</h3>
-                
-                <div className="flex flex-col gap-4">
+                <h3 className="text-lg font-semibold text-white mb-6">Opérations récentes</h3>
+
+                <div className="flex flex-col gap-6">
                   
                     {budgetItems
                       .filter(item => {
