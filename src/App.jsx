@@ -2267,7 +2267,7 @@ export default function App({ session, onLogout }) {
               >
                 {/* Mobile Header - Sticky en haut du scroll container */}
                   {/* Filtres Mobile - Optimisés pour réactivité native */}
-                  <div className="grid grid-cols-2 gap-3 max-w-md mx-auto">
+                  <div className="md:hidden grid grid-cols-2 gap-3 max-w-md mx-auto">
                     <select
                       ref={yearSelectRef}
                       value={dashboardFilter.year}
