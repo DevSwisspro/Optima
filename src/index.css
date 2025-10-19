@@ -1618,7 +1618,7 @@ body.menu-open > * {
   /* Conteneur principal avec scroll isolé sur mobile */
   .mobile-scroll-container {
     position: fixed;
-    top: 81px; /* Header: 12px paddingTop + 16px py-4 + 40px Settings button + 12px pb-3 + 1px border = 81px */
+    top: 110px; /* Header (81px) + GAP (29px) = 110px - Les boutons commencent EN DESSOUS du titre et sont VISIBLES */
     left: 0;
     right: 0;
     bottom: 64px; /* Hauteur de la bottom nav */
@@ -1627,7 +1627,7 @@ body.menu-open > * {
     -webkit-overflow-scrolling: touch;
     touch-action: pan-y;
     overscroll-behavior-y: contain;
-    padding-top: 20px !important; /* GAP UNIQUE ET CONSTANT: 20px entre le header et le premier élément sur TOUTES les pages */
+    padding-top: 0 !important; /* Pas de padding - le gap est géré par le top du container */
     padding-bottom: 84px !important; /* Bottom nav (64px) + 20px gap = 84px pour footer visible */
   }
 
