@@ -6435,18 +6435,26 @@ export default function App({ session, onLogout }) {
                                   {media.title}
                                 </h3>
 
-                                {/* Badges Type + Statut compacts */}
-                                <div className="flex gap-1.5 flex-shrink-0">
-                                  <Badge className="bg-red-600/90 text-white text-xs px-2 py-0.5 rounded-md font-medium">
-                                    {media.type === 'movie' ? '🎬' : media.type === 'tv' ? '📺' : '🎌'}
+                                {/* Badges Type + Statut avec texte clair */}
+                                <div className="flex gap-2 flex-shrink-0 flex-wrap">
+                                  {/* Badge Type - Texte complet */}
+                                  <Badge className="bg-red-600/90 text-white text-xs px-2.5 py-1 rounded-md font-medium">
+                                    {media.type === 'movie' ? 'Film' : media.type === 'tv' ? 'Série' : 'Animé'}
                                   </Badge>
 
-                                  <Badge className={`text-xs px-2 py-0.5 rounded-md font-medium ${
+                                  {/* Badge Statut - Icône + Texte clair */}
+                                  <Badge className={`text-xs px-2.5 py-1 rounded-md font-medium flex items-center gap-1 ${
                                     media.status === 'watched' ? 'bg-emerald-600 text-white' :
                                     media.status === 'watching' ? 'bg-blue-600 text-white' :
                                     'bg-amber-600 text-white'
                                   }`}>
-                                    {media.status === 'watched' ? '✓' : media.status === 'watching' ? '▶' : '○'}
+                                    {media.status === 'watched' ? (
+                                      <><span className="text-[10px]">✓</span> Vu</>
+                                    ) : media.status === 'watching' ? (
+                                      <><span className="text-[10px]">▶</span> En cours</>
+                                    ) : (
+                                      <><span className="text-[10px]">⏰</span> À voir</>
+                                    )}
                                   </Badge>
                                 </div>
                               </div>
