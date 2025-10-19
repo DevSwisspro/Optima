@@ -365,7 +365,7 @@ h1, h2, h3, h4, h5, h6 {
   /* Conteneur principal avec scroll isolé - FIX HEADER */
   .mobile-scroll-container {
     position: fixed !important;
-    top: 100px !important; /* Header (~81px) + gap ~19px pour visibilité sans trop d'espace */
+    top: 115px !important; /* Header (~81px) + gap ~34px pour visibilité propre et jolie */
     left: 0 !important;
     right: 0 !important;
     bottom: 64px !important; /* Bottom nav */
