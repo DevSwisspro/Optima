@@ -7002,7 +7002,7 @@ export default function App({ session, onLogout }) {
                       transition={{ delay: 0.6 }}
                       className="text-responsive-base text-gray-300 font-medium"
                     >
-                      Bientôt disponible
+                      Votre second cerveau
                     </motion.p>
                   </div>
 
@@ -7013,8 +7013,8 @@ export default function App({ session, onLogout }) {
                     className="bg-white/10 rounded-2xl p-3 backdrop-blur-sm"
                   >
                     <div className="text-center">
-                      <div className="text-responsive-xs text-gray-400 font-medium mb-1">Version desktop</div>
-                      <div className="text-responsive-sm font-semibold text-white">En cours...</div>
+                      <div className="text-responsive-xs text-gray-400 font-medium mb-1">Entrées</div>
+                      <div className="text-responsive-sm font-semibold text-white">{knowledgeEntries.length}</div>
                     </div>
                   </motion.div>
                 </div>
