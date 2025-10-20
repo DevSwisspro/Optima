@@ -7404,12 +7404,123 @@ export default function App({ session, onLogout }) {
                   ))}
               </div>
 
-              {/* Message pour mobile */}
-              <div className="md:hidden flex items-center justify-center min-h-screen px-6">
-                <div className="text-center glass-dark rounded-3xl p-8 border border-white/20">
-                  <Brain className="w-16 h-16 text-red-500 mx-auto mb-4" />
-                  <h3 className="text-2xl font-bold text-white mb-3">Bientôt disponible sur mobile</h3>
-                  <p className="text-gray-300">La Base de Connaissances est actuellement disponible uniquement sur desktop. La version mobile arrive prochainement!</p>
+              {/* Version Mobile */}
+              <div className="md:hidden space-y-4 pb-20">
+                {/* Formulaire mobile simplifié */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="glass-dark rounded-2xl p-4 border border-white/20"
+                >
+                  <h3 className="text-lg font-bold text-white mb-4">Nouvelle Connaissance</h3>
+
+                  <div className="space-y-3">
+                    <Input
+                      placeholder="Titre"
+                      value={knowledgeForm.titre}
+                      onChange={(e) => setKnowledgeForm({ ...knowledgeForm, titre: e.target.value })}
+                      className="h-10 text-base rounded-xl bg-white/10 text-white placeholder:text-gray-300 border-0"
+                    />
+
+                    <Select
+                      value={knowledgeForm.categorie}
+                      onValueChange={(v) => setKnowledgeForm({ ...knowledgeForm, categorie: v })}
+                    >
+                      <SelectTrigger className="h-10 text-base rounded-xl bg-white/10 text-white border-0">
+                        <SelectValue placeholder="Catégorie" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-gray-900 text-white border-gray-700">
+                        {knowledgeCategories.map(c => (
+                          <SelectItem key={c} value={c}>{c}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+                    <Textarea
+                      placeholder="Contenu"
+                      value={knowledgeForm.contenu}
+                      onChange={(e) => setKnowledgeForm({ ...knowledgeForm, contenu: e.target.value })}
+                      className="min-h-[120px] text-base rounded-xl bg-white/10 text-white placeholder:text-gray-300 border-0"
+                    />
+
+                    {(knowledgeForm.titre || knowledgeForm.contenu) && (
+                      <div className="bg-purple-500/10 border border-purple-500/30 rounded-xl p-3">
+                        <p className="text-xs text-purple-300 mb-2">Tags auto</p>
+                        <div className="flex flex-wrap gap-1">
+                          {extractAutoTags(knowledgeForm.titre, knowledgeForm.contenu, knowledgeForm.categorie).slice(0, 8).map((tag, idx) => (
+                            <span key={idx} className="text-xs bg-purple-600/80 text-white px-2 py-0.5 rounded-full">
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <Button
+                      onClick={async () => {
+                        if (!knowledgeForm.titre || !knowledgeForm.categorie || !knowledgeForm.contenu) return;
+                        try {
+                          const autoTags = extractAutoTags(knowledgeForm.titre, knowledgeForm.contenu, knowledgeForm.categorie);
+                          const { data, error } = await supabase
+                            .from('knowledge_entries')
+                            .insert([{
+                              user_id: userId,
+                              titre: knowledgeForm.titre,
+                              categorie: knowledgeForm.categorie,
+                              tags: autoTags,
+                              date: new Date().toISOString().split('T')[0],
+                              contenu: knowledgeForm.contenu,
+                              images: []
+                            }])
+                            .select()
+                            .single();
+                          if (error) throw error;
+                          setKnowledgeEntries([data, ...knowledgeEntries]);
+                          setKnowledgeForm({ titre: '', categorie: '', tags: '', date: new Date().toISOString().split('T')[0], contenu: '', images: [] });
+                        } catch (error) {
+                          logSupabaseError('Ajout connaissance', error);
+                        }
+                      }}
+                      className="w-full bg-gradient-to-r from-red-600 to-red-700 text-white font-bold h-10 rounded-xl"
+                    >
+                      Ajouter
+                    </Button>
+                  </div>
+                </motion.div>
+
+                {/* Recherche mobile */}
+                <div className="glass-dark rounded-2xl p-3 border border-white/20">
+                  <Input
+                    placeholder="Rechercher..."
+                    value={searchKnowledge}
+                    onChange={(e) => setSearchKnowledge(e.target.value)}
+                    className="h-10 text-base rounded-xl bg-white/10 text-white placeholder:text-gray-300 border-0"
+                  />
+                </div>
+
+                {/* Liste mobile */}
+                <div className="space-y-3">
+                  {smartSearch(knowledgeEntries, searchKnowledge).map((entry) => (
+                    <motion.div
+                      key={entry.id}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      onClick={() => setSelectedKnowledge(entry)}
+                      className="glass-dark rounded-2xl p-4 border border-white/10"
+                    >
+                      <h4 className="text-base font-bold text-red-400 mb-2">{entry.titre}</h4>
+                      <div className="flex flex-wrap gap-1 mb-2">
+                        <span className="text-xs bg-white/10 text-gray-300 px-2 py-0.5 rounded">{entry.categorie}</span>
+                        {entry.tags.slice(0, 3).map((tag, idx) => (
+                          <span key={idx} className="text-xs bg-purple-600/50 text-white px-2 py-0.5 rounded">{tag}</span>
+                        ))}
+                      </div>
+                      <p className="text-sm text-gray-300 line-clamp-2">{entry.contenu}</p>
+                    </motion.div>
+                  ))}
+                  {smartSearch(knowledgeEntries, searchKnowledge).length === 0 && (
+                    <div className="text-center py-8 text-gray-400">Aucune connaissance</div>
+                  )}
                 </div>
               </div>
 
