@@ -4444,60 +4444,6 @@ export default function App({ session, onLogout }) {
           {activeTab === "tasks" && (
             <PageTransition pageKey="tasks">
               <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 md:-mt-4 md:pb-10 space-y-8 md:space-y-12">
-              {/* Header Tâches - Mobile vs Desktop harmonisé */}
-
-              {/* Mobile Header - Style centralisé harmonisé */}
-              <div className="md:hidden">
-                <motion.div
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: 0.2, type: "spring", bounce: 0.3 }}
-                  className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 mx-auto max-w-sm card-premium"
-                >
-                  <div className="text-center space-y-4">
-                    <motion.div
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ delay: 0.4 }}
-                      className="inline-flex items-center justify-center p-4 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-xl mx-auto"
-                    >
-                      <List className="w-8 h-8 text-white" />
-                    </motion.div>
-
-                    <div className="space-y-2">
-                      <motion.h1
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.5 }}
-                        className="title-main font-black bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 bg-clip-text text-transparent"
-                      >
-                        TÂCHES
-                      </motion.h1>
-                      <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.6 }}
-                        className="text-responsive-base text-gray-300 font-medium"
-                      >
-                        Organisez vos objectifs
-                      </motion.p>
-                    </div>
-
-                    <motion.div
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ delay: 0.7, type: "spring" }}
-                      className="bg-white/10 rounded-2xl p-3 backdrop-blur-sm"
-                    >
-                      <div className="text-center">
-                        <div className="text-responsive-xs text-gray-400 font-medium mb-1">Tâches</div>
-                        <div className="text-responsive-2xl font-bold text-white">{tasks.length}</div>
-                      </div>
-                    </motion.div>
-                  </div>
-                </motion.div>
-              </div>
-
               {/* Desktop Header - Style Dashboard */}
               <div className="hidden md:block">
                   <div className="glass-dark rounded-3xl p-8 border border-white/10 card-premium">
@@ -4774,60 +4720,6 @@ export default function App({ session, onLogout }) {
           {activeTab === "notes" && (
             <PageTransition pageKey="notes">
               <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 md:-mt-4 md:pb-10 space-y-8 md:space-y-12">
-              {/* Header Notes - Mobile vs Desktop harmonisé */}
-
-              {/* Mobile Header - Style centralisé harmonisé */}
-              <div className="md:hidden">
-                <motion.div
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: 0.2, type: "spring", bounce: 0.3 }}
-                  className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 mx-auto max-w-sm card-premium"
-                >
-                  <div className="text-center space-y-4">
-                    <motion.div
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ delay: 0.4 }}
-                      className="inline-flex items-center justify-center p-4 bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl shadow-xl mx-auto"
-                    >
-                      <FileText className="w-8 h-8 text-white" />
-                    </motion.div>
-
-                    <div className="space-y-2">
-                      <motion.h1
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.5 }}
-                        className="title-main font-black bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 bg-clip-text text-transparent"
-                      >
-                        NOTES
-                      </motion.h1>
-                      <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.6 }}
-                        className="text-responsive-base text-gray-300 font-medium"
-                      >
-                        Capturez vos idées
-                      </motion.p>
-                    </div>
-
-                    <motion.div
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ delay: 0.7, type: "spring" }}
-                      className="bg-white/10 rounded-2xl p-3 backdrop-blur-sm"
-                    >
-                      <div className="text-center">
-                        <div className="text-responsive-xs text-gray-400 font-medium mb-1">Notes</div>
-                        <div className="text-responsive-2xl font-bold text-white">{notes.length}</div>
-                      </div>
-                    </motion.div>
-                  </div>
-                </motion.div>
-              </div>
-
               {/* Desktop Header - Style horizontal harmonisé */}
               <div className="hidden md:block">
                 <motion.div
@@ -5101,60 +4993,6 @@ export default function App({ session, onLogout }) {
         {activeTab === "shopping" && (
           <PageTransition pageKey="shopping">
             <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 md:-mt-4 md:pb-10 space-y-8 md:space-y-12">
-            {/* Header Courses - Mobile vs Desktop harmonisé */}
-
-            {/* Mobile Header - Style centralisé harmonisé */}
-            <div className="md:hidden">
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.2, type: "spring", bounce: 0.3 }}
-                className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 mx-auto max-w-sm card-premium"
-              >
-                <div className="text-center space-y-4">
-                  <motion.div
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 0.4 }}
-                    className="inline-flex items-center justify-center p-4 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl shadow-xl mx-auto"
-                  >
-                    <ShoppingCart className="w-8 h-8 text-white" />
-                  </motion.div>
-
-                  <div className="space-y-2">
-                    <motion.h1
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.5 }}
-                      className="title-main font-black bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 bg-clip-text text-transparent"
-                    >
-                      COURSES
-                    </motion.h1>
-                    <motion.p
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.6 }}
-                      className="text-responsive-base text-gray-300 font-medium"
-                    >
-                      Gérez vos achats
-                    </motion.p>
-                  </div>
-
-                  <motion.div
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 0.7, type: "spring" }}
-                    className="bg-white/10 rounded-2xl p-3 backdrop-blur-sm"
-                  >
-                    <div className="text-center">
-                      <div className="text-responsive-xs text-gray-400 font-medium mb-1">Articles</div>
-                      <div className="text-responsive-2xl font-bold text-white">{shoppingItems.length}</div>
-                    </div>
-                  </motion.div>
-                </div>
-              </motion.div>
-            </div>
-
             {/* Desktop Header - Style horizontal harmonisé */}
             <div className="hidden md:block">
               <motion.div
@@ -5392,60 +5230,6 @@ export default function App({ session, onLogout }) {
         {activeTab === "budget" && (
           <PageTransition pageKey="budget">
             <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 md:-mt-4 md:pb-10 space-y-8 md:space-y-12">
-            {/* Header Budget - Mobile vs Desktop harmonisé */}
-
-            {/* Mobile Header - Style centralisé harmonisé */}
-            <div className="md:hidden">
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.2, type: "spring", bounce: 0.3 }}
-                className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 mx-auto max-w-sm card-premium"
-              >
-                <div className="text-center space-y-4">
-                  <motion.div
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 0.4 }}
-                    className="inline-flex items-center justify-center p-4 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl shadow-xl mx-auto"
-                  >
-                    <Wallet className="w-8 h-8 text-white" />
-                  </motion.div>
-
-                  <div className="space-y-2">
-                    <motion.h1
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.5 }}
-                      className="title-main font-black bg-gradient-to-r from-green-400 via-green-500 to-green-600 bg-clip-text text-transparent"
-                    >
-                      BUDGET
-                    </motion.h1>
-                    <motion.p
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.6 }}
-                      className="text-responsive-base text-gray-300 font-medium"
-                    >
-                      Gérez vos finances
-                    </motion.p>
-                  </div>
-
-                  <motion.div
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 0.7, type: "spring" }}
-                    className="bg-white/10 rounded-2xl p-3 backdrop-blur-sm"
-                  >
-                    <div className="text-center">
-                      <div className="text-responsive-xs text-gray-400 font-medium mb-1">Transactions</div>
-                      <div className="text-responsive-2xl font-bold text-white">{budgetItems.length}</div>
-                    </div>
-                  </motion.div>
-                </div>
-              </motion.div>
-            </div>
-
             {/* Desktop Header - Style horizontal harmonisé */}
             <div className="hidden md:block">
               <motion.div
@@ -6525,60 +6309,6 @@ export default function App({ session, onLogout }) {
         {activeTab === "media" && (
           <PageTransition pageKey="media">
             <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 md:-mt-4 md:pb-10 space-y-8 md:space-y-12">
-            {/* Header Media - Mobile vs Desktop harmonisé */}
-
-            {/* Mobile Header - Style centralisé harmonisé */}
-            <div className="md:hidden">
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.2, type: "spring", bounce: 0.3 }}
-                className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 mx-auto max-w-sm card-premium"
-              >
-                <div className="text-center space-y-4">
-                  <motion.div
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 0.4 }}
-                    className="inline-flex items-center justify-center p-4 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl shadow-xl mx-auto"
-                  >
-                    <Play className="w-8 h-8 text-white" />
-                  </motion.div>
-
-                  <div className="space-y-2">
-                    <motion.h1
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.5 }}
-                      className="title-main font-black bg-gradient-to-r from-red-400 via-red-500 to-red-600 bg-clip-text text-transparent"
-                    >
-                      MEDIA
-                    </motion.h1>
-                    <motion.p
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.6 }}
-                      className="text-responsive-base text-gray-300 font-medium"
-                    >
-                      Suivez vos films et séries
-                    </motion.p>
-                  </div>
-
-                  <motion.div
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 0.7, type: "spring" }}
-                    className="bg-white/10 rounded-2xl p-3 backdrop-blur-sm"
-                  >
-                    <div className="text-center">
-                      <div className="text-responsive-xs text-gray-400 font-medium mb-1">Médias</div>
-                      <div className="text-responsive-2xl font-bold text-white">{mediaItems.length}</div>
-                    </div>
-                  </motion.div>
-                </div>
-              </motion.div>
-            </div>
-
             {/* Desktop Header - Style horizontal harmonisé */}
             <div className="hidden md:block">
               <motion.div
@@ -6967,60 +6697,6 @@ export default function App({ session, onLogout }) {
         {activeTab === "knowledge" && (
           <PageTransition pageKey="knowledge">
             <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 md:-mt-4 md:pb-10 space-y-8 md:space-y-12">
-            {/* Header Knowledge - Mobile vs Desktop harmonisé */}
-
-            {/* Mobile Header - Style centralisé harmonisé */}
-            <div className="md:hidden">
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.2, type: "spring", bounce: 0.3 }}
-                className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 mx-auto max-w-sm card-premium"
-              >
-                <div className="text-center space-y-4">
-                  <motion.div
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 0.4 }}
-                    className="inline-flex items-center justify-center p-4 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl shadow-xl mx-auto"
-                  >
-                    <Brain className="w-8 h-8 text-white" />
-                  </motion.div>
-
-                  <div className="space-y-2">
-                    <motion.h1
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.5 }}
-                      className="title-main font-black bg-gradient-to-r from-purple-400 via-purple-500 to-purple-600 bg-clip-text text-transparent"
-                    >
-                      CONNAISSANCES
-                    </motion.h1>
-                    <motion.p
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.6 }}
-                      className="text-responsive-base text-gray-300 font-medium"
-                    >
-                      Votre second cerveau
-                    </motion.p>
-                  </div>
-
-                  <motion.div
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 0.7, type: "spring" }}
-                    className="bg-white/10 rounded-2xl p-3 backdrop-blur-sm"
-                  >
-                    <div className="text-center">
-                      <div className="text-responsive-xs text-gray-400 font-medium mb-1">Entrées</div>
-                      <div className="text-responsive-sm font-semibold text-white">{knowledgeEntries.length}</div>
-                    </div>
-                  </motion.div>
-                </div>
-              </motion.div>
-            </div>
-
             {/* Desktop Header - Style horizontal harmonisé */}
             <div className="hidden md:block">
               <motion.div
