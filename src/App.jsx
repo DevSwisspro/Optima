@@ -4445,7 +4445,7 @@ export default function App({ session, onLogout }) {
             <PageTransition pageKey="tasks">
               <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 md:-mt-4 md:pb-10 space-y-8 md:space-y-12">
               {/* Desktop Header - Style Dashboard */}
-              <div className="hidden md:block">
+              <div className="hidden md:block md:mt-12">
                   <div className="glass-dark rounded-3xl p-8 border border-white/10 card-premium">
                     <div className="flex flex-row justify-between items-center">
                       <motion.div
@@ -4721,7 +4721,7 @@ export default function App({ session, onLogout }) {
             <PageTransition pageKey="notes">
               <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 md:-mt-4 md:pb-10 space-y-8 md:space-y-12">
               {/* Desktop Header - Style horizontal harmonisé */}
-              <div className="hidden md:block">
+              <div className="hidden md:block md:mt-12">
                 <motion.div
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -4994,7 +4994,7 @@ export default function App({ session, onLogout }) {
           <PageTransition pageKey="shopping">
             <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 md:-mt-4 md:pb-10 space-y-8 md:space-y-12">
             {/* Desktop Header - Style horizontal harmonisé */}
-            <div className="hidden md:block">
+            <div className="hidden md:block md:mt-12">
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -5231,7 +5231,7 @@ export default function App({ session, onLogout }) {
           <PageTransition pageKey="budget">
             <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 md:-mt-4 md:pb-10 space-y-8 md:space-y-12">
             {/* Desktop Header - Style horizontal harmonisé */}
-            <div className="hidden md:block">
+            <div className="hidden md:block md:mt-12">
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -6310,7 +6310,7 @@ export default function App({ session, onLogout }) {
           <PageTransition pageKey="media">
             <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 md:-mt-4 md:pb-10 space-y-8 md:space-y-12">
             {/* Desktop Header - Style horizontal harmonisé */}
-            <div className="hidden md:block">
+            <div className="hidden md:block md:mt-12">
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -6698,7 +6698,7 @@ export default function App({ session, onLogout }) {
           <PageTransition pageKey="knowledge">
             <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 md:-mt-4 md:pb-10 space-y-8 md:space-y-12">
             {/* Desktop Header - Style horizontal harmonisé */}
-            <div className="hidden md:block">
+            <div className="hidden md:block md:mt-12">
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
