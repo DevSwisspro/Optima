@@ -4223,12 +4223,6 @@ export default function App({ session, onLogout }) {
             <PageTransition pageKey="tasks">
               <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 md:-mt-4 md:pb-10 space-y-8 md:space-y-12">
               {/* Header Tâches - Mobile vs Desktop harmonisé */}
-              <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="text-center"
-              >
                 {/* Mobile Header - Sticky en haut du scroll container */}
                 {/* Desktop Header - Style Dashboard */}
                 <div className="hidden md:block">
@@ -4263,7 +4257,6 @@ export default function App({ session, onLogout }) {
                     </div>
                   </div>
                 </div>
-              </motion.div>
 
               {/* Zone d'ajout de tâche - Mobile vs Desktop */}
 
@@ -4512,7 +4505,7 @@ export default function App({ session, onLogout }) {
               {/* Mobile Header - Sticky en haut du scroll container */}
               {/* Desktop Header - Style horizontal harmonisé */}
               <div className="hidden md:block">
-                <div
+                <motion.div
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, ease: "easeOut" }}
@@ -4546,7 +4539,7 @@ export default function App({ session, onLogout }) {
                       </div>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               </div>
 
               {/* Zone d'ajout de note - Mobile vs Desktop */}
