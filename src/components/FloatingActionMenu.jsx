@@ -6,6 +6,7 @@ import {
   Wallet,
   Play,
   ShoppingCart,
+  Brain,
   X
 } from 'lucide-react';
 
@@ -154,6 +155,12 @@ const FloatingActionMenu = React.memo(function FloatingActionMenu({ isOpen, onCl
       label: 'Médias',
       icon: Play,
       color: 'from-red-500 to-red-600'
+    },
+    {
+      id: 'knowledge',
+      label: 'Connaissances',
+      icon: Brain,
+      color: 'from-cyan-500 to-cyan-600'
     }
   ], []);
 

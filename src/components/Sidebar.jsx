@@ -7,6 +7,7 @@ import {
   ShoppingCart,
   Wallet,
   Play,
+  Brain,
   Settings,
   Plus
 } from 'lucide-react';
@@ -24,7 +25,8 @@ export default function Sidebar({ activeTab, setActiveTab, session, onLogout }) 
     { id: 'notes', label: 'Notes', icon: FileText },
     { id: 'shopping', label: 'Courses', icon: ShoppingCart },
     { id: 'budget', label: 'Budget', icon: Wallet },
-    { id: 'media', label: 'Médias', icon: Play }
+    { id: 'media', label: 'Médias', icon: Play },
+    { id: 'knowledge', label: 'Connaissances', icon: Brain }
   ];
 
   return (

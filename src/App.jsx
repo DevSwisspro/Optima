@@ -1,12 +1,13 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Plus, Trash2, Sparkles, Search, List, FileText, ShoppingCart, Wallet, BarChart3, ArrowLeft, TrendingUp, PieChart as PieChartIcon, Calendar, Table, Download, Filter, ChevronLeft, ChevronRight, Settings, X, Play, Star, Edit } from "lucide-react";
+import { Check, Plus, Trash2, Sparkles, Search, List, FileText, ShoppingCart, Wallet, BarChart3, ArrowLeft, TrendingUp, PieChart as PieChartIcon, Calendar, Table, Download, Filter, ChevronLeft, ChevronRight, Settings, X, Play, Star, Edit, Brain, Image as ImageIcon } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, LabelList } from 'recharts';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import Header from "@/components/Header";
 import MobileHeader from "@/components/MobileHeader";
 import PullToRefresh from "@/components/PullToRefresh";
@@ -946,6 +947,21 @@ export default function App({ session, onLogout }) {
   const [editingBudgetItem, setEditingBudgetItem] = useState(null);
   const [budgetFilter, setBudgetFilter] = useState({});
 
+  // États pour la base de connaissances
+  const [knowledgeEntries, setKnowledgeEntries] = useState([]);
+  const [knowledgeCategories, setKnowledgeCategories] = useState([]);
+  const [newCategory, setNewCategory] = useState('');
+  const [knowledgeForm, setKnowledgeForm] = useState({
+    titre: '',
+    categorie: '',
+    tags: '',
+    date: new Date().toISOString().split('T')[0],
+    contenu: '',
+    images: []
+  });
+  const [searchKnowledge, setSearchKnowledge] = useState('');
+  const [selectedKnowledge, setSelectedKnowledge] = useState(null);
+
   // Force scroll en haut au chargement et au changement d'onglet
   useEffect(() => {
     const scrollContainer = document.querySelector('.mobile-scroll-container');
@@ -1194,6 +1210,58 @@ export default function App({ session, onLogout }) {
     };
 
     loadMedia();
+  }, [userId]);
+
+  // Charger les catégories de connaissances depuis Supabase
+  useEffect(() => {
+    if (!userId) return;
+
+    const loadKnowledgeCategories = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('knowledge_categories')
+          .select('name')
+          .eq('user_id', userId)
+          .order('name');
+
+        if (error) throw error;
+        if (data && data.length > 0) {
+          setKnowledgeCategories(data.map(c => c.name));
+        } else {
+          // Catégories par défaut si aucune n'existe
+          const defaultCategories = ['Programmation', 'Cybersécurité', 'Systèmes', 'Réseaux', 'DevOps', 'Méthodologie', 'Autre'];
+          setKnowledgeCategories(defaultCategories);
+        }
+      } catch (error) {
+        logSupabaseError('Chargement knowledge categories', error);
+        // En cas d'erreur, charger les catégories par défaut
+        setKnowledgeCategories(['Programmation', 'Cybersécurité', 'Systèmes', 'Réseaux', 'DevOps', 'Méthodologie', 'Autre']);
+      }
+    };
+
+    loadKnowledgeCategories();
+  }, [userId]);
+
+  // Charger les entrées de connaissances depuis Supabase
+  useEffect(() => {
+    if (!userId) return;
+
+    const loadKnowledgeEntries = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('knowledge_entries')
+          .select('*')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        if (data) setKnowledgeEntries(data);
+      } catch (error) {
+        logSupabaseError('Chargement knowledge entries', error);
+      }
+    };
+
+    loadKnowledgeEntries();
   }, [userId]);
 
   // Gérer la fermeture du menu de priorité au clic externe
@@ -6534,6 +6602,303 @@ export default function App({ session, onLogout }) {
             </div>
             </div>
           </PageTransition>
+        )}
+
+        {/* ===== Section Knowledge Base (Desktop uniquement) ===== */}
+        {activeTab === "knowledge" && (
+          <PageTransition pageKey="knowledge">
+            <div className="hidden md:block max-w-7xl mx-auto px-4 md:px-6 lg:px-8 md:-mt-4 md:pb-10 space-y-8 md:space-y-12">
+
+              {/* Header Desktop */}
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 card-premium"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-6">
+                    <div className="p-4 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-2xl shadow-xl">
+                      <Brain className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+                    </div>
+                    <div className="text-left">
+                      <h2 className="text-4xl font-bold text-white mb-2">Base de Connaissances</h2>
+                      <p className="text-xl text-gray-300">Organisez votre savoir technique</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="text-right">
+                      <div className="text-sm text-gray-400">Entrées totales</div>
+                      <div className="text-3xl font-bold text-white">{knowledgeEntries.length}</div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Formulaire d'ajout Desktop */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 card-premium"
+              >
+                <h3 className="text-2xl font-bold text-white mb-6">Nouvelle Connaissance</h3>
+
+                <div className="space-y-4">
+                  {/* Titre et Catégorie */}
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <Input
+                      placeholder="Titre / Sujet"
+                      value={knowledgeForm.titre}
+                      onChange={(e) => setKnowledgeForm({ ...knowledgeForm, titre: e.target.value })}
+                      className="glass-input text-white placeholder:text-gray-400"
+                    />
+                    <div className="flex gap-2">
+                      <Select
+                        value={knowledgeForm.categorie}
+                        onValueChange={(v) => setKnowledgeForm({ ...knowledgeForm, categorie: v })}
+                      >
+                        <SelectTrigger className="glass-input text-white">
+                          <SelectValue placeholder="Catégorie" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-gray-900 text-white">
+                          {knowledgeCategories.map(c => (
+                            <SelectItem key={c} value={c}>{c}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="border-gray-500 hover:border-cyan-500"
+                        title="Ajouter une catégorie"
+                      >
+                        <Plus className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Tags et Date */}
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <Input
+                      placeholder="Tags (séparés par des virgules)"
+                      value={knowledgeForm.tags}
+                      onChange={(e) => setKnowledgeForm({ ...knowledgeForm, tags: e.target.value })}
+                      className="glass-input text-white placeholder:text-gray-400"
+                    />
+                    <Input
+                      type="date"
+                      value={knowledgeForm.date}
+                      onChange={(e) => setKnowledgeForm({ ...knowledgeForm, date: e.target.value })}
+                      className="glass-input text-white"
+                    />
+                  </div>
+
+                  {/* Upload images */}
+                  <div>
+                    <label className="text-gray-300 flex items-center gap-2 mb-2">
+                      <ImageIcon className="w-5 h-5 text-cyan-400" />
+                      Ajouter des images (facultatif)
+                    </label>
+                    <div className="relative border-2 border-dashed border-gray-600 rounded-lg p-4 text-center hover:border-cyan-500 transition">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        className="absolute inset-0 opacity-0 cursor-pointer"
+                        onChange={(e) => {
+                          const files = Array.from(e.target.files || []);
+                          if (files.length) {
+                            const readers = files.map(file => new Promise(resolve => {
+                              const reader = new FileReader();
+                              reader.onloadend = () => resolve(reader.result);
+                              reader.readAsDataURL(file);
+                            }));
+                            Promise.all(readers).then(images => {
+                              setKnowledgeForm(prev => ({ ...prev, images: [...prev.images, ...images] }));
+                            });
+                          }
+                        }}
+                      />
+                      <p className="text-gray-400">Glissez-déposez vos images ici ou cliquez pour sélectionner</p>
+                    </div>
+
+                    {/* Preview images */}
+                    {knowledgeForm.images.length > 0 && (
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
+                        {knowledgeForm.images.map((img, index) => (
+                          <div key={index} className="relative group">
+                            <img src={img} alt="Illustration" className="rounded-lg border border-gray-600 max-h-40 object-cover w-full" />
+                            <button
+                              onClick={() => setKnowledgeForm(prev => ({
+                                ...prev,
+                                images: prev.images.filter((_, i) => i !== index)
+                              }))}
+                              className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-1 hover:bg-red-600 transition hidden group-hover:block"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Contenu */}
+                  <Textarea
+                    placeholder="Détail complet, explication ou note technique..."
+                    value={knowledgeForm.contenu}
+                    onChange={(e) => setKnowledgeForm({ ...knowledgeForm, contenu: e.target.value })}
+                    className="glass-input text-white placeholder:text-gray-400 min-h-[180px] resize-none"
+                  />
+
+                  {/* Bouton Ajouter */}
+                  <Button
+                    onClick={async () => {
+                      if (!knowledgeForm.titre || !knowledgeForm.categorie || !knowledgeForm.contenu) return;
+
+                      try {
+                        const newEntry = {
+                          user_id: userId,
+                          titre: knowledgeForm.titre,
+                          categorie: knowledgeForm.categorie,
+                          tags: knowledgeForm.tags.split(',').map(t => t.trim()).filter(t => t),
+                          date: knowledgeForm.date,
+                          contenu: knowledgeForm.contenu,
+                          images: knowledgeForm.images
+                        };
+
+                        const { data, error } = await supabase
+                          .from('knowledge_entries')
+                          .insert([newEntry])
+                          .select()
+                          .single();
+
+                        if (error) throw error;
+
+                        // Ajouter au state local
+                        setKnowledgeEntries([data, ...knowledgeEntries]);
+
+                        // Réinitialiser le formulaire
+                        setKnowledgeForm({
+                          titre: '',
+                          categorie: '',
+                          tags: '',
+                          date: new Date().toISOString().split('T')[0],
+                          contenu: '',
+                          images: []
+                        });
+                      } catch (error) {
+                        logSupabaseError('Ajout connaissance', error);
+                        alert('Erreur lors de l\'ajout de la connaissance');
+                      }
+                    }}
+                    className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-semibold text-lg py-3 rounded-xl transition-all"
+                  >
+                    <Plus className="w-5 h-5 mr-2" />
+                    Ajouter la connaissance
+                  </Button>
+                </div>
+              </motion.div>
+
+              {/* Barre de recherche */}
+              <div className="flex items-center gap-3 bg-gray-900/50 p-4 rounded-xl border border-gray-700">
+                <Search className="text-gray-400 w-5 h-5" />
+                <Input
+                  placeholder="Rechercher une connaissance, un tag ou une catégorie..."
+                  className="bg-transparent border-none text-white placeholder:text-gray-400 focus:ring-0"
+                  value={searchKnowledge}
+                  onChange={(e) => setSearchKnowledge(e.target.value)}
+                />
+              </div>
+
+              {/* Liste des connaissances */}
+              <div className="space-y-4">
+                {knowledgeEntries
+                  .filter(e =>
+                    e.titre.toLowerCase().includes(searchKnowledge.toLowerCase()) ||
+                    e.tags.some(t => t.toLowerCase().includes(searchKnowledge.toLowerCase())) ||
+                    e.categorie.toLowerCase().includes(searchKnowledge.toLowerCase())
+                  )
+                  .map((entry, i) => (
+                    <motion.div
+                      key={entry.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.05 }}
+                      whileHover={{ scale: 1.01 }}
+                      className="glass-dark rounded-xl p-5 border border-gray-700 hover:border-cyan-500 transition-all cursor-pointer"
+                      onClick={() => setSelectedKnowledge(entry)}
+                    >
+                      <h3 className="text-xl font-semibold text-cyan-400 mb-2">{entry.titre}</h3>
+                      <p className="text-gray-400 mb-3">
+                        {entry.categorie} • {entry.tags.join(', ')} • {entry.date}
+                      </p>
+                      {entry.images && entry.images.length > 0 && (
+                        <div className="grid grid-cols-4 gap-2 mb-3">
+                          {entry.images.slice(0, 4).map((img, idx) => (
+                            <img key={idx} src={img} alt="Illustration" className="rounded-lg max-h-28 object-cover border border-gray-600" />
+                          ))}
+                        </div>
+                      )}
+                      <p className="text-gray-300 line-clamp-3 leading-relaxed">{entry.contenu}</p>
+                    </motion.div>
+                  ))}
+              </div>
+
+            </div>
+
+            {/* Message pour mobile */}
+            <div className="md:hidden flex items-center justify-center min-h-screen px-6">
+              <div className="text-center glass-dark rounded-3xl p-8 border border-white/20">
+                <Brain className="w-16 h-16 text-cyan-500 mx-auto mb-4" />
+                <h3 className="text-2xl font-bold text-white mb-3">Bientôt disponible sur mobile</h3>
+                <p className="text-gray-300">La Base de Connaissances est actuellement disponible uniquement sur desktop. La version mobile arrive prochainement!</p>
+              </div>
+            </div>
+
+          </PageTransition>
+        )}
+
+        {/* Modal détails (affichée au-dessus de tout) */}
+        {selectedKnowledge && (
+          <div className="fixed inset-0 bg-black/70 flex justify-center items-center z-50 p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-gray-900 p-6 rounded-2xl w-full md:w-[800px] max-h-[90vh] overflow-y-auto border border-gray-700 shadow-2xl"
+            >
+              <h2 className="text-3xl font-bold text-cyan-400 mb-3">{selectedKnowledge.titre}</h2>
+              <p className="text-gray-400 mb-4">
+                {selectedKnowledge.categorie} • {selectedKnowledge.tags.join(', ')} • {selectedKnowledge.date}
+              </p>
+              {selectedKnowledge.images && selectedKnowledge.images.length > 0 && (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
+                  {selectedKnowledge.images.map((img, idx) => (
+                    <img key={idx} src={img} alt="Illustration" className="rounded-lg border border-gray-600 max-h-56 object-contain" />
+                  ))}
+                </div>
+              )}
+              <p className="text-gray-200 whitespace-pre-line text-lg leading-relaxed mb-6">
+                {selectedKnowledge.contenu}
+              </p>
+              <div className="flex justify-end gap-3">
+                <Button
+                  variant="outline"
+                  className="border-gray-600 hover:border-gray-400"
+                  onClick={() => navigator.clipboard.writeText(selectedKnowledge.contenu)}
+                >
+                  Copier
+                </Button>
+                <Button
+                  className="bg-cyan-600 hover:bg-cyan-700"
+                  onClick={() => setSelectedKnowledge(null)}
+                >
+                  Fermer
+                </Button>
+              </div>
+            </motion.div>
+          </div>
         )}
 
         {/* Footer responsive */}

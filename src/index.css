@@ -1614,23 +1614,20 @@ body.menu-open > * {
     scroll-behavior: smooth;
   }
 
-
   /* Conteneur principal avec scroll isolé sur mobile */
-  @media (max-width: 768px) {
-    .mobile-scroll-container {
-      position: fixed !important;
-      top: 150px !important; /* GRAND GAP: Header (~81px) + 69px d'espace = 150px - Boutons BIEN VISIBLES */
-      left: 0 !important;
-      right: 0 !important;
-      bottom: 64px !important; /* Hauteur de la bottom nav */
-      overflow-y: auto !important;
-      overflow-x: hidden !important;
-      -webkit-overflow-scrolling: touch;
-      touch-action: pan-y;
-      overscroll-behavior-y: contain;
-      padding-top: 0 !important; /* Pas de padding - le gap est géré par le top du container */
-      padding-bottom: 84px !important; /* Bottom nav (64px) + 20px gap = 84px pour footer visible */
-    }
+  .mobile-scroll-container {
+    position: fixed !important;
+    top: 150px !important; /* GRAND GAP: Header (~81px) + 69px d'espace = 150px - Boutons BIEN VISIBLES */
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 64px !important; /* Hauteur de la bottom nav */
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    overscroll-behavior-y: contain;
+    padding-top: 0 !important; /* Pas de padding - le gap est géré par le top du container */
+    padding-bottom: 84px !important; /* Bottom nav (64px) + 20px gap = 84px pour footer visible */
   }
 
   /* Scrollbar personnalisée pour le conteneur principal */
