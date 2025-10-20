@@ -97,6 +97,160 @@ const getAvailableYears = (budgetItems) => {
   return years.sort((a, b) => b - a); // Du plus récent au plus ancien
 };
 
+// ========== SYSTÈME AUTO-TAGGING INTELLIGENT (style Paperless) ==========
+
+// Dictionnaire de mots-clés pour "Second Cerveau" (tous domaines)
+const TECH_KEYWORDS = {
+  // === TECHNIQUE & IT ===
+  programmation: ['javascript', 'python', 'react', 'node', 'typescript', 'java', 'c++', 'php', 'ruby', 'go', 'rust', 'swift', 'kotlin', 'api', 'framework', 'library', 'fonction', 'class', 'async', 'await', 'promise', 'callback', 'hook', 'component', 'props', 'state', 'redux', 'vue', 'angular', 'nextjs', 'express', 'django', 'flask', 'spring', 'code', 'debug', 'syntax', 'algorithm', 'variable', 'array', 'object'],
+  cybersecurite: ['security', 'vulnerability', 'exploit', 'xss', 'sql injection', 'csrf', 'authentication', 'authorization', 'encryption', 'hash', 'ssl', 'tls', 'firewall', 'malware', 'phishing', 'password', 'token', 'jwt', 'oauth', 'penetration', 'audit', 'cve', 'zero-day', 'bruteforce', 'ddos', 'backup', 'sécurité', 'virus', 'antivirus', 'vpn'],
+  systemes: ['linux', 'windows', 'macos', 'unix', 'kernel', 'shell', 'bash', 'powershell', 'cmd', 'terminal', 'process', 'thread', 'memory', 'cpu', 'disk', 'filesystem', 'permissions', 'root', 'sudo', 'systemd', 'service', 'daemon', 'cron', 'task scheduler', 'driver', 'boot', 'bios'],
+  reseaux: ['tcp', 'udp', 'ip', 'http', 'https', 'dns', 'dhcp', 'nat', 'vpn', 'proxy', 'load balancer', 'cdn', 'socket', 'port', 'protocol', 'packet', 'router', 'switch', 'gateway', 'subnet', 'vlan', 'bandwidth', 'latency', 'wifi', 'ethernet', 'internet', 'réseau'],
+  devops: ['docker', 'kubernetes', 'ci/cd', 'jenkins', 'gitlab', 'github actions', 'terraform', 'ansible', 'chef', 'puppet', 'aws', 'azure', 'gcp', 'cloud', 'container', 'orchestration', 'deployment', 'pipeline', 'monitoring', 'prometheus', 'grafana', 'elk', 'logging'],
+  methodologie: ['agile', 'scrum', 'kanban', 'sprint', 'backlog', 'user story', 'epic', 'standup', 'retrospective', 'tdd', 'bdd', 'pair programming', 'code review', 'git', 'version control', 'merge', 'branch', 'commit', 'pull request', 'refactoring', 'technical debt'],
+  database: ['sql', 'nosql', 'mysql', 'postgresql', 'mongodb', 'redis', 'elasticsearch', 'database', 'table', 'index', 'query', 'join', 'transaction', 'acid', 'orm', 'migration', 'backup', 'replication', 'sharding', 'normalization', 'données', 'bdd'],
+
+  // === VIE PERSONNELLE ===
+  sante: ['santé', 'health', 'médecin', 'doctor', 'médicament', 'medication', 'exercice', 'sport', 'fitness', 'nutrition', 'alimentation', 'régime', 'diet', 'sommeil', 'sleep', 'stress', 'mental', 'thérapie', 'therapy', 'yoga', 'meditation', 'wellness', 'bien-être', 'vitamine', 'symptôme', 'maladie', 'traitement'],
+  finance: ['finance', 'argent', 'money', 'budget', 'épargne', 'savings', 'investissement', 'investment', 'bourse', 'stock', 'crypto', 'bitcoin', 'banque', 'bank', 'compte', 'account', 'prêt', 'loan', 'crédit', 'credit', 'impôt', 'tax', 'salaire', 'salary', 'revenu', 'income', 'dépense', 'expense'],
+  voyage: ['voyage', 'travel', 'vacances', 'holiday', 'destination', 'hôtel', 'hotel', 'avion', 'flight', 'billet', 'ticket', 'réservation', 'booking', 'visa', 'passeport', 'passport', 'tourisme', 'tourism', 'itinéraire', 'itinerary', 'bagages', 'luggage'],
+  cuisine: ['recette', 'recipe', 'cuisine', 'cooking', 'ingrédient', 'ingredient', 'plat', 'dish', 'cuisson', 'four', 'oven', 'poêle', 'pan', 'restaurant', 'gastronomie', 'gastronomy', 'saveur', 'flavor', 'épice', 'spice'],
+  maison: ['maison', 'home', 'bricolage', 'diy', 'réparation', 'repair', 'décoration', 'decoration', 'meuble', 'furniture', 'jardin', 'garden', 'plante', 'plant', 'ménage', 'cleaning', 'entretien', 'maintenance', 'électricité', 'electricity', 'plomberie', 'plumbing'],
+
+  // === PROFESSIONNEL ===
+  carriere: ['carrière', 'career', 'emploi', 'job', 'entretien', 'interview', 'cv', 'resume', 'compétence', 'skill', 'formation', 'training', 'certification', 'diplôme', 'degree', 'promotion', 'salaire', 'négociation', 'negotiation', 'networking', 'linkedin'],
+  business: ['business', 'entreprise', 'company', 'startup', 'entrepreneur', 'client', 'customer', 'vente', 'sales', 'marketing', 'stratégie', 'strategy', 'projet', 'project', 'management', 'réunion', 'meeting', 'présentation', 'presentation', 'pitch'],
+
+  // === LOISIRS & CULTURE ===
+  lecture: ['livre', 'book', 'lecture', 'reading', 'auteur', 'author', 'roman', 'novel', 'essai', 'essay', 'poésie', 'poetry', 'bibliothèque', 'library', 'littérature', 'literature'],
+  cinema: ['film', 'movie', 'cinéma', 'cinema', 'série', 'series', 'acteur', 'actor', 'réalisateur', 'director', 'scénario', 'script', 'netflix', 'streaming'],
+  musique: ['musique', 'music', 'chanson', 'song', 'album', 'artiste', 'artist', 'concert', 'festival', 'instrument', 'guitar', 'piano', 'spotify', 'playlist'],
+  gaming: ['jeu', 'game', 'gaming', 'console', 'playstation', 'xbox', 'nintendo', 'steam', 'pc gaming', 'esport', 'streamer', 'twitch'],
+
+  // === APPRENTISSAGE ===
+  education: ['éducation', 'education', 'apprentissage', 'learning', 'cours', 'course', 'tutoriel', 'tutorial', 'leçon', 'lesson', 'étude', 'study', 'examen', 'exam', 'école', 'school', 'université', 'university', 'formation', 'training'],
+  langue: ['langue', 'language', 'anglais', 'english', 'français', 'french', 'espagnol', 'spanish', 'vocabulaire', 'vocabulary', 'grammaire', 'grammar', 'traduction', 'translation', 'prononciation', 'pronunciation'],
+
+  // === RELATIONNEL ===
+  social: ['ami', 'friend', 'famille', 'family', 'relation', 'relationship', 'rencontre', 'meeting', 'réseau', 'network', 'communauté', 'community', 'événement', 'event', 'anniversaire', 'birthday', 'cadeau', 'gift'],
+
+  // === PRODUCTIVITÉ ===
+  productivite: ['productivité', 'productivity', 'organisation', 'organization', 'planning', 'objectif', 'goal', 'habitude', 'habit', 'routine', 'efficacité', 'efficiency', 'temps', 'time', 'priorité', 'priority', 'deadline', 'to-do', 'tâche', 'task']
+};
+
+// Mots vides à ignorer (stop words français et anglais)
+const STOP_WORDS = new Set([
+  'le', 'la', 'les', 'un', 'une', 'des', 'de', 'du', 'et', 'ou', 'mais', 'donc', 'or', 'ni', 'car',
+  'ce', 'ces', 'cette', 'cet', 'mon', 'ma', 'mes', 'ton', 'ta', 'tes', 'son', 'sa', 'ses',
+  'je', 'tu', 'il', 'elle', 'nous', 'vous', 'ils', 'elles', 'on',
+  'dans', 'sur', 'sous', 'avec', 'sans', 'pour', 'par', 'en', 'vers', 'chez',
+  'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'from',
+  'this', 'that', 'these', 'those', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
+  'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'should', 'could', 'can', 'may', 'might'
+]);
+
+/**
+ * Extrait automatiquement des tags pertinents depuis le titre et le contenu
+ * @param {string} titre - Le titre de l'entrée
+ * @param {string} contenu - Le contenu détaillé
+ * @param {string} categorie - La catégorie sélectionnée
+ * @returns {string[]} - Array de tags uniques
+ */
+const extractAutoTags = (titre, contenu, categorie) => {
+  const text = `${titre} ${contenu}`.toLowerCase();
+  const tags = new Set();
+
+  // 1. Ajouter la catégorie comme tag principal
+  if (categorie) {
+    tags.add(categorie.toLowerCase());
+  }
+
+  // 2. Détecter les mots-clés techniques du dictionnaire
+  Object.entries(TECH_KEYWORDS).forEach(([domain, keywords]) => {
+    keywords.forEach(keyword => {
+      if (text.includes(keyword.toLowerCase())) {
+        tags.add(keyword);
+        // Si un mot-clé est trouvé, ajouter aussi le domaine
+        tags.add(domain);
+      }
+    });
+  });
+
+  // 3. Extraire les mots significatifs (longueur > 4, pas dans stop words)
+  const words = text.match(/\b\w{5,}\b/g) || [];
+  words.forEach(word => {
+    const cleanWord = word.toLowerCase().trim();
+    if (!STOP_WORDS.has(cleanWord) && cleanWord.length >= 5) {
+      tags.add(cleanWord);
+    }
+  });
+
+  // 4. Limiter à 15 tags maximum pour éviter la surcharge
+  const tagsArray = Array.from(tags).slice(0, 15);
+
+  return tagsArray;
+};
+
+/**
+ * Recherche full-text avec scoring de pertinence (style Paperless)
+ * @param {Array} entries - Liste des entrées de connaissances
+ * @param {string} searchQuery - Requête de recherche
+ * @returns {Array} - Entrées triées par pertinence
+ */
+const smartSearch = (entries, searchQuery) => {
+  if (!searchQuery || searchQuery.trim() === '') {
+    return entries;
+  }
+
+  const query = searchQuery.toLowerCase().trim();
+  const queryWords = query.split(/\s+/);
+
+  // Calculer un score de pertinence pour chaque entrée
+  const scoredEntries = entries.map(entry => {
+    let score = 0;
+
+    // Bonus si le titre contient la requête exacte (poids: 100)
+    if (entry.titre.toLowerCase().includes(query)) {
+      score += 100;
+    }
+
+    // Bonus pour chaque mot du titre qui matche (poids: 30)
+    queryWords.forEach(word => {
+      if (entry.titre.toLowerCase().includes(word)) {
+        score += 30;
+      }
+    });
+
+    // Bonus pour chaque tag qui matche (poids: 50)
+    entry.tags.forEach(tag => {
+      queryWords.forEach(word => {
+        if (tag.toLowerCase().includes(word)) {
+          score += 50;
+        }
+      });
+    });
+
+    // Bonus si la catégorie matche (poids: 40)
+    if (entry.categorie.toLowerCase().includes(query)) {
+      score += 40;
+    }
+
+    // Bonus pour le contenu (poids: 10 par occurrence)
+    queryWords.forEach(word => {
+      const regex = new RegExp(word, 'gi');
+      const matches = (entry.contenu.match(regex) || []).length;
+      score += matches * 10;
+    });
+
+    return { ...entry, relevanceScore: score };
+  });
+
+  // Filtrer les entrées avec score > 0 et trier par pertinence
+  return scoredEntries
+    .filter(entry => entry.relevanceScore > 0)
+    .sort((a, b) => b.relevanceScore - a.relevanceScore);
+};
+
 const colors = {
   revenus: '#10b981',
   depenses_fixes: '#ef4444', 
@@ -4291,9 +4445,61 @@ export default function App({ session, onLogout }) {
             <PageTransition pageKey="tasks">
               <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 md:-mt-4 md:pb-10 space-y-8 md:space-y-12">
               {/* Header Tâches - Mobile vs Desktop harmonisé */}
-                {/* Mobile Header - Sticky en haut du scroll container */}
-                {/* Desktop Header - Style Dashboard */}
-                <div className="hidden md:block">
+
+              {/* Mobile Header - Style centralisé harmonisé */}
+              <div className="md:hidden">
+                <motion.div
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.2, type: "spring", bounce: 0.3 }}
+                  className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 mx-auto max-w-sm card-premium"
+                >
+                  <div className="text-center space-y-4">
+                    <motion.div
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ delay: 0.4 }}
+                      className="inline-flex items-center justify-center p-4 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-xl mx-auto"
+                    >
+                      <List className="w-8 h-8 text-white" />
+                    </motion.div>
+
+                    <div className="space-y-2">
+                      <motion.h1
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.5 }}
+                        className="title-main font-black bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 bg-clip-text text-transparent"
+                      >
+                        TÂCHES
+                      </motion.h1>
+                      <motion.p
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.6 }}
+                        className="text-responsive-base text-gray-300 font-medium"
+                      >
+                        Organisez vos objectifs
+                      </motion.p>
+                    </div>
+
+                    <motion.div
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ delay: 0.7, type: "spring" }}
+                      className="bg-white/10 rounded-2xl p-3 backdrop-blur-sm"
+                    >
+                      <div className="text-center">
+                        <div className="text-responsive-xs text-gray-400 font-medium mb-1">Tâches</div>
+                        <div className="text-responsive-2xl font-bold text-white">{tasks.length}</div>
+                      </div>
+                    </motion.div>
+                  </div>
+                </motion.div>
+              </div>
+
+              {/* Desktop Header - Style Dashboard */}
+              <div className="hidden md:block">
                   <div className="glass-dark rounded-3xl p-8 border border-white/10 card-premium">
                     <div className="flex flex-row justify-between items-center">
                       <motion.div
@@ -4570,7 +4776,58 @@ export default function App({ session, onLogout }) {
               <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 md:-mt-4 md:pb-10 space-y-8 md:space-y-12">
               {/* Header Notes - Mobile vs Desktop harmonisé */}
 
-              {/* Mobile Header - Sticky en haut du scroll container */}
+              {/* Mobile Header - Style centralisé harmonisé */}
+              <div className="md:hidden">
+                <motion.div
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.2, type: "spring", bounce: 0.3 }}
+                  className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 mx-auto max-w-sm card-premium"
+                >
+                  <div className="text-center space-y-4">
+                    <motion.div
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ delay: 0.4 }}
+                      className="inline-flex items-center justify-center p-4 bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl shadow-xl mx-auto"
+                    >
+                      <FileText className="w-8 h-8 text-white" />
+                    </motion.div>
+
+                    <div className="space-y-2">
+                      <motion.h1
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.5 }}
+                        className="title-main font-black bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 bg-clip-text text-transparent"
+                      >
+                        NOTES
+                      </motion.h1>
+                      <motion.p
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.6 }}
+                        className="text-responsive-base text-gray-300 font-medium"
+                      >
+                        Capturez vos idées
+                      </motion.p>
+                    </div>
+
+                    <motion.div
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ delay: 0.7, type: "spring" }}
+                      className="bg-white/10 rounded-2xl p-3 backdrop-blur-sm"
+                    >
+                      <div className="text-center">
+                        <div className="text-responsive-xs text-gray-400 font-medium mb-1">Notes</div>
+                        <div className="text-responsive-2xl font-bold text-white">{notes.length}</div>
+                      </div>
+                    </motion.div>
+                  </div>
+                </motion.div>
+              </div>
+
               {/* Desktop Header - Style horizontal harmonisé */}
               <div className="hidden md:block">
                 <motion.div
@@ -4846,7 +5103,58 @@ export default function App({ session, onLogout }) {
             <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 md:-mt-4 md:pb-10 space-y-8 md:space-y-12">
             {/* Header Courses - Mobile vs Desktop harmonisé */}
 
-            {/* Mobile Header - Sticky en haut du scroll container */}
+            {/* Mobile Header - Style centralisé harmonisé */}
+            <div className="md:hidden">
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.2, type: "spring", bounce: 0.3 }}
+                className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 mx-auto max-w-sm card-premium"
+              >
+                <div className="text-center space-y-4">
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.4 }}
+                    className="inline-flex items-center justify-center p-4 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl shadow-xl mx-auto"
+                  >
+                    <ShoppingCart className="w-8 h-8 text-white" />
+                  </motion.div>
+
+                  <div className="space-y-2">
+                    <motion.h1
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.5 }}
+                      className="title-main font-black bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 bg-clip-text text-transparent"
+                    >
+                      COURSES
+                    </motion.h1>
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.6 }}
+                      className="text-responsive-base text-gray-300 font-medium"
+                    >
+                      Gérez vos achats
+                    </motion.p>
+                  </div>
+
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.7, type: "spring" }}
+                    className="bg-white/10 rounded-2xl p-3 backdrop-blur-sm"
+                  >
+                    <div className="text-center">
+                      <div className="text-responsive-xs text-gray-400 font-medium mb-1">Articles</div>
+                      <div className="text-responsive-2xl font-bold text-white">{shoppingItems.length}</div>
+                    </div>
+                  </motion.div>
+                </div>
+              </motion.div>
+            </div>
+
             {/* Desktop Header - Style horizontal harmonisé */}
             <div className="hidden md:block">
               <motion.div
@@ -5086,7 +5394,58 @@ export default function App({ session, onLogout }) {
             <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 md:-mt-4 md:pb-10 space-y-8 md:space-y-12">
             {/* Header Budget - Mobile vs Desktop harmonisé */}
 
-            {/* Mobile Header - Sticky en haut du scroll container */}
+            {/* Mobile Header - Style centralisé harmonisé */}
+            <div className="md:hidden">
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.2, type: "spring", bounce: 0.3 }}
+                className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 mx-auto max-w-sm card-premium"
+              >
+                <div className="text-center space-y-4">
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.4 }}
+                    className="inline-flex items-center justify-center p-4 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl shadow-xl mx-auto"
+                  >
+                    <Wallet className="w-8 h-8 text-white" />
+                  </motion.div>
+
+                  <div className="space-y-2">
+                    <motion.h1
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.5 }}
+                      className="title-main font-black bg-gradient-to-r from-green-400 via-green-500 to-green-600 bg-clip-text text-transparent"
+                    >
+                      BUDGET
+                    </motion.h1>
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.6 }}
+                      className="text-responsive-base text-gray-300 font-medium"
+                    >
+                      Gérez vos finances
+                    </motion.p>
+                  </div>
+
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.7, type: "spring" }}
+                    className="bg-white/10 rounded-2xl p-3 backdrop-blur-sm"
+                  >
+                    <div className="text-center">
+                      <div className="text-responsive-xs text-gray-400 font-medium mb-1">Transactions</div>
+                      <div className="text-responsive-2xl font-bold text-white">{budgetItems.length}</div>
+                    </div>
+                  </motion.div>
+                </div>
+              </motion.div>
+            </div>
+
             {/* Desktop Header - Style horizontal harmonisé */}
             <div className="hidden md:block">
               <motion.div
@@ -6607,9 +6966,63 @@ export default function App({ session, onLogout }) {
         {/* ===== Section Knowledge Base (Desktop uniquement) ===== */}
         {activeTab === "knowledge" && (
           <PageTransition pageKey="knowledge">
-            <div className="hidden md:block max-w-7xl mx-auto px-4 md:px-6 lg:px-8 md:-mt-4 md:pb-10 space-y-8 md:space-y-12">
+            <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 md:-mt-4 md:pb-10 space-y-8 md:space-y-12">
+            {/* Header Knowledge - Mobile vs Desktop harmonisé */}
 
-              {/* Header Desktop */}
+            {/* Mobile Header - Style centralisé harmonisé */}
+            <div className="md:hidden">
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.2, type: "spring", bounce: 0.3 }}
+                className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 mx-auto max-w-sm card-premium"
+              >
+                <div className="text-center space-y-4">
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.4 }}
+                    className="inline-flex items-center justify-center p-4 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl shadow-xl mx-auto"
+                  >
+                    <Brain className="w-8 h-8 text-white" />
+                  </motion.div>
+
+                  <div className="space-y-2">
+                    <motion.h1
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.5 }}
+                      className="title-main font-black bg-gradient-to-r from-purple-400 via-purple-500 to-purple-600 bg-clip-text text-transparent"
+                    >
+                      CONNAISSANCES
+                    </motion.h1>
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.6 }}
+                      className="text-responsive-base text-gray-300 font-medium"
+                    >
+                      Bientôt disponible
+                    </motion.p>
+                  </div>
+
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.7, type: "spring" }}
+                    className="bg-white/10 rounded-2xl p-3 backdrop-blur-sm"
+                  >
+                    <div className="text-center">
+                      <div className="text-responsive-xs text-gray-400 font-medium mb-1">Version desktop</div>
+                      <div className="text-responsive-sm font-semibold text-white">En cours...</div>
+                    </div>
+                  </motion.div>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Desktop Header - Style horizontal harmonisé */}
+            <div className="hidden md:block">
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -6617,90 +7030,133 @@ export default function App({ session, onLogout }) {
                 className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 card-premium"
               >
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-6">
-                    <div className="p-4 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-2xl shadow-xl">
-                      <Brain className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+                  <motion.div
+                    initial={{ x: -30, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                    className="flex items-center gap-6"
+                  >
+                    <div className="p-4 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl shadow-xl">
+                      <Brain className="w-10 h-10 text-white" />
                     </div>
                     <div className="text-left">
                       <h2 className="text-4xl font-bold text-white mb-2">Base de Connaissances</h2>
                       <p className="text-xl text-gray-300">Organisez votre savoir technique</p>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-4">
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ x: 30, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                    className="flex items-center gap-4"
+                  >
                     <div className="text-right">
                       <div className="text-sm text-gray-400">Entrées totales</div>
                       <div className="text-3xl font-bold text-white">{knowledgeEntries.length}</div>
                     </div>
-                  </div>
+                  </motion.div>
                 </div>
               </motion.div>
+            </div>
 
               {/* Formulaire d'ajout Desktop */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 card-premium"
-              >
-                <h3 className="text-2xl font-bold text-white mb-6">Nouvelle Connaissance</h3>
+              <div className="hidden md:block">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="glass-dark rounded-3xl p-6 neo-shadow border border-white/20 card-premium"
+                >
+                  <h3 className="text-2xl font-bold text-white mb-6">Nouvelle Connaissance</h3>
 
-                <div className="space-y-4">
-                  {/* Titre et Catégorie */}
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <Input
-                      placeholder="Titre / Sujet"
-                      value={knowledgeForm.titre}
-                      onChange={(e) => setKnowledgeForm({ ...knowledgeForm, titre: e.target.value })}
-                      className="glass-input text-white placeholder:text-gray-400"
-                    />
-                    <div className="flex gap-2">
-                      <Select
-                        value={knowledgeForm.categorie}
-                        onValueChange={(v) => setKnowledgeForm({ ...knowledgeForm, categorie: v })}
-                      >
-                        <SelectTrigger className="glass-input text-white">
-                          <SelectValue placeholder="Catégorie" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-gray-900 text-white">
-                          {knowledgeCategories.map(c => (
-                            <SelectItem key={c} value={c}>{c}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="border-gray-500 hover:border-cyan-500"
-                        title="Ajouter une catégorie"
-                      >
-                        <Plus className="w-4 h-4" />
-                      </Button>
+                  <div className="space-y-4">
+                    {/* Titre et Catégorie */}
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <Input
+                        placeholder="Titre / Sujet"
+                        value={knowledgeForm.titre}
+                        onChange={(e) => setKnowledgeForm({ ...knowledgeForm, titre: e.target.value })}
+                        className="h-12 text-lg rounded-2xl border-0 bg-white/10 text-white placeholder:text-gray-300 font-medium focus:bg-white/15 focus:ring-2 focus:ring-red-500 transition-all duration-300 px-5"
+                      />
+                      <div className="flex gap-2">
+                        <Select
+                          value={knowledgeForm.categorie}
+                          onValueChange={(v) => setKnowledgeForm({ ...knowledgeForm, categorie: v })}
+                        >
+                          <SelectTrigger className="h-12 text-lg rounded-2xl border-0 bg-white/10 text-white font-medium focus:bg-white/15 focus:ring-2 focus:ring-red-500 transition-all duration-300 px-5">
+                            <SelectValue placeholder="Catégorie" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-gray-900 text-white border-gray-700">
+                            {knowledgeCategories.map(c => (
+                              <SelectItem key={c} value={c} className="hover:bg-white/10">{c}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => {
+                            const categoryName = prompt('Entrez le nom de la nouvelle catégorie:');
+                            if (categoryName && categoryName.trim() && !knowledgeCategories.includes(categoryName.trim())) {
+                              setKnowledgeCategories([...knowledgeCategories, categoryName.trim()]);
+                            }
+                          }}
+                          className="h-12 w-12 border-gray-500 hover:border-red-500 hover:bg-red-500/10 rounded-2xl"
+                          title="Ajouter une catégorie"
+                        >
+                          <Plus className="w-5 h-5" />
+                        </Button>
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Tags et Date */}
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <Input
-                      placeholder="Tags (séparés par des virgules)"
-                      value={knowledgeForm.tags}
-                      onChange={(e) => setKnowledgeForm({ ...knowledgeForm, tags: e.target.value })}
-                      className="glass-input text-white placeholder:text-gray-400"
-                    />
-                    <Input
-                      type="date"
-                      value={knowledgeForm.date}
-                      onChange={(e) => setKnowledgeForm({ ...knowledgeForm, date: e.target.value })}
-                      className="glass-input text-white"
-                    />
-                  </div>
+                    {/* Date uniquement (tags auto-générés) */}
+                    <div className="grid md:grid-cols-1 gap-4">
+                      <Input
+                        type="date"
+                        value={knowledgeForm.date}
+                        onChange={(e) => setKnowledgeForm({ ...knowledgeForm, date: e.target.value })}
+                        className="h-12 text-lg rounded-2xl border-0 bg-white/10 text-white font-medium focus:bg-white/15 focus:ring-2 focus:ring-red-500 transition-all duration-300 px-5"
+                      />
+                    </div>
+
+                    {/* Preview des tags auto-générés */}
+                    {(knowledgeForm.titre || knowledgeForm.contenu) && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-purple-500/10 border border-purple-500/30 rounded-2xl p-4"
+                      >
+                        <div className="flex items-center gap-2 mb-2">
+                          <Sparkles className="w-4 h-4 text-purple-400" />
+                          <span className="text-sm font-semibold text-purple-300">
+                            Tags détectés automatiquement
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {extractAutoTags(
+                            knowledgeForm.titre,
+                            knowledgeForm.contenu,
+                            knowledgeForm.categorie
+                          ).map((tag, idx) => (
+                            <Badge
+                              key={idx}
+                              className="bg-purple-600/80 text-white px-3 py-1 text-xs rounded-full"
+                            >
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
 
                   {/* Upload images */}
                   <div>
                     <label className="text-gray-300 flex items-center gap-2 mb-2">
-                      <ImageIcon className="w-5 h-5 text-cyan-400" />
+                      <ImageIcon className="w-5 h-5 text-red-400" />
                       Ajouter des images (facultatif)
                     </label>
-                    <div className="relative border-2 border-dashed border-gray-600 rounded-lg p-4 text-center hover:border-cyan-500 transition">
+                    <div className="relative border-2 border-dashed border-gray-600 rounded-lg p-4 text-center hover:border-red-500 transition">
                       <input
                         type="file"
                         accept="image/*"
@@ -6749,7 +7205,7 @@ export default function App({ session, onLogout }) {
                     placeholder="Détail complet, explication ou note technique..."
                     value={knowledgeForm.contenu}
                     onChange={(e) => setKnowledgeForm({ ...knowledgeForm, contenu: e.target.value })}
-                    className="glass-input text-white placeholder:text-gray-400 min-h-[180px] resize-none"
+                    className="w-full min-h-[180px] p-4 text-lg rounded-2xl border-0 bg-white/10 text-white placeholder:text-gray-300 font-medium focus:bg-white/15 focus:ring-2 focus:ring-red-500 transition-all duration-300 resize-none"
                   />
 
                   {/* Bouton Ajouter */}
@@ -6758,11 +7214,18 @@ export default function App({ session, onLogout }) {
                       if (!knowledgeForm.titre || !knowledgeForm.categorie || !knowledgeForm.contenu) return;
 
                       try {
+                        // Auto-générer les tags à partir du contenu
+                        const autoTags = extractAutoTags(
+                          knowledgeForm.titre,
+                          knowledgeForm.contenu,
+                          knowledgeForm.categorie
+                        );
+
                         const newEntry = {
                           user_id: userId,
                           titre: knowledgeForm.titre,
                           categorie: knowledgeForm.categorie,
-                          tags: knowledgeForm.tags.split(',').map(t => t.trim()).filter(t => t),
+                          tags: autoTags, // Tags auto-générés
                           date: knowledgeForm.date,
                           contenu: knowledgeForm.contenu,
                           images: knowledgeForm.images
@@ -6793,44 +7256,139 @@ export default function App({ session, onLogout }) {
                         alert('Erreur lors de l\'ajout de la connaissance');
                       }
                     }}
-                    className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-semibold text-lg py-3 rounded-xl transition-all"
+                    className="w-full bg-gradient-to-r from-red-600 to-red-700 text-white font-bold text-lg py-3 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2"
                   >
-                    <Plus className="w-5 h-5 mr-2" />
+                    <Sparkles className="w-5 h-5" />
                     Ajouter la connaissance
                   </Button>
                 </div>
-              </motion.div>
+                </motion.div>
+              </div>
 
-              {/* Barre de recherche */}
-              <div className="flex items-center gap-3 bg-gray-900/50 p-4 rounded-xl border border-gray-700">
-                <Search className="text-gray-400 w-5 h-5" />
+              {/* Barre de recherche intelligente */}
+              <div className="hidden md:flex items-center gap-3 bg-gradient-to-r from-purple-500/10 to-red-500/10 p-4 rounded-2xl border border-purple-500/30">
+                <Search className="text-purple-400 w-6 h-6" />
                 <Input
-                  placeholder="Rechercher une connaissance, un tag ou une catégorie..."
-                  className="bg-transparent border-none text-white placeholder:text-gray-400 focus:ring-0"
+                  placeholder="Recherche intelligente : mots-clés, tags, catégories, contenu..."
+                  className="bg-transparent border-none text-white placeholder:text-gray-300 focus:ring-0 text-lg font-medium"
                   value={searchKnowledge}
                   onChange={(e) => setSearchKnowledge(e.target.value)}
                 />
+                {searchKnowledge && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="flex items-center gap-2 text-xs text-purple-300 bg-purple-500/20 px-3 py-1 rounded-full"
+                  >
+                    <Sparkles className="w-3 h-3" />
+                    {smartSearch(knowledgeEntries, searchKnowledge).length} résultat(s)
+                  </motion.div>
+                )}
               </div>
 
-              {/* Liste des connaissances */}
-              <div className="space-y-4">
-                {knowledgeEntries
-                  .filter(e =>
-                    e.titre.toLowerCase().includes(searchKnowledge.toLowerCase()) ||
-                    e.tags.some(t => t.toLowerCase().includes(searchKnowledge.toLowerCase())) ||
-                    e.categorie.toLowerCase().includes(searchKnowledge.toLowerCase())
-                  )
-                  .map((entry, i) => (
+              {/* Nuage de tags intelligent (affiche les tags les plus utilisés) */}
+              {knowledgeEntries.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="hidden md:block glass-dark rounded-2xl p-5 border border-white/10"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <Filter className="w-5 h-5 text-purple-400" />
+                      <h3 className="text-lg font-semibold text-white">Tags populaires</h3>
+                    </div>
+                    {searchKnowledge && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSearchKnowledge('')}
+                        className="text-xs border-purple-500/50 hover:border-purple-400 hover:bg-purple-500/10"
+                      >
+                        <X className="w-3 h-3 mr-1" />
+                        Effacer
+                      </Button>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {/* Calculer les tags les plus fréquents */}
+                    {(() => {
+                      const tagFrequency = {};
+                      knowledgeEntries.forEach(entry => {
+                        entry.tags.forEach(tag => {
+                          tagFrequency[tag] = (tagFrequency[tag] || 0) + 1;
+                        });
+                      });
+
+                      // Trier par fréquence et prendre les 20 premiers
+                      return Object.entries(tagFrequency)
+                        .sort((a, b) => b[1] - a[1])
+                        .slice(0, 20)
+                        .map(([tag, count]) => {
+                          const isActive = searchKnowledge.toLowerCase() === tag.toLowerCase();
+                          return (
+                            <motion.button
+                              key={tag}
+                              onClick={() => setSearchKnowledge(tag)}
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
+                                isActive
+                                  ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/30'
+                                  : 'bg-white/5 text-gray-300 hover:bg-purple-500/20 hover:text-purple-300 border border-white/10'
+                              }`}
+                            >
+                              {tag}
+                              <span className="ml-1.5 text-xs opacity-70">({count})</span>
+                            </motion.button>
+                          );
+                        });
+                    })()}
+                  </div>
+
+                  {/* Filtres par catégorie */}
+                  <div className="mt-4 pt-4 border-t border-white/10">
+                    <h4 className="text-sm font-semibold text-gray-400 mb-2">Catégories</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {knowledgeCategories.map(cat => {
+                        const count = knowledgeEntries.filter(e => e.categorie === cat).length;
+                        if (count === 0) return null;
+                        const isActive = searchKnowledge.toLowerCase() === cat.toLowerCase();
+                        return (
+                          <motion.button
+                            key={cat}
+                            onClick={() => setSearchKnowledge(cat)}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                              isActive
+                                ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg'
+                                : 'bg-white/5 text-gray-300 hover:bg-red-500/20 hover:text-red-300 border border-white/10'
+                            }`}
+                          >
+                            {cat}
+                            <span className="ml-1.5 text-xs opacity-70">({count})</span>
+                          </motion.button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Liste des connaissances avec recherche intelligente */}
+              <div className="hidden md:block space-y-4">
+                {smartSearch(knowledgeEntries, searchKnowledge).map((entry, i) => (
                     <motion.div
                       key={entry.id}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.05 }}
                       whileHover={{ scale: 1.01 }}
-                      className="glass-dark rounded-xl p-5 border border-gray-700 hover:border-cyan-500 transition-all cursor-pointer"
+                      className="glass-dark rounded-2xl p-6 border border-white/10 hover:border-red-500 transition-all cursor-pointer"
                       onClick={() => setSelectedKnowledge(entry)}
                     >
-                      <h3 className="text-xl font-semibold text-cyan-400 mb-2">{entry.titre}</h3>
+                      <h3 className="text-xl font-semibold text-red-400 mb-2">{entry.titre}</h3>
                       <p className="text-gray-400 mb-3">
                         {entry.categorie} • {entry.tags.join(', ')} • {entry.date}
                       </p>
@@ -6846,15 +7404,15 @@ export default function App({ session, onLogout }) {
                   ))}
               </div>
 
-            </div>
-
-            {/* Message pour mobile */}
-            <div className="md:hidden flex items-center justify-center min-h-screen px-6">
-              <div className="text-center glass-dark rounded-3xl p-8 border border-white/20">
-                <Brain className="w-16 h-16 text-cyan-500 mx-auto mb-4" />
-                <h3 className="text-2xl font-bold text-white mb-3">Bientôt disponible sur mobile</h3>
-                <p className="text-gray-300">La Base de Connaissances est actuellement disponible uniquement sur desktop. La version mobile arrive prochainement!</p>
+              {/* Message pour mobile */}
+              <div className="md:hidden flex items-center justify-center min-h-screen px-6">
+                <div className="text-center glass-dark rounded-3xl p-8 border border-white/20">
+                  <Brain className="w-16 h-16 text-red-500 mx-auto mb-4" />
+                  <h3 className="text-2xl font-bold text-white mb-3">Bientôt disponible sur mobile</h3>
+                  <p className="text-gray-300">La Base de Connaissances est actuellement disponible uniquement sur desktop. La version mobile arrive prochainement!</p>
+                </div>
               </div>
+
             </div>
 
           </PageTransition>
@@ -6866,9 +7424,9 @@ export default function App({ session, onLogout }) {
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="bg-gray-900 p-6 rounded-2xl w-full md:w-[800px] max-h-[90vh] overflow-y-auto border border-gray-700 shadow-2xl"
+              className="bg-gray-900 p-6 rounded-2xl w-full md:w-[800px] max-h-[90vh] overflow-y-auto border border-white/20 shadow-2xl"
             >
-              <h2 className="text-3xl font-bold text-cyan-400 mb-3">{selectedKnowledge.titre}</h2>
+              <h2 className="text-3xl font-bold text-red-400 mb-3">{selectedKnowledge.titre}</h2>
               <p className="text-gray-400 mb-4">
                 {selectedKnowledge.categorie} • {selectedKnowledge.tags.join(', ')} • {selectedKnowledge.date}
               </p>
@@ -6885,13 +7443,13 @@ export default function App({ session, onLogout }) {
               <div className="flex justify-end gap-3">
                 <Button
                   variant="outline"
-                  className="border-gray-600 hover:border-gray-400"
+                  className="border-gray-600 hover:border-gray-400 hover:bg-white/5"
                   onClick={() => navigator.clipboard.writeText(selectedKnowledge.contenu)}
                 >
                   Copier
                 </Button>
                 <Button
-                  className="bg-cyan-600 hover:bg-cyan-700"
+                  className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800"
                   onClick={() => setSelectedKnowledge(null)}
                 >
                   Fermer

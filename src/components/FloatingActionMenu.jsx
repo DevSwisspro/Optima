@@ -160,7 +160,7 @@ const FloatingActionMenu = React.memo(function FloatingActionMenu({ isOpen, onCl
       id: 'knowledge',
       label: 'Connaissances',
       icon: Brain,
-      color: 'from-cyan-500 to-cyan-600'
+      color: 'from-purple-500 to-purple-600'
     }
   ], []);
 
