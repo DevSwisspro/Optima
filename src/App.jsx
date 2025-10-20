@@ -7246,21 +7246,23 @@ export default function App({ session, onLogout }) {
           </div>
         )}
 
-        {/* Footer responsive */}
-        <footer className="text-center mobile-compact border-t border-gray-800 md:mb-0 p-responsive-md pb-safe">
-          <div className="flex flex-col items-center justify-center mobile-spacing">
-            {/* Logo et nom responsive */}
-            <div className="flex flex-col items-center mobile-spacing">
-              <LogoDevSwiss className="icon-responsive-lg text-white" showText={false} />
-              <span className="text-white text-responsive-lg font-bold">Dev-Swiss</span>
-            </div>
+        {/* Footer responsive - uniquement sur Dashboard */}
+        {activeTab === "dashboard" && (
+          <footer className="text-center mobile-compact border-t border-gray-800 md:mb-0 p-responsive-md pb-safe">
+            <div className="flex flex-col items-center justify-center mobile-spacing">
+              {/* Logo et nom responsive */}
+              <div className="flex flex-col items-center mobile-spacing">
+                <LogoDevSwiss className="icon-responsive-lg text-white" showText={false} />
+                <span className="text-white text-responsive-lg font-bold">Dev-Swiss</span>
+              </div>
 
-            {/* Texte descriptif séparé */}
-            <div className="border-t border-gray-700 pt-2 mt-1">
-              <span className="text-white text-sm">Solutions web & apps sur mesure</span>
+              {/* Texte descriptif séparé */}
+              <div className="border-t border-gray-700 pt-2 mt-1">
+                <span className="text-white text-sm">Solutions web & apps sur mesure</span>
+              </div>
             </div>
-          </div>
-        </footer>
+          </footer>
+        )}
       </div>
         </PullToRefresh>
       </div>
