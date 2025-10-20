@@ -12,6 +12,7 @@ export default function MobileHeader({ onSettingsClick, activeTab = "dashboard" 
     budget: "Mon Budget",
     "budget-dashboard": "Budget Avancé",
     media: "Mes Médias",
+    knowledge: "Connaissances",
     settings: "Paramètres"
   };
 
